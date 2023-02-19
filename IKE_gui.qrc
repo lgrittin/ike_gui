@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/application-exit.png</file>
+        <file>images/clear.png</file>
+        <file>images/connect.png</file>
+        <file>images/disconnect.png</file>
+        <file>images/settings.png</file>
+        <file>images/AssociationEditor.ico</file>
+        <file>images/AssociationEditor_5849.png</file>
+        <file>images/AUTTEK logo.bmp</file>
+        <file>images/CustomActionEditor.ico</file>
+        <file>images/CustomActionsEditor_5850.png</file>
+        <file>images/DeployStatusBar9_16x.png</file>
+        <file>images/DirectCommands.ico</file>
+        <file>images/DirectCommands.png</file>
+        <file>images/DocumentOutline.ico</file>
+        <file>images/DocumentOutline_64x.png</file>
+        <file>images/DownloadFile_16x.png</file>
+        <file>images/GoToDefinition_16x.png</file>
+        <file>images/GoToEvent_16x.png</file>
+        <file>images/IntellisenseLightBulb_16x.png</file>
+        <file>images/IntellisenseLightBulbError_16x.png</file>
+        <file>images/NewFile_16x.png</file>
+        <file>images/OpenFile_16x.png</file>
+        <file>images/OrderDown_16x.png</file>
+        <file>images/Plugged_16x.png</file>
+        <file>images/RecursivelyCheckAll_16x.png</file>
+        <file>images/RecursivelyUncheckAll_16x.png</file>
+        <file>images/ResetInfoViewersArrangement.png</file>
+        <file>images/Save_16x.png</file>
+        <file>images/SetField_16x.png</file>
+        <file>images/StopQuery_16x.png</file>
+        <file>images/TemplateFieldColumn_16x.png</file>
+        <file>images/Timeout_16x.png</file>
+        <file>images/Unplugged_16x.png</file>
+        <file>images/UploadFile_16x.png</file>
+        <file>images/UserDefinedDataTypeError_16x.png</file>
+        <file>images/icons8-settings-32.png</file>
+        <file>images/icons8-broom-32.png</file>
+        <file>images/icons8-synchronize-32.png</file>
+    </qresource>
+</RCC>
