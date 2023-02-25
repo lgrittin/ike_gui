@@ -88,10 +88,14 @@ typedef union ALM_WD1 {
 } ALM_WD1;
 
 typedef struct {
+    uint16_t v_inv;
+    uint16_t i_inv;
     float v_inv_f;
     float i_inv_f;
 } ADC_CTRL_FDB;
 typedef struct {
+    uint16_t v_inv_rect;
+    uint16_t i_inv_rect;
     float v_inv_rect_gain;
     float v_inv_rect_offset;
     float i_inv_rect_gain;
@@ -100,6 +104,9 @@ typedef struct {
     float i_inv_rect_f;
 } ADC_CTRL_FDB_RECT;
 typedef struct {
+    uint16_t ntc1;
+    uint16_t ntc2;
+    uint16_t pot;
     float ntc1_gain;
     float ntc1_offset;
     float ntc2_gain;
@@ -110,16 +117,15 @@ typedef struct {
     float ntc2_f;
     float pot_f;
 } ADC_SYS;
-
 typedef struct {
     ADC_CTRL_FDB adc_ctrl_fdb;
     ADC_CTRL_FDB_RECT adc_ctrl_fdb_rect;
     ADC_SYS adc_sys;
 } ADC;
 #define ADC_DEFAULT { \
-    0.0f, 0.0f, \
-    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, \
-    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f \
+    0U, 0U, 0.0f, 0.0f, \
+    0U, 0U, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, \
+    0U, 0U, 0U, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f \
 }
 
 /* Drive State */

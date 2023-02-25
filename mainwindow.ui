@@ -896,6 +896,9 @@ Abilitati</string>
       <property name="maximum">
        <double>30000.000000000000000</double>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_ampModSweep">
       <property name="geometry">
@@ -912,6 +915,12 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="maximum">
+       <double>5000.000000000000000</double>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_freqModSweep">
       <property name="geometry">
@@ -927,6 +936,9 @@ Abilitati</string>
       </property>
       <property name="frame">
        <bool>true</bool>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="label_p6">
@@ -1104,6 +1116,9 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_vInvRectOffset">
       <property name="geometry">
@@ -1120,6 +1135,9 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_iInvRectGain">
       <property name="geometry">
@@ -1135,6 +1153,9 @@ Abilitati</string>
       </property>
       <property name="frame">
        <bool>true</bool>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="label_p6_2">
@@ -1456,6 +1477,9 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_ntc1Gain">
       <property name="geometry">
@@ -1471,6 +1495,9 @@ Abilitati</string>
       </property>
       <property name="frame">
        <bool>true</bool>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_ntc1Offset">
@@ -1488,6 +1515,9 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_ntc2Gain">
       <property name="geometry">
@@ -1503,6 +1533,9 @@ Abilitati</string>
       </property>
       <property name="frame">
        <bool>true</bool>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
       </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_ntc2Offset">
@@ -1520,6 +1553,9 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_potGain">
       <property name="geometry">
@@ -1536,6 +1572,9 @@ Abilitati</string>
       <property name="frame">
        <bool>true</bool>
       </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
+      </property>
      </widget>
      <widget class="QDoubleSpinBox" name="doubleSpinBox_potOffset">
       <property name="geometry">
@@ -1551,6 +1590,9 @@ Abilitati</string>
       </property>
       <property name="frame">
        <bool>true</bool>
+      </property>
+      <property name="singleStep">
+       <double>0.010000000000000</double>
       </property>
      </widget>
      <widget class="QLabel" name="label_iInvRectOffsetUM">

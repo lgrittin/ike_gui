@@ -133,6 +133,7 @@ void MainWindow::about()
 void MainWindow::synchronizeParams()
 {
     m_serialReadParams->start();
+    //m_ui->doubleSpinBox_valApertura->autoFillBackground
 }
 
 void MainWindow::askToReadParam()
@@ -449,9 +450,25 @@ void MainWindow::initActionsConnections()
     connect(m_ui->doubleSpinBox_durataApRidottaCheck, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_durataApRidottaCheck);
     connect(m_ui->doubleSpinBox_velRampa, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_velRampa);
     connect(m_ui->checkBox_enSweep, &QCheckBox::pressed, this, &MainWindow::pressed_enSweep);
-
-    
+    connect(m_ui->doubleSpinBox_freqPrincipale, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_freqPrincipale);
+    connect(m_ui->doubleSpinBox_ampModSweep, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ampModSweep);
+    connect(m_ui->doubleSpinBox_freqModSweep, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_freqModSweep);
+    connect(m_ui->doubleSpinBox_vInvRectGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_vInvRectGain);
+    connect(m_ui->doubleSpinBox_vInvRectOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_vInvRectOffset);
+    connect(m_ui->doubleSpinBox_iInvRectGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_iInvRectGain);
+    connect(m_ui->doubleSpinBox_iInvRectOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_iInvRectOffset);
+    connect(m_ui->doubleSpinBox_ntc1Gain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc1Gain);
+    connect(m_ui->doubleSpinBox_ntc1Offset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc1Offset);
+    connect(m_ui->doubleSpinBox_ntc2Gain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc2Gain);
+    connect(m_ui->doubleSpinBox_ntc2Offset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc2Offset);
+    connect(m_ui->doubleSpinBox_potGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_potGain);
+    connect(m_ui->doubleSpinBox_potOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_potOffset);
 }
+
+//void blinkObject(void)
+//{
+//    QTimer::singleShot(..., resetBlink);
+//}
 
 void MainWindow::showStatusMessage(const QString &message)
 {
@@ -520,7 +537,7 @@ void MainWindow::valueChanged_valAperturaRidotta60()
 
 void MainWindow::valueChanged_durataApRidottaCheck()
 {
-    float data_val = m_ui->doubleSpinBox_durataApRidottaCheck->value();
+    uint32_t data_val = m_ui->doubleSpinBox_durataApRidottaCheck->value();
     uint16_t data_id = ID_SDO_07;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
@@ -530,6 +547,30 @@ void MainWindow::valueChanged_velRampa()
 {
     float data_val = m_ui->doubleSpinBox_velRampa->value();
     uint16_t data_id = ID_SDO_08;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_freqPrincipale()
+{
+    float data_val = m_ui->doubleSpinBox_freqPrincipale->value();
+    uint16_t data_id = ID_SDO_09;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_ampModSweep()
+{
+    float data_val = m_ui->doubleSpinBox_ampModSweep->value();
+    uint16_t data_id = ID_SDO_10;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_freqModSweep()
+{
+    float data_val = m_ui->doubleSpinBox_freqModSweep->value();
+    uint16_t data_id = ID_SDO_11;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
 }
@@ -544,6 +585,86 @@ void MainWindow::pressed_enSweep()
     else
         data_val = 1;
     data_tx = QByteArray(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_vInvRectGain()
+{
+    float data_val = m_ui->doubleSpinBox_vInvRectGain->value();
+    uint16_t data_id = ID_SDO_12;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_vInvRectOffset()
+{
+    float data_val = m_ui->doubleSpinBox_vInvRectOffset->value();
+    uint16_t data_id = ID_SDO_13;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_iInvRectGain()
+{
+    float data_val = m_ui->doubleSpinBox_iInvRectGain->value();
+    uint16_t data_id = ID_SDO_14;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_iInvRectOffset()
+{
+    float data_val = m_ui->doubleSpinBox_iInvRectOffset->value();
+    uint16_t data_id = ID_SDO_15;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_ntc1Gain()
+{
+    float data_val = m_ui->doubleSpinBox_ntc1Gain->value();
+    uint16_t data_id = ID_SDO_16;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_ntc1Offset()
+{
+    float data_val = m_ui->doubleSpinBox_ntc1Offset->value();
+    uint16_t data_id = ID_SDO_17;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_ntc2Gain()
+{
+    float data_val = m_ui->doubleSpinBox_ntc2Gain->value();
+    uint16_t data_id = ID_SDO_18;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_ntc2Offset()
+{
+    float data_val = m_ui->doubleSpinBox_ntc2Offset->value();
+    uint16_t data_id = ID_SDO_19;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_potGain()
+{
+    float data_val = m_ui->doubleSpinBox_potGain->value();
+    uint16_t data_id = ID_SDO_20;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_potOffset()
+{
+    float data_val = m_ui->doubleSpinBox_potOffset->value();
+    uint16_t data_id = ID_SDO_21;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
 }
 

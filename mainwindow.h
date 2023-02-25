@@ -48,13 +48,27 @@ private slots:
     void valueChanged_durataApRidottaCheck();
     void valueChanged_velRampa();
     void pressed_enSweep();
+    void valueChanged_freqPrincipale();
+    void valueChanged_ampModSweep();
+    void valueChanged_freqModSweep();
+    void valueChanged_vInvRectGain();
+    void valueChanged_vInvRectOffset();
+    void valueChanged_iInvRectGain();
+    void valueChanged_iInvRectOffset();
+    void valueChanged_ntc1Gain();
+    void valueChanged_ntc1Offset();
+    void valueChanged_ntc2Gain();
+    void valueChanged_ntc2Offset();
+    void valueChanged_potGain();
+    void valueChanged_potOffset();
 
 private:
     void initActionsConnections();
     void sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, unsigned int data_id);
-
-private:
     void showStatusMessage(const QString &message);
+    //void setBlink(void);
+    //void data(void);
+    //void resetBlink(void);
 
     Ui::MainWindow *m_ui = nullptr;
     QLabel* m_status_label_1 = nullptr;
