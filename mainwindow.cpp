@@ -105,6 +105,7 @@ void MainWindow::openSerialPort()
         showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                           .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                           .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
+        synchronizeParams();
     } else {
         QMessageBox::critical(this, tr("Error"), m_serial->errorString());
 
@@ -133,17 +134,20 @@ void MainWindow::about()
 void MainWindow::synchronizeParams()
 {
     m_serialReadParams->start();
-    //m_ui->doubleSpinBox_valApertura->autoFillBackground
 }
 
 void MainWindow::askToReadParam()
 {
     MainWindow::sendDataThroughSerial(CMD_READ, QByteArrayLiteral("\x00\x00\x00\x00"), param_data[id].id);
     id++;
+    showStatusMessage(tr("Synchronizing... %1").arg(id));
     if (id == SDO_LENGTH)
     {
         id = 0;
         m_serialReadParams->stop();
+        showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
+            .arg(m_settings->settings().name).arg(m_settings->settings().stringBaudRate).arg(m_settings->settings().stringDataBits)
+            .arg(m_settings->settings().stringParity).arg(m_settings->settings().stringStopBits).arg(m_settings->settings().stringFlowControl));
     }
 }
 
@@ -156,10 +160,10 @@ void MainWindow::sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, uns
         /**
          * USART Msg Structure:
          *
-         * idx:	[0]   [1]   [2]     [3]     [4]     [5]     [6]   [7]        [8]	 [9]
-         *  	---------------------------------------------------------------------------
-         *  	| ID1 | ID0 | DATA3 | DATA2 | DATA1 | DATA0 | STS | ARTIFACT | CHKSM | LF |
-         *  	---------------------------------------------------------------------------
+         * idx:	[0]   [1]   [2]     [3]     [4]     [5]     [6]		 [7]        [8]	 	[9]
+         *  	------------------------------------------------------------------------------
+         *  	| ID1 | ID0 | DATA3 | DATA2 | DATA1 | DATA0 | CMDSTS | ARTIFACT | CHKSM | LF |
+         *  	------------------------------------------------------------------------------
          */
         QByteArray array;
         uint8_t data_cod[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -221,8 +225,9 @@ void MainWindow::readData()
     uint16_t data_id = 0;
     uint8_t data_idx = 0;
     uint8_t data_dec[7] = { 0, 0, 0, 0, 0, 0, 0 };
-    uint8_t computed_chksm = 0x00;
+    uint8_t computed_chksm = 0xA5;
     uint8_t data_chksm = 0x00;
+    USART_RX_MSG usart_rx;
 
 
     while (m_serial->canReadLine())
@@ -231,26 +236,74 @@ void MainWindow::readData()
 
         if (data.size() == 10)
         {
-            computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
-            data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
-            if (computed_chksm == data_chksm)
+            /**
+             * USART Msg Structure:
+             *
+             * idx:	[0]   [1]   [2]     [3]     [4]     [5]     [6]		 [7]        [8]	 	[9]
+             *  	------------------------------------------------------------------------------
+             *  	| ID1 | ID0 | DATA3 | DATA2 | DATA1 | DATA0 | CMDSTS | ARTIFACT | CHKSM | LF |
+             *  	------------------------------------------------------------------------------
+             */
+
+            //memcpy(&usart_rx.all, &data[0], 10);
+            usart_rx.byte.data_id[0] = data.at(0);
+            usart_rx.byte.data_id[1] = data.at(1);
+            usart_rx.byte.data_val[0] = data.at(2);
+            usart_rx.byte.data_val[1] = data.at(3);
+            usart_rx.byte.data_val[2] = data.at(4);
+            usart_rx.byte.data_val[3] = data.at(5);
+            usart_rx.byte.cmd_sts.all = data.at(6);
+            usart_rx.byte.artifact = data.at(7);
+            usart_rx.byte.checksum = data.at(8);
+
+            calc_chksm(&usart_rx.byte.data_id[0], &computed_chksm);
+            calc_chksm(&usart_rx.byte.data_id[1], &computed_chksm);
+            calc_chksm(&usart_rx.byte.data_val[0], &computed_chksm);
+            calc_chksm(&usart_rx.byte.data_val[1], &computed_chksm);
+            calc_chksm(&usart_rx.byte.data_val[2], &computed_chksm);
+            calc_chksm(&usart_rx.byte.data_val[3], &computed_chksm);
+            calc_chksm(&usart_rx.byte.cmd_sts.all, &computed_chksm);
+            calc_chksm(&usart_rx.byte.artifact, &computed_chksm);
+
+            usart_rx.byte.checksum = ((usart_rx.byte.checksum == 0x1A) ? (0x0A) : (usart_rx.byte.checksum));
+
+            //computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
+            //data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
+            //if (computed_chksm == data_chksm)
+            if (computed_chksm == usart_rx.byte.checksum)
             {
-                artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
-                data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
-                data_dec[1] = ((((artifact & 0x40) >> 6) * 0x0A) + (data.at(1) * (1 - ((artifact & 0x40) >> 6))));
-                data_dec[2] = ((((artifact & 0x20) >> 5) * 0x0A) + (data.at(2) * (1 - ((artifact & 0x20) >> 5))));
-                data_dec[3] = ((((artifact & 0x10) >> 4) * 0x0A) + (data.at(3) * (1 - ((artifact & 0x10) >> 4))));
-                data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
-                data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
-                data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
-                chksum_error_tx = data_dec[6];
-                data_id = (data_dec[0] << 8) + data_dec[1];
-                data_idx = data_id - ID_PDO_00;
+                //artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
+                //data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
+                //data_dec[1] = ((((artifact & 0x40) >> 6) * 0x0A) + (data.at(1) * (1 - ((artifact & 0x40) >> 6))));
+                //data_dec[2] = ((((artifact & 0x20) >> 5) * 0x0A) + (data.at(2) * (1 - ((artifact & 0x20) >> 5))));
+                //data_dec[3] = ((((artifact & 0x10) >> 4) * 0x0A) + (data.at(3) * (1 - ((artifact & 0x10) >> 4))));
+                //data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
+                //data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
+                //data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
+                //chksum_error_tx = data_dec[6];
+                //data_id = (data_dec[0] << 8) + data_dec[1];
+                
+                usart_rx.byte.artifact = ((usart_rx.byte.artifact == 0x01) ? (0x0A) : (usart_rx.byte.artifact));
+                decode_usart_rx(&usart_rx.byte.data_id[0], ((usart_rx.byte.artifact & 0x80) >> 7));
+                decode_usart_rx(&usart_rx.byte.data_id[1], ((usart_rx.byte.artifact & 0x40) >> 6));
+                decode_usart_rx(&usart_rx.byte.data_val[0], ((usart_rx.byte.artifact & 0x20) >> 5));
+                decode_usart_rx(&usart_rx.byte.data_val[1], ((usart_rx.byte.artifact & 0x10) >> 4));
+                decode_usart_rx(&usart_rx.byte.data_val[2], ((usart_rx.byte.artifact & 0x08) >> 3));
+                decode_usart_rx(&usart_rx.byte.data_val[3], ((usart_rx.byte.artifact & 0x04) >> 2));
+                decode_usart_rx(&usart_rx.byte.cmd_sts.all, ((usart_rx.byte.artifact & 0x02) >> 1));
+                data_id = (uint32_t)((uint16_t)(usart_rx.byte.data_id[1] & 0x00FF) +
+                    (uint16_t)((usart_rx.byte.data_id[0] << 8) & 0xFF00));
 
                 if ((data_id & 0xFF00) == ID_PDO_00)
+                {
+                    data_idx = data_id - ID_PDO_00;
                     memcpy(process_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), process_data[data_idx].num_byte);
+                }
                 else if ((data_id & 0xFF00) == ID_SDO_00)
-                    memcpy(param_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), process_data[data_idx].num_byte);
+                {
+                    data_idx = data_id - ID_SDO_00;
+                    memcpy(param_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), param_data[data_idx].num_byte);
+                }
 
                 switch (data_id)
                 {
@@ -278,11 +331,13 @@ void MainWindow::readData()
                     // PULSE_ENABLED
                     if (sts_wd_1.bit.PULSE_ENABLED)
                     {
+                        m_ui->pushButton_start->setChecked(1);
                         m_ui->label_impulsiAttivi->setStyleSheet("background-color: red");
                         m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: white");
                     }
                     else
                     {
+                        m_ui->pushButton_start->setChecked(0);
                         m_ui->label_impulsiAttivi->setStyleSheet("background-color: white");
                         m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: green");
                     }
@@ -345,19 +400,19 @@ void MainWindow::readData()
                 case ID_SDO_03:
                     disconnect(m_ui->checkBox_aperturaMan, &QCheckBox::toggled, this, &MainWindow::pressed_aperturaMan);
                     m_ui->checkBox_aperturaMan->setChecked((*(uint16_t*)param_data[data_idx].val));
-                    if (m_ui->checkBox_aperturaMan->isChecked())
-                    {
-                        m_ui->label_valApertura->setEnabled(1);
-                        m_ui->doubleSpinBox_valApertura->setEnabled(1);
-                        m_ui->label_valAperturaUM->setEnabled(1);
-                        m_ui->doubleSpinBox_valApertura->setValue(scr_cmd_alfa_set);
-                    }
-                    else
-                    {
-                        m_ui->label_valApertura->setEnabled(0);
-                        m_ui->doubleSpinBox_valApertura->setEnabled(0);
-                        m_ui->label_valAperturaUM->setEnabled(0);
-                    }
+                    //if (m_ui->checkBox_aperturaMan->isChecked())
+                    //{
+                    //    m_ui->label_valApertura->setEnabled(1);
+                    //    m_ui->doubleSpinBox_valApertura->setEnabled(1);
+                    //    m_ui->label_valAperturaUM->setEnabled(1);
+                    //    m_ui->doubleSpinBox_valApertura->setValue(scr_cmd_alfa_set);
+                    //}
+                    //else
+                    //{
+                    //    m_ui->label_valApertura->setEnabled(0);
+                    //    m_ui->doubleSpinBox_valApertura->setEnabled(0);
+                    //    m_ui->label_valAperturaUM->setEnabled(0);
+                    //}
                     connect(m_ui->checkBox_aperturaMan, &QCheckBox::toggled, this, &MainWindow::pressed_aperturaMan);
                     break;
                 case ID_SDO_04: m_ui->doubleSpinBox_valApertura->setValue((*(float*)param_data[data_idx].val)); break;
@@ -369,42 +424,48 @@ void MainWindow::readData()
                 case ID_SDO_10: m_ui->doubleSpinBox_ampModSweep->setValue((*(float*)param_data[data_idx].val)); break;
                 case ID_SDO_11: m_ui->doubleSpinBox_freqModSweep->setValue((*(float*)param_data[data_idx].val)); break;
                 case ID_SDO_12: m_ui->doubleSpinBox_vInvRectGain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_13: m_ui->doubleSpinBox_vInvRectOffset->setValue((*(float*)param_data[data_idx].val)); break;
+                case ID_SDO_13: m_ui->doubleSpinBox_vInvRectOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
                 case ID_SDO_14: m_ui->doubleSpinBox_iInvRectGain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_15: m_ui->doubleSpinBox_iInvRectOffset->setValue((*(float*)param_data[data_idx].val)); break;
+                case ID_SDO_15: m_ui->doubleSpinBox_iInvRectOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
                 case ID_SDO_16: m_ui->doubleSpinBox_ntc1Gain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_17: m_ui->doubleSpinBox_ntc1Offset->setValue((*(float*)param_data[data_idx].val)); break;
+                case ID_SDO_17: m_ui->doubleSpinBox_ntc1Offset->setValue((*(int16_t*)param_data[data_idx].val)); break;
                 case ID_SDO_18: m_ui->doubleSpinBox_ntc2Gain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_19: m_ui->doubleSpinBox_ntc2Offset->setValue((*(float*)param_data[data_idx].val)); break;
+                case ID_SDO_19: m_ui->doubleSpinBox_ntc2Offset->setValue((*(int16_t*)param_data[data_idx].val)); break;
                 case ID_SDO_20: m_ui->doubleSpinBox_potGain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_21: m_ui->doubleSpinBox_potOffset->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_22: m_ui->doubleSpinBox_valOverCurr->setValue((*(float*)param_data[data_idx].val)); break;
+                case ID_SDO_21: m_ui->doubleSpinBox_potOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
+                case ID_SDO_22: m_ui->doubleSpinBox_valOvercurr->setValue((*(float*)param_data[data_idx].val)); break;
                 case ID_SDO_23:
                     disconnect(m_ui->checkBox_enSweep, &QCheckBox::toggled, this, &MainWindow::pressed_enSweep);
                     m_ui->checkBox_enSweep->setChecked((*(uint16_t*)param_data[data_idx].val));
-                    if (m_ui->checkBox_enSweep->isChecked())
-                    {
-                        m_ui->label_ampModSweep->setEnabled(1);
-                        m_ui->doubleSpinBox_ampModSweep->setEnabled(1);
-                        m_ui->label_ampModSweep_2->setEnabled(1);
-                        m_ui->doubleSpinBox_ampModSweep->setValue(sweep_amplitude);
-                        
-                        m_ui->label_freqModSweep->setEnabled(1);
-                        m_ui->doubleSpinBox_freqModSweep->setEnabled(1);
-                        m_ui->label_freqModSweepUM->setEnabled(1);
-                        m_ui->doubleSpinBox_freqModSweep->setValue(sweep_freq);
-                    }
-                    else
-                    {
-                        m_ui->label_ampModSweep->setEnabled(0);
-                        m_ui->doubleSpinBox_ampModSweep->setEnabled(0);
-                        m_ui->label_ampModSweep_2->setEnabled(0);
-
-                        m_ui->label_freqModSweep->setEnabled(0);
-                        m_ui->doubleSpinBox_freqModSweep->setEnabled(0);
-                        m_ui->label_freqModSweepUM->setEnabled(0);
-                    }
+                    //if (m_ui->checkBox_enSweep->isChecked())
+                    //{
+                    //    m_ui->label_ampModSweep->setEnabled(1);
+                    //    m_ui->doubleSpinBox_ampModSweep->setEnabled(1);
+                    //    m_ui->label_ampModSweep_2->setEnabled(1);
+                    //    m_ui->doubleSpinBox_ampModSweep->setValue(sweep_amplitude);
+                    //    
+                    //    m_ui->label_freqModSweep->setEnabled(1);
+                    //    m_ui->doubleSpinBox_freqModSweep->setEnabled(1);
+                    //    m_ui->label_freqModSweepUM->setEnabled(1);
+                    //    m_ui->doubleSpinBox_freqModSweep->setValue(sweep_freq);
+                    //}
+                    //else
+                    //{
+                    //    m_ui->label_ampModSweep->setEnabled(0);
+                    //    m_ui->doubleSpinBox_ampModSweep->setEnabled(0);
+                    //    m_ui->label_ampModSweep_2->setEnabled(0);
+                    //
+                    //    m_ui->label_freqModSweep->setEnabled(0);
+                    //    m_ui->doubleSpinBox_freqModSweep->setEnabled(0);
+                    //    m_ui->label_freqModSweepUM->setEnabled(0);
+                    //}
                     connect(m_ui->checkBox_enSweep, &QCheckBox::toggled, this, &MainWindow::pressed_enSweep);
+                    break;
+                case ID_SDO_24: m_ui->doubleSpinBox_valAperturaFinale->setValue((*(float*)param_data[data_idx].val)); break;
+                case ID_SDO_25:
+                    disconnect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
+                    m_ui->checkBox_enProtOvercurr->setChecked((*(uint16_t*)param_data[data_idx].val));
+                    connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
                     break;
                 default: break;
                 }
@@ -412,15 +473,27 @@ void MainWindow::readData()
             else
             {
                 chksum_error_rx++;
+                qDebug() << hex << "errore chksum. parametro/dp. id: " << QString::number(data.at(0), 16) << QString::number(data.at(1), 16);
             }
         }
         else
         {
             chksum_error_rx;
+            qDebug() << hex << "errore lunhgezza. parametro/dp. id: " << data.at(0) << data.at(1);
         }
         m_status_label_3->setText(QString::number(chksum_error_rx));
         m_status_label_4->setText(QString::number(chksum_error_tx));
     }
+}
+
+void MainWindow::calc_chksm(uint8_t* serial_tx, uint8_t* checksum)
+{
+    *checksum ^= *serial_tx;
+}
+
+void MainWindow::decode_usart_rx(uint8_t* serial_rx, uint8_t artifact_bitwise)
+{
+    *serial_rx = (artifact_bitwise * 0x0A) + (*serial_rx * (1 - artifact_bitwise));
 }
 
 void MainWindow::handleError(QSerialPort::SerialPortError error)
@@ -445,6 +518,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->pushButton_start, &QPushButton::pressed, this, &MainWindow::pressed_start);
     connect(m_ui->checkBox_aperturaMan, &QCheckBox::pressed, this, &MainWindow::pressed_aperturaMan);
     connect(m_ui->doubleSpinBox_valApertura, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valApertura);
+    connect(m_ui->doubleSpinBox_valAperturaFinale, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valAperturaFinale);
     connect(m_ui->doubleSpinBox_valAperturaRidotta50, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valAperturaRidotta50);
     connect(m_ui->doubleSpinBox_valAperturaRidotta60, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valAperturaRidotta60);
     connect(m_ui->doubleSpinBox_durataApRidottaCheck, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_durataApRidottaCheck);
@@ -463,6 +537,8 @@ void MainWindow::initActionsConnections()
     connect(m_ui->doubleSpinBox_ntc2Offset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc2Offset);
     connect(m_ui->doubleSpinBox_potGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_potGain);
     connect(m_ui->doubleSpinBox_potOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_potOffset);
+    connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::pressed, this, &MainWindow::pressed_enProtOvercurr);
+    connect(m_ui->doubleSpinBox_valOvercurr, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valOvercurr);
 }
 
 //void blinkObject(void)
@@ -515,6 +591,14 @@ void MainWindow::valueChanged_valApertura()
 {
     float data_val = m_ui->doubleSpinBox_valApertura->value();
     uint16_t data_id = ID_SDO_04;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_valAperturaFinale()
+{
+    float data_val = m_ui->doubleSpinBox_valAperturaFinale->value();
+    uint16_t data_id = ID_SDO_24;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
 }
@@ -598,7 +682,7 @@ void MainWindow::valueChanged_vInvRectGain()
 
 void MainWindow::valueChanged_vInvRectOffset()
 {
-    float data_val = m_ui->doubleSpinBox_vInvRectOffset->value();
+    uint32_t data_val = m_ui->doubleSpinBox_vInvRectOffset->value();
     uint16_t data_id = ID_SDO_13;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
@@ -614,7 +698,7 @@ void MainWindow::valueChanged_iInvRectGain()
 
 void MainWindow::valueChanged_iInvRectOffset()
 {
-    float data_val = m_ui->doubleSpinBox_iInvRectOffset->value();
+    uint32_t data_val = m_ui->doubleSpinBox_iInvRectOffset->value();
     uint16_t data_id = ID_SDO_15;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
@@ -630,7 +714,7 @@ void MainWindow::valueChanged_ntc1Gain()
 
 void MainWindow::valueChanged_ntc1Offset()
 {
-    float data_val = m_ui->doubleSpinBox_ntc1Offset->value();
+    uint32_t data_val = m_ui->doubleSpinBox_ntc1Offset->value();
     uint16_t data_id = ID_SDO_17;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
@@ -646,7 +730,7 @@ void MainWindow::valueChanged_ntc2Gain()
 
 void MainWindow::valueChanged_ntc2Offset()
 {
-    float data_val = m_ui->doubleSpinBox_ntc2Offset->value();
+    uint32_t data_val = m_ui->doubleSpinBox_ntc2Offset->value();
     uint16_t data_id = ID_SDO_19;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
@@ -662,9 +746,30 @@ void MainWindow::valueChanged_potGain()
 
 void MainWindow::valueChanged_potOffset()
 {
-    float data_val = m_ui->doubleSpinBox_potOffset->value();
+    uint32_t data_val = m_ui->doubleSpinBox_potOffset->value();
     uint16_t data_id = ID_SDO_21;
     QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::valueChanged_valOvercurr()
+{
+    float data_val = m_ui->doubleSpinBox_valOvercurr->value();
+    uint16_t data_id = ID_SDO_22;
+    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
+    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+}
+
+void MainWindow::pressed_enProtOvercurr()
+{
+    uint32_t data_val;
+    uint16_t data_id = ID_SDO_25;
+    QByteArray data_tx;
+    if (m_ui->checkBox_enProtOvercurr->isChecked())
+        data_val = 0;
+    else
+        data_val = 1;
+    data_tx = QByteArray(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
     MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
 }
 

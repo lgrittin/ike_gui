@@ -231,5 +231,17 @@ struct DATA param_data[] =
     ID_SDO_23,
     IGBT_SETTINGS,
     ID_SDO_23_BYTE,
-    &en_sweep
+    &en_sweep,
+
+    //scr_cmd_alfa_max
+    ID_SDO_24,
+    SCR_SETTINGS,
+    ID_SDO_24_BYTE,
+    &scr_cmd_alfa_max,
+
+    //en_prot_overcurr
+    ID_SDO_25,
+    PROTECTION,
+    ID_SDO_25_BYTE,
+    &en_prot_overcurr
 };

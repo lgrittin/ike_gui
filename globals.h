@@ -14,6 +14,31 @@
 //#define uint32_t unsigned long
 
 #define SERIAL_CRLF    "\r\n"
+#define USART_MSG_LENGTH 10
+
+struct CMDSTS_BIT {
+    uint8_t read_cmd : 1;			// bit0
+    uint8_t chksm_rx_err_sts : 7;	// bit1..bit7
+};
+
+typedef union CMDSTS {
+    uint8_t all;
+    struct CMDSTS_BIT bit;
+} CMDSTS;
+
+typedef struct {
+    uint8_t data_id[2];
+    uint8_t data_val[4];
+    CMDSTS cmd_sts;
+    uint8_t artifact;
+    uint8_t checksum;
+    uint8_t lf;
+} USART_TX_MSG;
+
+typedef union USART_RX_MSG {
+    uint8_t all[USART_MSG_LENGTH];
+    USART_TX_MSG byte;
+} USART_RX_MSG;
 
 /* Command Word 1 */
 struct CMD_BIT {
@@ -87,6 +112,7 @@ typedef union ALM_WD1 {
     struct ALM_BIT bit;
 } ALM_WD1;
 
+/* Adc Signals */
 typedef struct {
     uint16_t v_inv;
     uint16_t i_inv;
@@ -97,9 +123,9 @@ typedef struct {
     uint16_t v_inv_rect;
     uint16_t i_inv_rect;
     float v_inv_rect_gain;
-    float v_inv_rect_offset;
+    int16_t v_inv_rect_offset;
     float i_inv_rect_gain;
-    float i_inv_rect_offset;
+    int16_t i_inv_rect_offset;
     float v_inv_rect_f;
     float i_inv_rect_f;
 } ADC_CTRL_FDB_RECT;
@@ -108,11 +134,11 @@ typedef struct {
     uint16_t ntc2;
     uint16_t pot;
     float ntc1_gain;
-    float ntc1_offset;
+    int16_t ntc1_offset;
     float ntc2_gain;
-    float ntc2_offset;
+    int16_t ntc2_offset;
     float pot_gain;
-    float pot_offset;
+    int16_t pot_offset;
     float ntc1_f;
     float ntc2_f;
     float pot_f;
@@ -124,8 +150,8 @@ typedef struct {
 } ADC;
 #define ADC_DEFAULT { \
     0U, 0U, 0.0f, 0.0f, \
-    0U, 0U, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, \
-    0U, 0U, 0U, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f \
+    0U, 0U, 1.0f, 0, 1.0f, 0, 0.0f, 0.0f, \
+    0U, 0U, 0U, 1.0f, 0, 1.0f, 0, 1.0f, 0, 0.0f, 0.0f, 0.0f \
 }
 
 /* Drive State */
@@ -188,7 +214,7 @@ struct DATA {
  * SERVICE DEVICE OBJECT (SDO)
  * ========================================================= */
 
-#define SDO_LENGTH 24
+#define SDO_LENGTH 26
 
 #define ID_SDO_00 0x0200
 #define ID_SDO_01 0x0201
@@ -214,6 +240,8 @@ struct DATA {
 #define ID_SDO_21 0x0215
 #define ID_SDO_22 0x0216
 #define ID_SDO_23 0x0217
+#define ID_SDO_24 0x0218
+#define ID_SDO_25 0x0219
 
 #define ID_SDO_00_BYTE 2
 #define ID_SDO_01_BYTE 2
@@ -228,17 +256,19 @@ struct DATA {
 #define ID_SDO_10_BYTE 4
 #define ID_SDO_11_BYTE 4
 #define ID_SDO_12_BYTE 4
-#define ID_SDO_13_BYTE 4
+#define ID_SDO_13_BYTE 2
 #define ID_SDO_14_BYTE 4
-#define ID_SDO_15_BYTE 4
+#define ID_SDO_15_BYTE 2
 #define ID_SDO_16_BYTE 4
-#define ID_SDO_17_BYTE 4
+#define ID_SDO_17_BYTE 2
 #define ID_SDO_18_BYTE 4
-#define ID_SDO_19_BYTE 4
+#define ID_SDO_19_BYTE 2
 #define ID_SDO_20_BYTE 4
-#define ID_SDO_21_BYTE 4
+#define ID_SDO_21_BYTE 2
 #define ID_SDO_22_BYTE 4
 #define ID_SDO_23_BYTE 2
+#define ID_SDO_24_BYTE 4
+#define ID_SDO_25_BYTE 2
 
  /* ========================================================= *
   * PROCESS DATA OBJECT (PDO)
@@ -332,6 +362,7 @@ EXTERN uint16_t scr_cmd_cmpa            DSPINIT(20000U) // [epwmclk]
 EXTERN uint16_t scr_cmd_cmpb            DSPINIT(13000U) // [epwmclk]
 EXTERN float scr_cmd_alfa_set           DSPINIT(0.0f)   // [pu]
 EXTERN float scr_cmd_alfa               DSPINIT(0.0f)   // [pu]
+EXTERN float scr_cmd_alfa_max           DSPINIT(1.0f)   // [pu]
 EXTERN float scr_cmd_alfa_check_50hz    DSPINIT(0.1f)   // [pu]
 EXTERN float scr_cmd_alfa_check_60hz    DSPINIT(0.1f)   // [pu]
 EXTERN float scr_cmd_alfa_increment     DSPINIT(0.001f) // [pu/ms]
@@ -350,3 +381,4 @@ EXTERN uint16_t en_sweep                DSPINIT(0U)     // [#]
 /* variables for cmpss overcurrent */
 EXTERN uint16_t overcurr_ac_detect      DSPINIT(0U)
 EXTERN float i_inv_oc                   DSPINIT(2.0f)   // [A]
+EXTERN uint16_t en_prot_overcurr        DSPINIT(0U)     // [#]

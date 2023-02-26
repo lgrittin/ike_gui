@@ -36,6 +36,8 @@ private slots:
     void readData();
     void synchronizeParams();
     void askToReadParam();
+    void calc_chksm(uint8_t* serial_tx, uint8_t* checksum);
+    void decode_usart_rx(uint8_t* serial_rx, uint8_t artifact_bitwise);
     void handleError(QSerialPort::SerialPortError error);
 
     //void valueChanged_valApertura();
@@ -43,6 +45,7 @@ private slots:
     void pressed_start();
     void pressed_aperturaMan();
     void valueChanged_valApertura();
+    void valueChanged_valAperturaFinale();
     void valueChanged_valAperturaRidotta50();
     void valueChanged_valAperturaRidotta60();
     void valueChanged_durataApRidottaCheck();
@@ -61,6 +64,8 @@ private slots:
     void valueChanged_ntc2Offset();
     void valueChanged_potGain();
     void valueChanged_potOffset();
+    void pressed_enProtOvercurr();
+    void valueChanged_valOvercurr();
 
 private:
     void initActionsConnections();
