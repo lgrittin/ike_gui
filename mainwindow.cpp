@@ -246,53 +246,53 @@ void MainWindow::readData()
              */
 
             //memcpy(&usart_rx.all, &data[0], 10);
-            usart_rx.byte.data_id[0] = data.at(0);
-            usart_rx.byte.data_id[1] = data.at(1);
-            usart_rx.byte.data_val[0] = data.at(2);
-            usart_rx.byte.data_val[1] = data.at(3);
-            usart_rx.byte.data_val[2] = data.at(4);
-            usart_rx.byte.data_val[3] = data.at(5);
-            usart_rx.byte.cmd_sts.all = data.at(6);
-            usart_rx.byte.artifact = data.at(7);
-            usart_rx.byte.checksum = data.at(8);
+            //usart_rx.byte.data_id[0] = data.at(0);
+            //usart_rx.byte.data_id[1] = data.at(1);
+            //usart_rx.byte.data_val[0] = data.at(2);
+            //usart_rx.byte.data_val[1] = data.at(3);
+            //usart_rx.byte.data_val[2] = data.at(4);
+            //usart_rx.byte.data_val[3] = data.at(5);
+            //usart_rx.byte.cmd_sts.all = data.at(6);
+            //usart_rx.byte.artifact = data.at(7);
+            //usart_rx.byte.checksum = data.at(8);
 
-            calc_chksm(&usart_rx.byte.data_id[0], &computed_chksm);
-            calc_chksm(&usart_rx.byte.data_id[1], &computed_chksm);
-            calc_chksm(&usart_rx.byte.data_val[0], &computed_chksm);
-            calc_chksm(&usart_rx.byte.data_val[1], &computed_chksm);
-            calc_chksm(&usart_rx.byte.data_val[2], &computed_chksm);
-            calc_chksm(&usart_rx.byte.data_val[3], &computed_chksm);
-            calc_chksm(&usart_rx.byte.cmd_sts.all, &computed_chksm);
-            calc_chksm(&usart_rx.byte.artifact, &computed_chksm);
+            //calc_chksm(&usart_rx.byte.data_id[0], &computed_chksm);
+            //calc_chksm(&usart_rx.byte.data_id[1], &computed_chksm);
+            //calc_chksm(&usart_rx.byte.data_val[0], &computed_chksm);
+            //calc_chksm(&usart_rx.byte.data_val[1], &computed_chksm);
+            //calc_chksm(&usart_rx.byte.data_val[2], &computed_chksm);
+            //calc_chksm(&usart_rx.byte.data_val[3], &computed_chksm);
+            //calc_chksm(&usart_rx.byte.cmd_sts.all, &computed_chksm);
+            //calc_chksm(&usart_rx.byte.artifact, &computed_chksm);
 
-            usart_rx.byte.checksum = ((usart_rx.byte.checksum == 0x1A) ? (0x0A) : (usart_rx.byte.checksum));
+            //usart_rx.byte.checksum = ((usart_rx.byte.checksum == 0x1A) ? (0x0A) : (usart_rx.byte.checksum));
 
-            //computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
-            //data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
-            //if (computed_chksm == data_chksm)
-            if (computed_chksm == usart_rx.byte.checksum)
+            computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
+            data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
+            if (computed_chksm == data_chksm)
+            //if (computed_chksm == usart_rx.byte.checksum)
             {
-                //artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
-                //data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
-                //data_dec[1] = ((((artifact & 0x40) >> 6) * 0x0A) + (data.at(1) * (1 - ((artifact & 0x40) >> 6))));
-                //data_dec[2] = ((((artifact & 0x20) >> 5) * 0x0A) + (data.at(2) * (1 - ((artifact & 0x20) >> 5))));
-                //data_dec[3] = ((((artifact & 0x10) >> 4) * 0x0A) + (data.at(3) * (1 - ((artifact & 0x10) >> 4))));
-                //data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
-                //data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
-                //data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
-                //chksum_error_tx = data_dec[6];
-                //data_id = (data_dec[0] << 8) + data_dec[1];
+                artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
+                data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
+                data_dec[1] = ((((artifact & 0x40) >> 6) * 0x0A) + (data.at(1) * (1 - ((artifact & 0x40) >> 6))));
+                data_dec[2] = ((((artifact & 0x20) >> 5) * 0x0A) + (data.at(2) * (1 - ((artifact & 0x20) >> 5))));
+                data_dec[3] = ((((artifact & 0x10) >> 4) * 0x0A) + (data.at(3) * (1 - ((artifact & 0x10) >> 4))));
+                data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
+                data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
+                data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
+                chksum_error_tx = data_dec[6];
+                data_id = (data_dec[0] << 8) + data_dec[1];
                 
-                usart_rx.byte.artifact = ((usart_rx.byte.artifact == 0x01) ? (0x0A) : (usart_rx.byte.artifact));
-                decode_usart_rx(&usart_rx.byte.data_id[0], ((usart_rx.byte.artifact & 0x80) >> 7));
-                decode_usart_rx(&usart_rx.byte.data_id[1], ((usart_rx.byte.artifact & 0x40) >> 6));
-                decode_usart_rx(&usart_rx.byte.data_val[0], ((usart_rx.byte.artifact & 0x20) >> 5));
-                decode_usart_rx(&usart_rx.byte.data_val[1], ((usart_rx.byte.artifact & 0x10) >> 4));
-                decode_usart_rx(&usart_rx.byte.data_val[2], ((usart_rx.byte.artifact & 0x08) >> 3));
-                decode_usart_rx(&usart_rx.byte.data_val[3], ((usart_rx.byte.artifact & 0x04) >> 2));
-                decode_usart_rx(&usart_rx.byte.cmd_sts.all, ((usart_rx.byte.artifact & 0x02) >> 1));
-                data_id = (uint32_t)((uint16_t)(usart_rx.byte.data_id[1] & 0x00FF) +
-                    (uint16_t)((usart_rx.byte.data_id[0] << 8) & 0xFF00));
+                //usart_rx.byte.artifact = ((usart_rx.byte.artifact == 0x01) ? (0x0A) : (usart_rx.byte.artifact));
+                //decode_usart_rx(&usart_rx.byte.data_id[0], ((usart_rx.byte.artifact & 0x80) >> 7));
+                //decode_usart_rx(&usart_rx.byte.data_id[1], ((usart_rx.byte.artifact & 0x40) >> 6));
+                //decode_usart_rx(&usart_rx.byte.data_val[0], ((usart_rx.byte.artifact & 0x20) >> 5));
+                //decode_usart_rx(&usart_rx.byte.data_val[1], ((usart_rx.byte.artifact & 0x10) >> 4));
+                //decode_usart_rx(&usart_rx.byte.data_val[2], ((usart_rx.byte.artifact & 0x08) >> 3));
+                //decode_usart_rx(&usart_rx.byte.data_val[3], ((usart_rx.byte.artifact & 0x04) >> 2));
+                //decode_usart_rx(&usart_rx.byte.cmd_sts.all, ((usart_rx.byte.artifact & 0x02) >> 1));
+                //data_id = (uint32_t)((uint16_t)(usart_rx.byte.data_id[1] & 0x00FF) +
+                //    (uint16_t)((usart_rx.byte.data_id[0] << 8) & 0xFF00));
 
                 if ((data_id & 0xFF00) == ID_PDO_00)
                 {
@@ -331,13 +331,13 @@ void MainWindow::readData()
                     // PULSE_ENABLED
                     if (sts_wd_1.bit.PULSE_ENABLED)
                     {
-                        m_ui->pushButton_start->setChecked(1);
+                        //m_ui->pushButton_start->setChecked(1);
                         m_ui->label_impulsiAttivi->setStyleSheet("background-color: red");
                         m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: white");
                     }
                     else
                     {
-                        m_ui->pushButton_start->setChecked(0);
+                        //m_ui->pushButton_start->setChecked(0);
                         m_ui->label_impulsiAttivi->setStyleSheet("background-color: white");
                         m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: green");
                     }
@@ -514,7 +514,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
     connect(m_ui->actionSynchronizeParams, &QAction::triggered, this, &MainWindow::synchronizeParams);
 
-    connect(m_ui->pushButton_ackFault, &QPushButton::pressed, this, &MainWindow::pressed_ackFault);
+    //connect(m_ui->pushButton_ackFault, &QPushButton::pressed, this, &MainWindow::pressed_ackFault);
     connect(m_ui->pushButton_start, &QPushButton::pressed, this, &MainWindow::pressed_start);
     connect(m_ui->checkBox_aperturaMan, &QCheckBox::pressed, this, &MainWindow::pressed_aperturaMan);
     connect(m_ui->doubleSpinBox_valApertura, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valApertura);
