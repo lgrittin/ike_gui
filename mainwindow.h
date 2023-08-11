@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QThread>
+#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 
@@ -39,6 +40,8 @@ private slots:
     void calc_chksm(uint8_t* serial_tx, uint8_t* checksum);
     void decode_usart_rx(uint8_t* serial_rx, uint8_t artifact_bitwise);
     void handleError(QSerialPort::SerialPortError error);
+    void tableDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+
 
     //void valueChanged_valApertura();
     void pressed_ackFault();
@@ -71,6 +74,7 @@ private:
     void initActionsConnections();
     void sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, unsigned int data_id);
     void showStatusMessage(const QString &message);
+    void refreshData(unsigned int data_id, unsigned int data_idx);
     //void setBlink(void);
     //void data(void);
     //void resetBlink(void);
@@ -81,6 +85,7 @@ private:
     QLabel* m_status_label_3 = nullptr;
     QLabel* m_status_label_4 = nullptr;
     QLabel* m_status_label_5 = nullptr;
+    QStandardItemModel* model = nullptr;
     SettingsDialog *m_settings = nullptr;
     QSerialPort *m_serial = nullptr;
     QTimer* m_serialScanTimer;

@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\lucag\local_repos\ike_gui\debug\IKE_gui.exe</FullPath>
+      <FullPath>C:\local_repos\_private\ike_gui\Debug\IKE_gui.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

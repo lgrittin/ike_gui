@@ -4,6 +4,13 @@
 #include <QDialog>
 #include <QSerialPort>
 
+enum CommProtocol
+{
+    Modbus_RTU = 0,
+    Modbus_TCP = 1,
+    CustomSerial_9B = 2
+};
+
 QT_BEGIN_NAMESPACE
 
 namespace Ui {
@@ -20,6 +27,7 @@ class SettingsDialog : public QDialog
 
 public:
     struct Settings {
+        CommProtocol protocol;
         QString name;
         qint32 baudRate;
         QString stringBaudRate;
@@ -31,6 +39,7 @@ public:
         QString stringStopBits;
         QSerialPort::FlowControl flowControl;
         QString stringFlowControl;
+        QString ipAddressAndPort;
         bool localEchoEnabled;
     };
 
@@ -44,6 +53,7 @@ private slots:
     void apply();
     void checkCustomBaudRatePolicy(int idx);
     void checkCustomDevicePathPolicy(int idx);
+    void hideBoxes(int idx);
 
 private:
     void fillPortsParameters();

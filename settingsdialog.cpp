@@ -24,6 +24,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
             this, &SettingsDialog::checkCustomBaudRatePolicy);
     connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SettingsDialog::checkCustomDevicePathPolicy);
+    connect(m_ui->protocolListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this, &SettingsDialog::hideBoxes);
 
     fillPortsParameters();
     fillPortsInfo();
@@ -58,7 +60,7 @@ void SettingsDialog::showPortInfo(int idx)
 void SettingsDialog::apply()
 {
     updateSettings();
-    hide();
+    //hide();
 }
 
 void SettingsDialog::checkCustomBaudRatePolicy(int idx)
@@ -82,6 +84,10 @@ void SettingsDialog::checkCustomDevicePathPolicy(int idx)
 
 void SettingsDialog::fillPortsParameters()
 {
+    m_ui->protocolListBox->addItem(tr("Modbus_RTU"));
+    m_ui->protocolListBox->addItem(tr("Modbus_TCP"));
+    m_ui->protocolListBox->addItem(tr("CustomSerial_9B"));
+
     m_ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
     m_ui->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
     m_ui->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
@@ -110,7 +116,34 @@ void SettingsDialog::fillPortsParameters()
     m_ui->flowControlBox->addItem(tr("None"), QSerialPort::NoFlowControl);
     m_ui->flowControlBox->addItem(tr("RTS/CTS"), QSerialPort::HardwareControl);
     m_ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
+
+    m_ui->ipPortLineEdit->setText(tr("127.0.0.1:502"));
 }
+
+void SettingsDialog::hideBoxes(int idx)
+{
+    switch (idx)
+    {
+    case Modbus_RTU:
+        m_ui->tcpGroupBox->setEnabled(0);
+        m_ui->selectBox->setEnabled(1);
+        m_ui->parametersBox->setEnabled(1);
+        break;
+    case Modbus_TCP:
+        m_ui->tcpGroupBox->setEnabled(1);
+        m_ui->selectBox->setEnabled(0);
+        m_ui->parametersBox->setEnabled(0);
+        break;
+    case CustomSerial_9B:
+        m_ui->tcpGroupBox->setEnabled(0);
+        m_ui->selectBox->setEnabled(1);
+        m_ui->parametersBox->setEnabled(1);
+        break;
+    default:
+        break;
+    }
+}
+
 
 void SettingsDialog::fillPortsInfo()
 {
@@ -167,4 +200,8 @@ void SettingsDialog::updateSettings()
     m_currentSettings.stringFlowControl = m_ui->flowControlBox->currentText();
 
     m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
+
+    m_currentSettings.protocol = (CommProtocol)m_ui->protocolListBox->currentIndex();
+
+    m_currentSettings.ipAddressAndPort = m_ui->ipPortLineEdit->text();
 }

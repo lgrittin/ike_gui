@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
+#include "freezetablewidget.h"
 #include "globals.h"
 
 #include <QLabel>
@@ -9,6 +10,16 @@
 #include <QScrollBar>
 #include <QDoubleSpinBox>
 #include <QFrame>
+#include <QModbusTcpClient>
+#include <QModbusRtuSerialMaster>
+#include <QStatusBar>
+#include <QUrl>
+#include <QtWidgets>
+#include <QtSql>
+#include <QApplication>
+#include <QFile>
+#include <QTextStream>
+#include <QTableView>
 
 static uint8_t chksum_error_rx = 0;
 static uint8_t chksum_error_tx = 0;
@@ -23,8 +34,13 @@ MainWindow::MainWindow(QWidget *parent) :
     m_status_label_4(new QLabel),
     m_status_label_5(new QLabel),
     m_settings(new SettingsDialog),
-    m_serial(new QSerialPort(this))
+    model(new QStandardItemModel),
+    m_serial(new QSerialPort(this)
+    )
 {
+    // ---------------------------------------
+    // INIT ELEMENTI GUI
+    // ---------------------------------------
     m_ui->setupUi(this);
 
     m_ui->actionConnect->setEnabled(true);
@@ -69,16 +85,68 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->label_impulsiAttivi->setAutoFillBackground(true);
     m_ui->label_ImpulsiSpenti->setAutoFillBackground(true);
 
+    // ---------------------------------------
+    // IMPORTAZIONE DATABASE E COSTRUZIONE
+    // TABELLA PARAMETRI /DATI DI PROCESSO
+    // ---------------------------------------
+    //QStandardItemModel* model = new QStandardItemModel();
+
+    QFile file(":/ike_params_data.txt");
+    if (file.open(QFile::ReadOnly)) {
+        QTextStream stream(&file);
+
+        char separator_file = ';';
+        QString line = stream.readLine();
+        QStringList list = line.simplified().split(separator_file);
+        for (int list_it = 0; list_it < 6; list_it++) list.pop_back();
+        model->setHorizontalHeaderLabels(list);
+
+        int row = 0;
+        QStandardItem* newItem = nullptr;
+        while (!stream.atEnd()) {
+            line = stream.readLine();
+            if (!line.startsWith('#') && line.contains(separator_file)) {
+                list = line.simplified().split(separator_file);
+                for (int list_it = 0; list_it < 6; list_it++) list.pop_back();
+                for (int col = 0; col < list.length(); ++col) {
+                    newItem = new QStandardItem(list.at(col));
+                    model->setItem(row, col, newItem);
+                }
+                ++row;
+            }
+        }
+    }
+    file.close();
+
+    FreezeTableWidget* tableView = new FreezeTableWidget(model);
+
+    tableView->setWindowTitle(QObject::tr("Frozen Column Example"));
+    tableView->resize(560, 680);
+    m_ui->verticalLayout_2->addWidget(tableView);
+
+    // ---------------------------------------
+    // GUI TIMERS
+    // ---------------------------------------
     m_serialScanTimer = new QTimer(this);
     m_serialScanTimer->setInterval(5000);
     m_serialReadParams = new QTimer(this);
     m_serialReadParams->setInterval(300);
 
+    // ---------------------------------------
+    // CONNESSIONI
+    // ---------------------------------------
     initActionsConnections();
 
     connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
     connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
     connect(m_serialReadParams, SIGNAL(timeout()), this, SLOT(askToReadParam()));
+    //connect(model, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(dataChanged(QStandardItem*)));
+    connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged(QModelIndex, QModelIndex, QVector<int>)));
+    
+    QVector<int> roles;
+    roles.append(Qt::DisplayRole);
+    roles.append(Qt::UserRole);
+    emit model->dataChanged(model->index(0, 0), model->index(0, 0), roles); // works. roles.count() == 2
 
     m_serialScanTimer->start();
 }
@@ -87,6 +155,42 @@ MainWindow::~MainWindow()
 {
     delete m_settings;
     delete m_ui;
+}
+
+void MainWindow::tableDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    QString type_array[5] = {"uint16_t", "int16_t", "uint32_t", "int32_t", "float"};
+    QString type = model->data(model->index(topLeft.row(), 2)).toString();
+    QString id = model->data(model->index(topLeft.row(), 0)).toString();
+    unsigned int var_u16 = 0U;
+    unsigned long var_u32 = 0UL;
+    float var_float = 0.0;
+    QString var;
+
+    if ((type == type_array[0]) || (type == type_array[1]))
+    {
+        // string -> unsigned int
+        var_u16 = model->data(model->index(topLeft.row(), topLeft.column())).toString().toInt();
+    }
+    else if ((type == type_array[2]) || (type == type_array[3]))
+    {
+        // string -> unsigned long -> unsigned int[1], unsigned int[0]
+        var_u32 = model->data(model->index(topLeft.row(), topLeft.column())).toString().toLong();
+    }
+    else if (type == type_array[4])
+    {
+        // string -> float -> unsigned int[3], unsigned int[2], unsigned int[1], unsigned int[0]
+        var_float = model->data(model->index(topLeft.row(), topLeft.column())).toString().toFloat();
+    }
+    else
+    {
+        // unmanaged
+    }
+    
+    var = model->data(model->index(topLeft.row(), topLeft.column())).toString();
+
+    qDebug() << "id: " << id << " - tipo: " << type << " - valore: " << var;
+
 }
 
 void MainWindow::openSerialPort()
@@ -245,32 +349,9 @@ void MainWindow::readData()
              *  	------------------------------------------------------------------------------
              */
 
-            //memcpy(&usart_rx.all, &data[0], 10);
-            //usart_rx.byte.data_id[0] = data.at(0);
-            //usart_rx.byte.data_id[1] = data.at(1);
-            //usart_rx.byte.data_val[0] = data.at(2);
-            //usart_rx.byte.data_val[1] = data.at(3);
-            //usart_rx.byte.data_val[2] = data.at(4);
-            //usart_rx.byte.data_val[3] = data.at(5);
-            //usart_rx.byte.cmd_sts.all = data.at(6);
-            //usart_rx.byte.artifact = data.at(7);
-            //usart_rx.byte.checksum = data.at(8);
-
-            //calc_chksm(&usart_rx.byte.data_id[0], &computed_chksm);
-            //calc_chksm(&usart_rx.byte.data_id[1], &computed_chksm);
-            //calc_chksm(&usart_rx.byte.data_val[0], &computed_chksm);
-            //calc_chksm(&usart_rx.byte.data_val[1], &computed_chksm);
-            //calc_chksm(&usart_rx.byte.data_val[2], &computed_chksm);
-            //calc_chksm(&usart_rx.byte.data_val[3], &computed_chksm);
-            //calc_chksm(&usart_rx.byte.cmd_sts.all, &computed_chksm);
-            //calc_chksm(&usart_rx.byte.artifact, &computed_chksm);
-
-            //usart_rx.byte.checksum = ((usart_rx.byte.checksum == 0x1A) ? (0x0A) : (usart_rx.byte.checksum));
-
             computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
             data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
             if (computed_chksm == data_chksm)
-            //if (computed_chksm == usart_rx.byte.checksum)
             {
                 artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
                 data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
@@ -283,17 +364,6 @@ void MainWindow::readData()
                 chksum_error_tx = data_dec[6];
                 data_id = (data_dec[0] << 8) + data_dec[1];
                 
-                //usart_rx.byte.artifact = ((usart_rx.byte.artifact == 0x01) ? (0x0A) : (usart_rx.byte.artifact));
-                //decode_usart_rx(&usart_rx.byte.data_id[0], ((usart_rx.byte.artifact & 0x80) >> 7));
-                //decode_usart_rx(&usart_rx.byte.data_id[1], ((usart_rx.byte.artifact & 0x40) >> 6));
-                //decode_usart_rx(&usart_rx.byte.data_val[0], ((usart_rx.byte.artifact & 0x20) >> 5));
-                //decode_usart_rx(&usart_rx.byte.data_val[1], ((usart_rx.byte.artifact & 0x10) >> 4));
-                //decode_usart_rx(&usart_rx.byte.data_val[2], ((usart_rx.byte.artifact & 0x08) >> 3));
-                //decode_usart_rx(&usart_rx.byte.data_val[3], ((usart_rx.byte.artifact & 0x04) >> 2));
-                //decode_usart_rx(&usart_rx.byte.cmd_sts.all, ((usart_rx.byte.artifact & 0x02) >> 1));
-                //data_id = (uint32_t)((uint16_t)(usart_rx.byte.data_id[1] & 0x00FF) +
-                //    (uint16_t)((usart_rx.byte.data_id[0] << 8) & 0xFF00));
-
                 if ((data_id & 0xFF00) == ID_PDO_00)
                 {
                     data_idx = data_id - ID_PDO_00;
@@ -305,170 +375,7 @@ void MainWindow::readData()
                     memcpy(param_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), param_data[data_idx].num_byte);
                 }
 
-                switch (data_id)
-                {
-
-                    /* ---- */
-                    /* PDO  */
-                    /* ---- */
-
-                case ID_PDO_00:
-                    // INITIALIZED
-                    if (sts_wd_1.bit.INITIALIZED) m_ui->label_init->setStyleSheet("background-color: green");
-                    else m_ui->label_init->setStyleSheet("background-color: white");
-                    // FREQ_ESTIMATED
-                    if (sts_wd_1.bit.FREQ_ESTIMATED) m_ui->label_freqEst->setStyleSheet("background-color: green");
-                    else m_ui->label_freqEst->setStyleSheet("background-color: white");
-                    // READY_TO_OPERATE
-                    if (sts_wd_1.bit.READY_TO_OPERATE) m_ui->label_readyToOp->setStyleSheet("background-color: green");
-                    else m_ui->label_readyToOp->setStyleSheet("background-color: white");
-                    // OP_ENABLED
-                    if (sts_wd_1.bit.OP_ENABLED) m_ui->label_opEnabled->setStyleSheet("background-color: green");
-                    else m_ui->label_opEnabled->setStyleSheet("background-color: white");
-                    // FAULT
-                    if (sts_wd_1.bit.FAULT) m_ui->label_fault->setStyleSheet("background-color: red");
-                    else m_ui->label_fault->setStyleSheet("background-color: white");
-                    // PULSE_ENABLED
-                    if (sts_wd_1.bit.PULSE_ENABLED)
-                    {
-                        //m_ui->pushButton_start->setChecked(1);
-                        m_ui->label_impulsiAttivi->setStyleSheet("background-color: red");
-                        m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: white");
-                    }
-                    else
-                    {
-                        //m_ui->pushButton_start->setChecked(0);
-                        m_ui->label_impulsiAttivi->setStyleSheet("background-color: white");
-                        m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: green");
-                    }
-                    break;
-                case ID_PDO_01:
-                    // SYNCH_SCR_LOST
-                    if (alm_wd_1.bit.SYNCH_SCR_LOST) m_ui->label_SYNCH_SCR_LOST->setStyleSheet("background-color: red");
-                    else m_ui->label_SYNCH_SCR_LOST->setStyleSheet("background-color: white");
-                    // FREQ_SCR_UNDEF
-                    if (alm_wd_1.bit.FREQ_SCR_UNDEF) m_ui->label_FREQ_SCR_UNDEF->setStyleSheet("background-color: red");
-                    else m_ui->label_FREQ_SCR_UNDEF->setStyleSheet("background-color: white");
-                    // DESAT
-                    if (alm_wd_1.bit.DESAT) m_ui->label_DESAT->setStyleSheet("background-color: red");
-                    else m_ui->label_DESAT->setStyleSheet("background-color: white");
-                    // OVER_CURRENT
-                    if (alm_wd_1.bit.OVER_CURRENT) m_ui->label_OVER_CURRENT->setStyleSheet("background-color: red");
-                    else m_ui->label_OVER_CURRENT->setStyleSheet("background-color: white");
-                    // UNDER_CURRENT
-                    if (alm_wd_1.bit.UNDER_CURRENT) m_ui->label_UNDER_CURRENT->setStyleSheet("background-color: red");
-                    else m_ui->label_UNDER_CURRENT->setStyleSheet("background-color: white");
-                    // OVER_VOLTAGE
-                    if (alm_wd_1.bit.OVER_VOLTAGE) m_ui->label_OVER_VOLTAGE->setStyleSheet("background-color: red");
-                    else m_ui->label_OVER_VOLTAGE->setStyleSheet("background-color: white");
-                    // UNDER_VOLTAGE
-                    if (alm_wd_1.bit.UNDER_VOLTAGE) m_ui->label_UNDER_VOLTAGE->setStyleSheet("background-color: red");
-                    else m_ui->label_UNDER_VOLTAGE->setStyleSheet("background-color: white");
-                    // PSUPLLY
-                    if (alm_wd_1.bit.PSUPLLY) m_ui->label_PSUPLLY->setStyleSheet("background-color: red");
-                    else m_ui->label_PSUPLLY->setStyleSheet("background-color: white");
-                    // EXTERNAL_FLT
-                    if (alm_wd_1.bit.EXTERNAL_FLT) m_ui->label_EXTERNAL_FLT->setStyleSheet("background-color: red");
-                    else m_ui->label_EXTERNAL_FLT->setStyleSheet("background-color: white");
-                    // OH1
-                    if (alm_wd_1.bit.OH1) m_ui->label_OH1->setStyleSheet("background-color: red");
-                    else m_ui->label_OH1->setStyleSheet("background-color: white");
-                    // OH2
-                    if (alm_wd_1.bit.OH2) m_ui->label_OH2->setStyleSheet("background-color: red");
-                    else m_ui->label_OH2->setStyleSheet("background-color: white");
-                    break;
-                case ID_PDO_02: m_ui->label_vInvVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_03: m_ui->label_iInvVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_04: m_ui->label_vInvRectVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_05: m_ui->label_iInvRectVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_06: m_ui->label_ntc1Val->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_07: m_ui->label_ntc2Val->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_08: m_ui->label_potVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_09: m_ui->label_apScrVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_10: m_ui->label_freqIgbtVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-                case ID_PDO_11: m_ui->label_timer0CntVal->setText(QString::number(*(uint32_t*)process_data[data_idx].val)); break;
-                case ID_PDO_12: m_ui->label_freqInvalidCntVal->setText(QString::number(*(uint16_t*)process_data[data_idx].val)); break;
-                case ID_PDO_13: m_ui->label_lineFreqVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
-
-                    /* ---- */
-                    /* SDO  */
-                    /* ---- */
-                   
-                case ID_SDO_00: break;
-                case ID_SDO_01: m_ui->doubleSpinBox_durataInit->setValue(*(uint16_t*)param_data[data_idx].val); break;
-                case ID_SDO_02: m_ui->doubleSpinBox_durataFreqEst->setValue(*(uint16_t*)param_data[data_idx].val); break;
-                case ID_SDO_03:
-                    disconnect(m_ui->checkBox_aperturaMan, &QCheckBox::toggled, this, &MainWindow::pressed_aperturaMan);
-                    m_ui->checkBox_aperturaMan->setChecked((*(uint16_t*)param_data[data_idx].val));
-                    //if (m_ui->checkBox_aperturaMan->isChecked())
-                    //{
-                    //    m_ui->label_valApertura->setEnabled(1);
-                    //    m_ui->doubleSpinBox_valApertura->setEnabled(1);
-                    //    m_ui->label_valAperturaUM->setEnabled(1);
-                    //    m_ui->doubleSpinBox_valApertura->setValue(scr_cmd_alfa_set);
-                    //}
-                    //else
-                    //{
-                    //    m_ui->label_valApertura->setEnabled(0);
-                    //    m_ui->doubleSpinBox_valApertura->setEnabled(0);
-                    //    m_ui->label_valAperturaUM->setEnabled(0);
-                    //}
-                    connect(m_ui->checkBox_aperturaMan, &QCheckBox::toggled, this, &MainWindow::pressed_aperturaMan);
-                    break;
-                case ID_SDO_04: m_ui->doubleSpinBox_valApertura->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_05: m_ui->doubleSpinBox_valAperturaRidotta50->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_06: m_ui->doubleSpinBox_valAperturaRidotta60->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_07: m_ui->doubleSpinBox_durataApRidottaCheck->setValue((*(uint16_t*)param_data[data_idx].val)); break;
-                case ID_SDO_08: m_ui->doubleSpinBox_velRampa->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_09: m_ui->doubleSpinBox_freqPrincipale->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_10: m_ui->doubleSpinBox_ampModSweep->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_11: m_ui->doubleSpinBox_freqModSweep->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_12: m_ui->doubleSpinBox_vInvRectGain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_13: m_ui->doubleSpinBox_vInvRectOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
-                case ID_SDO_14: m_ui->doubleSpinBox_iInvRectGain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_15: m_ui->doubleSpinBox_iInvRectOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
-                case ID_SDO_16: m_ui->doubleSpinBox_ntc1Gain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_17: m_ui->doubleSpinBox_ntc1Offset->setValue((*(int16_t*)param_data[data_idx].val)); break;
-                case ID_SDO_18: m_ui->doubleSpinBox_ntc2Gain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_19: m_ui->doubleSpinBox_ntc2Offset->setValue((*(int16_t*)param_data[data_idx].val)); break;
-                case ID_SDO_20: m_ui->doubleSpinBox_potGain->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_21: m_ui->doubleSpinBox_potOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
-                case ID_SDO_22: m_ui->doubleSpinBox_valOvercurr->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_23:
-                    disconnect(m_ui->checkBox_enSweep, &QCheckBox::toggled, this, &MainWindow::pressed_enSweep);
-                    m_ui->checkBox_enSweep->setChecked((*(uint16_t*)param_data[data_idx].val));
-                    //if (m_ui->checkBox_enSweep->isChecked())
-                    //{
-                    //    m_ui->label_ampModSweep->setEnabled(1);
-                    //    m_ui->doubleSpinBox_ampModSweep->setEnabled(1);
-                    //    m_ui->label_ampModSweep_2->setEnabled(1);
-                    //    m_ui->doubleSpinBox_ampModSweep->setValue(sweep_amplitude);
-                    //    
-                    //    m_ui->label_freqModSweep->setEnabled(1);
-                    //    m_ui->doubleSpinBox_freqModSweep->setEnabled(1);
-                    //    m_ui->label_freqModSweepUM->setEnabled(1);
-                    //    m_ui->doubleSpinBox_freqModSweep->setValue(sweep_freq);
-                    //}
-                    //else
-                    //{
-                    //    m_ui->label_ampModSweep->setEnabled(0);
-                    //    m_ui->doubleSpinBox_ampModSweep->setEnabled(0);
-                    //    m_ui->label_ampModSweep_2->setEnabled(0);
-                    //
-                    //    m_ui->label_freqModSweep->setEnabled(0);
-                    //    m_ui->doubleSpinBox_freqModSweep->setEnabled(0);
-                    //    m_ui->label_freqModSweepUM->setEnabled(0);
-                    //}
-                    connect(m_ui->checkBox_enSweep, &QCheckBox::toggled, this, &MainWindow::pressed_enSweep);
-                    break;
-                case ID_SDO_24: m_ui->doubleSpinBox_valAperturaFinale->setValue((*(float*)param_data[data_idx].val)); break;
-                case ID_SDO_25:
-                    disconnect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
-                    m_ui->checkBox_enProtOvercurr->setChecked((*(uint16_t*)param_data[data_idx].val));
-                    connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
-                    break;
-                default: break;
-                }
+                MainWindow::refreshData(data_id, data_idx);
             }
             else
             {
@@ -483,6 +390,139 @@ void MainWindow::readData()
         }
         m_status_label_3->setText(QString::number(chksum_error_rx));
         m_status_label_4->setText(QString::number(chksum_error_tx));
+    }
+}
+
+void MainWindow::refreshData(unsigned int data_id, unsigned int data_idx)
+{
+    switch (data_id)
+    {
+
+        /* ----------------- */
+        /* DATI DI PROCESSO  */
+        /* ----------------- */
+
+    case ID_PDO_00:
+        // INITIALIZED
+        if (sts_wd_1.bit.INITIALIZED) m_ui->label_init->setStyleSheet("background-color: green");
+        else m_ui->label_init->setStyleSheet("background-color: white");
+        // FREQ_ESTIMATED
+        if (sts_wd_1.bit.FREQ_ESTIMATED) m_ui->label_freqEst->setStyleSheet("background-color: green");
+        else m_ui->label_freqEst->setStyleSheet("background-color: white");
+        // READY_TO_OPERATE
+        if (sts_wd_1.bit.READY_TO_OPERATE) m_ui->label_readyToOp->setStyleSheet("background-color: green");
+        else m_ui->label_readyToOp->setStyleSheet("background-color: white");
+        // OP_ENABLED
+        if (sts_wd_1.bit.OP_ENABLED) m_ui->label_opEnabled->setStyleSheet("background-color: green");
+        else m_ui->label_opEnabled->setStyleSheet("background-color: white");
+        // FAULT
+        if (sts_wd_1.bit.FAULT) m_ui->label_fault->setStyleSheet("background-color: red");
+        else m_ui->label_fault->setStyleSheet("background-color: white");
+        // PULSE_ENABLED
+        if (sts_wd_1.bit.PULSE_ENABLED)
+        {
+            //m_ui->pushButton_start->setChecked(1);
+            m_ui->label_impulsiAttivi->setStyleSheet("background-color: red");
+            m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: white");
+        }
+        else
+        {
+            //m_ui->pushButton_start->setChecked(0);
+            m_ui->label_impulsiAttivi->setStyleSheet("background-color: white");
+            m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: green");
+        }
+        break;
+    case ID_PDO_01:
+        // SYNCH_SCR_LOST
+        if (alm_wd_1.bit.SYNCH_SCR_LOST) m_ui->label_SYNCH_SCR_LOST->setStyleSheet("background-color: red");
+        else m_ui->label_SYNCH_SCR_LOST->setStyleSheet("background-color: white");
+        // FREQ_SCR_UNDEF
+        if (alm_wd_1.bit.FREQ_SCR_UNDEF) m_ui->label_FREQ_SCR_UNDEF->setStyleSheet("background-color: red");
+        else m_ui->label_FREQ_SCR_UNDEF->setStyleSheet("background-color: white");
+        // DESAT
+        if (alm_wd_1.bit.DESAT) m_ui->label_DESAT->setStyleSheet("background-color: red");
+        else m_ui->label_DESAT->setStyleSheet("background-color: white");
+        // OVER_CURRENT
+        if (alm_wd_1.bit.OVER_CURRENT) m_ui->label_OVER_CURRENT->setStyleSheet("background-color: red");
+        else m_ui->label_OVER_CURRENT->setStyleSheet("background-color: white");
+        // UNDER_CURRENT
+        if (alm_wd_1.bit.UNDER_CURRENT) m_ui->label_UNDER_CURRENT->setStyleSheet("background-color: red");
+        else m_ui->label_UNDER_CURRENT->setStyleSheet("background-color: white");
+        // OVER_VOLTAGE
+        if (alm_wd_1.bit.OVER_VOLTAGE) m_ui->label_OVER_VOLTAGE->setStyleSheet("background-color: red");
+        else m_ui->label_OVER_VOLTAGE->setStyleSheet("background-color: white");
+        // UNDER_VOLTAGE
+        if (alm_wd_1.bit.UNDER_VOLTAGE) m_ui->label_UNDER_VOLTAGE->setStyleSheet("background-color: red");
+        else m_ui->label_UNDER_VOLTAGE->setStyleSheet("background-color: white");
+        // PSUPLLY
+        if (alm_wd_1.bit.PSUPLLY) m_ui->label_PSUPLLY->setStyleSheet("background-color: red");
+        else m_ui->label_PSUPLLY->setStyleSheet("background-color: white");
+        // EXTERNAL_FLT
+        if (alm_wd_1.bit.EXTERNAL_FLT) m_ui->label_EXTERNAL_FLT->setStyleSheet("background-color: red");
+        else m_ui->label_EXTERNAL_FLT->setStyleSheet("background-color: white");
+        // OH1
+        if (alm_wd_1.bit.OH1) m_ui->label_OH1->setStyleSheet("background-color: red");
+        else m_ui->label_OH1->setStyleSheet("background-color: white");
+        // OH2
+        if (alm_wd_1.bit.OH2) m_ui->label_OH2->setStyleSheet("background-color: red");
+        else m_ui->label_OH2->setStyleSheet("background-color: white");
+        break;
+    case ID_PDO_02: m_ui->label_vInvVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_03: m_ui->label_iInvVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_04: m_ui->label_vInvRectVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_05: m_ui->label_iInvRectVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_06: m_ui->label_ntc1Val->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_07: m_ui->label_ntc2Val->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_08: m_ui->label_potVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_09: m_ui->label_apScrVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_10: m_ui->label_freqIgbtVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+    case ID_PDO_11: m_ui->label_timer0CntVal->setText(QString::number(*(uint32_t*)process_data[data_idx].val)); break;
+    case ID_PDO_12: m_ui->label_freqInvalidCntVal->setText(QString::number(*(uint16_t*)process_data[data_idx].val)); break;
+    case ID_PDO_13: m_ui->label_lineFreqVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
+
+        /* ---------- */
+        /* PARAMETRI  */
+        /* ---------- */
+
+    case ID_SDO_00: break;
+    case ID_SDO_01: m_ui->doubleSpinBox_durataInit->setValue(*(uint16_t*)param_data[data_idx].val); break;
+    case ID_SDO_02: m_ui->doubleSpinBox_durataFreqEst->setValue(*(uint16_t*)param_data[data_idx].val); break;
+    case ID_SDO_03:
+        disconnect(m_ui->checkBox_aperturaMan, &QCheckBox::toggled, this, &MainWindow::pressed_aperturaMan);
+        m_ui->checkBox_aperturaMan->setChecked((*(uint16_t*)param_data[data_idx].val));
+        connect(m_ui->checkBox_aperturaMan, &QCheckBox::toggled, this, &MainWindow::pressed_aperturaMan);
+        break;
+    case ID_SDO_04: m_ui->doubleSpinBox_valApertura->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_05: m_ui->doubleSpinBox_valAperturaRidotta50->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_06: m_ui->doubleSpinBox_valAperturaRidotta60->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_07: m_ui->doubleSpinBox_durataApRidottaCheck->setValue((*(uint16_t*)param_data[data_idx].val)); break;
+    case ID_SDO_08: m_ui->doubleSpinBox_velRampa->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_09: m_ui->doubleSpinBox_freqPrincipale->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_10: m_ui->doubleSpinBox_ampModSweep->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_11: m_ui->doubleSpinBox_freqModSweep->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_12: m_ui->doubleSpinBox_vInvRectGain->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_13: m_ui->doubleSpinBox_vInvRectOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
+    case ID_SDO_14: m_ui->doubleSpinBox_iInvRectGain->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_15: m_ui->doubleSpinBox_iInvRectOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
+    case ID_SDO_16: m_ui->doubleSpinBox_ntc1Gain->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_17: m_ui->doubleSpinBox_ntc1Offset->setValue((*(int16_t*)param_data[data_idx].val)); break;
+    case ID_SDO_18: m_ui->doubleSpinBox_ntc2Gain->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_19: m_ui->doubleSpinBox_ntc2Offset->setValue((*(int16_t*)param_data[data_idx].val)); break;
+    case ID_SDO_20: m_ui->doubleSpinBox_potGain->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_21: m_ui->doubleSpinBox_potOffset->setValue((*(int16_t*)param_data[data_idx].val)); break;
+    case ID_SDO_22: m_ui->doubleSpinBox_valOvercurr->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_23:
+        disconnect(m_ui->checkBox_enSweep, &QCheckBox::toggled, this, &MainWindow::pressed_enSweep);
+        m_ui->checkBox_enSweep->setChecked((*(uint16_t*)param_data[data_idx].val));
+        connect(m_ui->checkBox_enSweep, &QCheckBox::toggled, this, &MainWindow::pressed_enSweep);
+        break;
+    case ID_SDO_24: m_ui->doubleSpinBox_valAperturaFinale->setValue((*(float*)param_data[data_idx].val)); break;
+    case ID_SDO_25:
+        disconnect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
+        m_ui->checkBox_enProtOvercurr->setChecked((*(uint16_t*)param_data[data_idx].val));
+        connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
+        break;
+    default: break;
     }
 }
 
@@ -540,11 +580,6 @@ void MainWindow::initActionsConnections()
     connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::pressed, this, &MainWindow::pressed_enProtOvercurr);
     connect(m_ui->doubleSpinBox_valOvercurr, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valOvercurr);
 }
-
-//void blinkObject(void)
-//{
-//    QTimer::singleShot(..., resetBlink);
-//}
 
 void MainWindow::showStatusMessage(const QString &message)
 {

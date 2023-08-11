@@ -1,5 +1,3 @@
 ﻿  Generate moc_predefs.h
-C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(247,5): warning MSB8064: Custom build for item "debug\moc_predefs.h.cbt" succeeded, but specified dependency "c:\users\lucag\local_repos\ike_gui\debug\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
-  mainwindow.cpp
-C:\Users\lucag\local_repos\ike_gui\mainwindow.cpp(230,18): warning C4101: 'usart_rx': unreferenced local variable
-  IKE_gui.vcxproj -> C:\Users\lucag\local_repos\ike_gui\debug\IKE_gui.exe
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(241,5): warning MSB8064: Custom build for item "debug\moc_predefs.h.cbt" succeeded, but specified dependency "c:\local_repos\_private\ike_gui\debug\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
+  IKE_gui.vcxproj -> C:\local_repos\_private\ike_gui\Debug\IKE_gui.exe

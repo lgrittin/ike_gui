@@ -38,5 +38,8 @@
         <file>images/icons8-settings-32.png</file>
         <file>images/icons8-broom-32.png</file>
         <file>images/icons8-synchronize-32.png</file>
+        <file>ike_params_data.txt</file>
+        <file>ike_process_data.txt</file>
+        <file>grades.txt</file>
     </qresource>
 </RCC>

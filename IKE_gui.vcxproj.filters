@@ -62,6 +62,9 @@
     <ClCompile Include="ParamProcessData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="freezetablewidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="console.h">
@@ -71,6 +74,9 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="settingsdialog.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="freezetablewidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -114,5 +120,16 @@
     <ClInclude Include="globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="grades.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="ike_process_data.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="ike_params_data.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
