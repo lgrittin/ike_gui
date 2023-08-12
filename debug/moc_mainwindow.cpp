@@ -7,7 +7,7 @@
 *****************************************************************************/
 
 #include <memory>
-#include "../mainwindow.h"
+#include "../inc/mainwindow.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #include <QtCore/QVector>

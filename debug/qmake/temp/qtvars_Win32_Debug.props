@@ -1,7 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
 <Qt_DEFINES_>_WINDOWS;UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;QT_WIDGETS_LIB;QT_GUI_LIB;QT_SQL_LIB;QT_SERIALPORT_LIB;QT_SERIALBUS_LIB;QT_CORE_LIB</Qt_DEFINES_>
-<Qt_INCLUDEPATH_>C:\Users\lgrittin\AppData\Local\Temp\o4wgswhx.k1a;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtANGLE;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include\QtSerialPort;C:\Qt\5.15.2\msvc2019\include\QtSerialBus;C:\Qt\5.15.2\msvc2019\include\QtCore;C:\Users\lgrittin\AppData\Local\Temp\o4wgswhx.k1a;/include;C:\Qt\5.15.2\msvc2019\mkspecs\win32-msvc</Qt_INCLUDEPATH_>
+<Qt_INCLUDEPATH_>C:\Users\lgrittin\AppData\Local\Temp\phiaotps.ypx;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtANGLE;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include\QtSerialPort;C:\Qt\5.15.2\msvc2019\include\QtSerialBus;C:\Qt\5.15.2\msvc2019\include\QtCore;C:\Users\lgrittin\AppData\Local\Temp\phiaotps.ypx;/include;C:\Qt\5.15.2\msvc2019\mkspecs\win32-msvc</Qt_INCLUDEPATH_>
 <Qt_STDCPP_></Qt_STDCPP_>
 <Qt_RUNTIME_>MultiThreadedDebugDLL</Qt_RUNTIME_>
 <Qt_CL_OPTIONS_>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus</Qt_CL_OPTIONS_>

@@ -93,6 +93,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>IKE_gui</TargetName>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
+    <IncludePath>inc/;$(IncludePath)</IncludePath>
+    <SourcePath>src/;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>release\</OutDir>
@@ -375,22 +377,6 @@
     </QtUic>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="console.cpp" />
-    <ClCompile Include="freezetablewidget.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="mainwindow.cpp" />
-    <ClCompile Include="ParamProcessData.cpp" />
-    <ClCompile Include="settingsdialog.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="console.h">
-    </QtMoc>
-    <QtMoc Include="mainwindow.h">
-    </QtMoc>
-    <QtMoc Include="settingsdialog.h">
-    </QtMoc>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -419,14 +405,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="mainwindow.ui">
-    </QtUic>
-    <QtUic Include="settingsdialog.ui">
-    </QtUic>
-  </ItemGroup>
-  <ItemGroup>
     <QtRcc Include="IKE_gui.qrc">
     </QtRcc>
+    <None Include="db\ike_params_data.csv" />
+    <None Include="db\ike_process_data.csv" />
     <None Include="images\application-exit.png" />
     <None Include="images\clear.png" />
     <None Include="images\connect.png" />
@@ -434,13 +416,31 @@
     <None Include="images\settings.png" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="freezetablewidget.h" />
-    <ClInclude Include="globals.h" />
+    <ClCompile Include="src\console.cpp" />
+    <ClCompile Include="src\delegate.cpp" />
+    <ClCompile Include="src\freezetablewidget.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mainwindow.cpp" />
+    <ClCompile Include="src\ParamProcessData.cpp" />
+    <ClCompile Include="src\settingsdialog.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="grades.txt" />
-    <Text Include="ike_params_data.txt" />
-    <Text Include="ike_process_data.txt" />
+    <QtMoc Include="inc\console.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="inc\delegate.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="inc\freezetablewidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\globals.h" />
+    <QtMoc Include="inc\settingsdialog.h" />
+    <QtMoc Include="inc\mainwindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="ui\mainwindow.ui" />
+    <QtUic Include="ui\settingsdialog.ui" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

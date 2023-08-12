@@ -1,3 +1,5 @@
 ﻿  Generate moc_predefs.h
 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(241,5): warning MSB8064: Custom build for item "debug\moc_predefs.h.cbt" succeeded, but specified dependency "c:\local_repos\_private\ike_gui\debug\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
+  Rcc'ing IKE_gui.qrc...
+  qrc_IKE_gui.cpp
   IKE_gui.vcxproj -> C:\local_repos\_private\ike_gui\Debug\IKE_gui.exe

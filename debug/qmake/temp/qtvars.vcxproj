@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\lgrittin\AppData\Local\Temp\o4wgswhx.k1a;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtANGLE;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include\QtSerialPort;C:\Qt\5.15.2\msvc2019\include\QtSerialBus;C:\Qt\5.15.2\msvc2019\include\QtCore;C:\Users\lgrittin\AppData\Local\Temp\o4wgswhx.k1a;/include;C:\Qt\5.15.2\msvc2019\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\lgrittin\AppData\Local\Temp\phiaotps.ypx;C:\Qt\5.15.2\msvc2019\include;C:\Qt\5.15.2\msvc2019\include\QtWidgets;C:\Qt\5.15.2\msvc2019\include\QtGui;C:\Qt\5.15.2\msvc2019\include\QtANGLE;C:\Qt\5.15.2\msvc2019\include\QtSql;C:\Qt\5.15.2\msvc2019\include\QtSerialPort;C:\Qt\5.15.2\msvc2019\include\QtSerialBus;C:\Qt\5.15.2\msvc2019\include\QtCore;C:\Users\lgrittin\AppData\Local\Temp\phiaotps.ypx;/include;C:\Qt\5.15.2\msvc2019\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>

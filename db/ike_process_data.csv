@@ -1,0 +1,15 @@
+﻿n;id_name;id_address (hex);id_address;id_offset (hex);n_byte_name;n_byte;type;dsp_name;description;dsp_family
+0;ID_PDO_00;100;256;0;ID_PDO_00_BYTE;2;uint16_t;sts_wd_1;bit significant;CTRL_OUTPUT
+1;ID_PDO_01;101;257;1;ID_PDO_01_BYTE;2;uint16_t;alm_wd_1;bit significant;CTRL_OUTPUT
+2;ID_PDO_02;102;258;2;ID_PDO_02_BYTE;4;float;adc.adc_ctrl_fdb.v_inv_f;[V];ADC_OUTPUT
+3;ID_PDO_03;103;259;4;ID_PDO_03_BYTE;4;float;adc.adc_ctrl_fdb.i_inv_f;[A];ADC_OUTPUT
+4;ID_PDO_04;104;260;6;ID_PDO_04_BYTE;4;float;adc.adc_ctrl_fdb_rect.v_inv_rect_f;[V];ADC_OUTPUT
+5;ID_PDO_05;105;261;8;ID_PDO_05_BYTE;4;float;adc.adc_ctrl_fdb_rect.i_inv_rect_f;[A];ADC_OUTPUT
+6;ID_PDO_06;106;262;10;ID_PDO_06_BYTE;4;float;adc.adc_sys.ntc1_f;[deg] (0..200);ADC_OUTPUT
+7;ID_PDO_07;107;263;12;ID_PDO_07_BYTE;4;float;adc.adc_sys.ntc2_f;[deg] (0..200);ADC_OUTPUT
+8;ID_PDO_08;108;264;14;ID_PDO_08_BYTE;4;float;adc.adc_sys.pot_f;[0..1];ADC_OUTPUT
+9;ID_PDO_09;109;265;16;ID_PDO_09_BYTE;4;float;scr_cmd_alfa;apertura scr [0..1];SCR_OUTPUT
+10;ID_PDO_10;10A;266;18;ID_PDO_10_BYTE;4;float;igbt_actual_freq;frequenza attuale igbt con sweep [Hz];IGBT_OUTPUT
+11;ID_PDO_11;10B;267;20;ID_PDO_11_BYTE;4;uint32_t;main_fsm_loop_cnt;contatore isr timer 0 [ms];DGN_OUTPUT
+12;ID_PDO_12;10C;268;22;ID_PDO_12_BYTE;2;uint16_t;scr_synch_invalid_cnt;numero conteggi invalidi misura frequenza;DGN_OUTPUT
+13;ID_PDO_13;10D;269;23;ID_PDO_13_BYTE;4;float;scr_synch_freq;frequenza attuale ingresso [Hz];SCR_OUTPUT
