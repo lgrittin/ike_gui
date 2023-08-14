@@ -38,7 +38,7 @@
         <file>images/icons8-settings-32.png</file>
         <file>images/icons8-broom-32.png</file>
         <file>images/icons8-synchronize-32.png</file>
-        <file>db/ike_params_data.csv</file>
-        <file>db/ike_process_data.csv</file>
+        <file>db/params_data.csv</file>
+        <file>db/process_data.csv</file>
     </qresource>
 </RCC>

@@ -1,2 +1,0 @@
-C:\Users\lucag\local_repos\ike_gui\debug\IKE_gui.exe
-C:\local_repos\_private\ike_gui\Debug\IKE_gui.exe

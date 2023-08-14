@@ -90,11 +90,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // IMPORTAZIONE DATABASE E COSTRUZIONE
     // TABELLA PARAMETRI /DATI DI PROCESSO
     // ---------------------------------------
-    QFile file(":/db/ike_params_data.csv");
+    QFile file(":/db/params_data.csv");
     if (file.open(QFile::ReadOnly)) {
         QTextStream stream(&file);
 
-        char separator_file = ';';
+        char separator_file = ',';
         QString line = stream.readLine();
         list_columns = line.simplified().split(separator_file);
         model->setHorizontalHeaderLabels(list_columns);
@@ -142,11 +142,9 @@ MainWindow::MainWindow(QWidget *parent) :
     tableView->setColumnHidden(list_columns.indexOf("type"), 1);
     tableView->setColumnHidden(list_columns.indexOf("decimal"), 1);
     tableView->setColumnHidden(list_columns.indexOf("single_steps"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("id_name"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("id_offset"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("n_byte_name"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("n_word"), 1);
     tableView->setColumnHidden(list_columns.indexOf("dsp_name"), 1);
+    tableView->setColumnHidden(list_columns.indexOf("kp_to_modbus"), 1);
+    tableView->setColumnHidden(list_columns.indexOf("precision"), 1);
     tableView->horizontalHeader()->setStretchLastSection(true);
     tableView->setWindowTitle(QObject::tr("PARAMETERS"));
     //tableView->resize(560, 680);
@@ -182,39 +180,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::tableDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
-    QString type_array[5] = {"uint16_t", "int16_t", "uint32_t", "int32_t", "float"};
-    QString type = model->data(model->index(topLeft.row(), list_columns.indexOf("type"))).toString();
-    QString id_addr = model->data(model->index(topLeft.row(), list_columns.indexOf("id_address"))).toString();
-    QString modbus_addr = model->data(model->index(topLeft.row(), list_columns.indexOf("modbus_address"))).toString();
-    unsigned int var_u16 = 0U;
-    unsigned long var_u32 = 0UL;
-    float var_float = 0.0;
-    QString var;
-
-    if ((type == type_array[0]) || (type == type_array[1]))
-    {
-        // string -> unsigned int
-        var_u16 = model->data(model->index(topLeft.row(), topLeft.column())).toString().toInt();
-    }
-    else if ((type == type_array[2]) || (type == type_array[3]))
-    {
-        // string -> unsigned long -> unsigned int[1], unsigned int[0]
-        var_u32 = model->data(model->index(topLeft.row(), topLeft.column())).toString().toLong();
-    }
-    else if (type == type_array[4])
-    {
-        // string -> float -> unsigned int[3], unsigned int[2], unsigned int[1], unsigned int[0]
-        var_float = model->data(model->index(topLeft.row(), topLeft.column())).toString().toFloat();
-    }
-    else
-    {
-        // unmanaged
-    }
     
-    var = model->data(model->index(topLeft.row(), topLeft.column())).toString();
+    double val = model->data(model->index(topLeft.row(), list_columns.indexOf("val_actual"))).toDouble();
+    double kp_modbus = model->data(model->index(topLeft.row(), list_columns.indexOf("kp_to_modbus"))).toDouble();
+    double min_val = model->data(model->index(topLeft.row(), list_columns.indexOf("val_min"))).toDouble();
+    unsigned int val_u16 = (unsigned int)round((val - min_val) * kp_modbus);
+    QString id_addr = model->data(model->index(topLeft.row(), list_columns.indexOf("id_address"))).toString();
 
-    qDebug() << "id_addr: " << id_addr << " - modbus_addr: " << modbus_addr << " - tipo: " << type << " - valore: " << var;
-
+    qDebug() << "id_addr: " << id_addr << " - val: " << QString::number(val) << " - val_modbus: " << QString::number(val_u16);
 }
 
 void MainWindow::openSerialPort()
