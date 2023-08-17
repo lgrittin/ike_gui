@@ -70,11 +70,11 @@ QWidget *SpinBoxDelegate::createEditor(QWidget *parent,
                                        const QModelIndex &index) const
 {
     editor = new QDoubleSpinBox(parent);
-    editor->setDecimals(model->data(model->index(index.row(), headers.indexOf("decimal"))).toInt());
-    editor->setSingleStep(model->data(model->index(index.row(), headers.indexOf("single_steps"))).toDouble());
+    editor->setDecimals(model->data(model->index(index.row(), headers_params.indexOf("decimal"))).toInt());
+    editor->setSingleStep(model->data(model->index(index.row(), headers_params.indexOf("single_steps"))).toDouble());
     editor->setFrame(false);
-    editor->setMinimum(model->data(model->index(index.row(), headers.indexOf("val_min"))).toDouble());
-    editor->setMaximum(model->data(model->index(index.row(), headers.indexOf("val_max"))).toDouble());
+    editor->setMinimum(model->data(model->index(index.row(), headers_params.indexOf("val_min"))).toDouble());
+    editor->setMaximum(model->data(model->index(index.row(), headers_params.indexOf("val_max"))).toDouble());
     QObject::connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SpinBoxDelegate::setData);
     return editor;
 }

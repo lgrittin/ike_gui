@@ -23,8 +23,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[52];
-    char stringdata0[929];
+    QByteArrayData data[32];
+    char stringdata0[394];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -54,37 +54,17 @@ QT_MOC_LITERAL(17, 179, 16), // "artifact_bitwise"
 QT_MOC_LITERAL(18, 196, 11), // "handleError"
 QT_MOC_LITERAL(19, 208, 28), // "QSerialPort::SerialPortError"
 QT_MOC_LITERAL(20, 237, 5), // "error"
-QT_MOC_LITERAL(21, 243, 16), // "tableDataChanged"
-QT_MOC_LITERAL(22, 260, 11), // "QModelIndex"
-QT_MOC_LITERAL(23, 272, 7), // "topLeft"
-QT_MOC_LITERAL(24, 280, 11), // "bottomRight"
-QT_MOC_LITERAL(25, 292, 12), // "QVector<int>"
-QT_MOC_LITERAL(26, 305, 5), // "roles"
-QT_MOC_LITERAL(27, 311, 16), // "pressed_ackFault"
-QT_MOC_LITERAL(28, 328, 13), // "pressed_start"
-QT_MOC_LITERAL(29, 342, 19), // "pressed_aperturaMan"
-QT_MOC_LITERAL(30, 362, 24), // "valueChanged_valApertura"
-QT_MOC_LITERAL(31, 387, 30), // "valueChanged_valAperturaFinale"
-QT_MOC_LITERAL(32, 418, 33), // "valueChanged_valAperturaRidot..."
-QT_MOC_LITERAL(33, 452, 33), // "valueChanged_valAperturaRidot..."
-QT_MOC_LITERAL(34, 486, 33), // "valueChanged_durataApRidottaC..."
-QT_MOC_LITERAL(35, 520, 21), // "valueChanged_velRampa"
-QT_MOC_LITERAL(36, 542, 15), // "pressed_enSweep"
-QT_MOC_LITERAL(37, 558, 27), // "valueChanged_freqPrincipale"
-QT_MOC_LITERAL(38, 586, 24), // "valueChanged_ampModSweep"
-QT_MOC_LITERAL(39, 611, 25), // "valueChanged_freqModSweep"
-QT_MOC_LITERAL(40, 637, 25), // "valueChanged_vInvRectGain"
-QT_MOC_LITERAL(41, 663, 27), // "valueChanged_vInvRectOffset"
-QT_MOC_LITERAL(42, 691, 25), // "valueChanged_iInvRectGain"
-QT_MOC_LITERAL(43, 717, 27), // "valueChanged_iInvRectOffset"
-QT_MOC_LITERAL(44, 745, 21), // "valueChanged_ntc1Gain"
-QT_MOC_LITERAL(45, 767, 23), // "valueChanged_ntc1Offset"
-QT_MOC_LITERAL(46, 791, 21), // "valueChanged_ntc2Gain"
-QT_MOC_LITERAL(47, 813, 23), // "valueChanged_ntc2Offset"
-QT_MOC_LITERAL(48, 837, 20), // "valueChanged_potGain"
-QT_MOC_LITERAL(49, 858, 22), // "valueChanged_potOffset"
-QT_MOC_LITERAL(50, 881, 22), // "pressed_enProtOvercurr"
-QT_MOC_LITERAL(51, 904, 24) // "valueChanged_valOvercurr"
+QT_MOC_LITERAL(21, 243, 23), // "tableDataChanged_params"
+QT_MOC_LITERAL(22, 267, 11), // "QModelIndex"
+QT_MOC_LITERAL(23, 279, 7), // "topLeft"
+QT_MOC_LITERAL(24, 287, 11), // "bottomRight"
+QT_MOC_LITERAL(25, 299, 12), // "QVector<int>"
+QT_MOC_LITERAL(26, 312, 5), // "roles"
+QT_MOC_LITERAL(27, 318, 17), // "onSettingsChanged"
+QT_MOC_LITERAL(28, 336, 20), // "onModbusStateChanged"
+QT_MOC_LITERAL(29, 357, 5), // "state"
+QT_MOC_LITERAL(30, 363, 16), // "pressed_ackFault"
+QT_MOC_LITERAL(31, 380, 13) // "pressed_start"
 
     },
     "MainWindow\0openSerialPort\0\0closeSerialPort\0"
@@ -94,26 +74,10 @@ QT_MOC_LITERAL(51, 904, 24) // "valueChanged_valOvercurr"
     "decode_usart_rx\0serial_rx\0uint8_t\0"
     "artifact_bitwise\0handleError\0"
     "QSerialPort::SerialPortError\0error\0"
-    "tableDataChanged\0QModelIndex\0topLeft\0"
-    "bottomRight\0QVector<int>\0roles\0"
-    "pressed_ackFault\0pressed_start\0"
-    "pressed_aperturaMan\0valueChanged_valApertura\0"
-    "valueChanged_valAperturaFinale\0"
-    "valueChanged_valAperturaRidotta50\0"
-    "valueChanged_valAperturaRidotta60\0"
-    "valueChanged_durataApRidottaCheck\0"
-    "valueChanged_velRampa\0pressed_enSweep\0"
-    "valueChanged_freqPrincipale\0"
-    "valueChanged_ampModSweep\0"
-    "valueChanged_freqModSweep\0"
-    "valueChanged_vInvRectGain\0"
-    "valueChanged_vInvRectOffset\0"
-    "valueChanged_iInvRectGain\0"
-    "valueChanged_iInvRectOffset\0"
-    "valueChanged_ntc1Gain\0valueChanged_ntc1Offset\0"
-    "valueChanged_ntc2Gain\0valueChanged_ntc2Offset\0"
-    "valueChanged_potGain\0valueChanged_potOffset\0"
-    "pressed_enProtOvercurr\0valueChanged_valOvercurr"
+    "tableDataChanged_params\0QModelIndex\0"
+    "topLeft\0bottomRight\0QVector<int>\0roles\0"
+    "onSettingsChanged\0onModbusStateChanged\0"
+    "state\0pressed_ackFault\0pressed_start"
 };
 #undef QT_MOC_LITERAL
 
@@ -123,7 +87,7 @@ static const uint qt_meta_data_MainWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      36,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -131,42 +95,21 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  194,    2, 0x08 /* Private */,
-       3,    0,  195,    2, 0x08 /* Private */,
-       4,    0,  196,    2, 0x08 /* Private */,
-       5,    1,  197,    2, 0x08 /* Private */,
-       7,    0,  200,    2, 0x08 /* Private */,
-       8,    0,  201,    2, 0x08 /* Private */,
-       9,    0,  202,    2, 0x08 /* Private */,
-      10,    2,  203,    2, 0x08 /* Private */,
-      14,    2,  208,    2, 0x08 /* Private */,
-      18,    1,  213,    2, 0x08 /* Private */,
-      21,    3,  216,    2, 0x08 /* Private */,
-      27,    0,  223,    2, 0x08 /* Private */,
-      28,    0,  224,    2, 0x08 /* Private */,
-      29,    0,  225,    2, 0x08 /* Private */,
-      30,    0,  226,    2, 0x08 /* Private */,
-      31,    0,  227,    2, 0x08 /* Private */,
-      32,    0,  228,    2, 0x08 /* Private */,
-      33,    0,  229,    2, 0x08 /* Private */,
-      34,    0,  230,    2, 0x08 /* Private */,
-      35,    0,  231,    2, 0x08 /* Private */,
-      36,    0,  232,    2, 0x08 /* Private */,
-      37,    0,  233,    2, 0x08 /* Private */,
-      38,    0,  234,    2, 0x08 /* Private */,
-      39,    0,  235,    2, 0x08 /* Private */,
-      40,    0,  236,    2, 0x08 /* Private */,
-      41,    0,  237,    2, 0x08 /* Private */,
-      42,    0,  238,    2, 0x08 /* Private */,
-      43,    0,  239,    2, 0x08 /* Private */,
-      44,    0,  240,    2, 0x08 /* Private */,
-      45,    0,  241,    2, 0x08 /* Private */,
-      46,    0,  242,    2, 0x08 /* Private */,
-      47,    0,  243,    2, 0x08 /* Private */,
-      48,    0,  244,    2, 0x08 /* Private */,
-      49,    0,  245,    2, 0x08 /* Private */,
-      50,    0,  246,    2, 0x08 /* Private */,
-      51,    0,  247,    2, 0x08 /* Private */,
+       1,    0,   89,    2, 0x08 /* Private */,
+       3,    0,   90,    2, 0x08 /* Private */,
+       4,    0,   91,    2, 0x08 /* Private */,
+       5,    1,   92,    2, 0x08 /* Private */,
+       7,    0,   95,    2, 0x08 /* Private */,
+       8,    0,   96,    2, 0x08 /* Private */,
+       9,    0,   97,    2, 0x08 /* Private */,
+      10,    2,   98,    2, 0x08 /* Private */,
+      14,    2,  103,    2, 0x08 /* Private */,
+      18,    1,  108,    2, 0x08 /* Private */,
+      21,    3,  111,    2, 0x08 /* Private */,
+      27,    0,  118,    2, 0x08 /* Private */,
+      28,    1,  119,    2, 0x08 /* Private */,
+      30,    0,  122,    2, 0x08 /* Private */,
+      31,    0,  123,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -181,28 +124,7 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void, 0x80000000 | 19,   20,
     QMetaType::Void, 0x80000000 | 22, 0x80000000 | 22, 0x80000000 | 25,   23,   24,   26,
     QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   29,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -225,32 +147,11 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 7: _t->calc_chksm((*reinterpret_cast< uint8_t*(*)>(_a[1])),(*reinterpret_cast< uint8_t*(*)>(_a[2]))); break;
         case 8: _t->decode_usart_rx((*reinterpret_cast< uint8_t*(*)>(_a[1])),(*reinterpret_cast< uint8_t(*)>(_a[2]))); break;
         case 9: _t->handleError((*reinterpret_cast< QSerialPort::SerialPortError(*)>(_a[1]))); break;
-        case 10: _t->tableDataChanged((*reinterpret_cast< const QModelIndex(*)>(_a[1])),(*reinterpret_cast< const QModelIndex(*)>(_a[2])),(*reinterpret_cast< const QVector<int>(*)>(_a[3]))); break;
-        case 11: _t->pressed_ackFault(); break;
-        case 12: _t->pressed_start(); break;
-        case 13: _t->pressed_aperturaMan(); break;
-        case 14: _t->valueChanged_valApertura(); break;
-        case 15: _t->valueChanged_valAperturaFinale(); break;
-        case 16: _t->valueChanged_valAperturaRidotta50(); break;
-        case 17: _t->valueChanged_valAperturaRidotta60(); break;
-        case 18: _t->valueChanged_durataApRidottaCheck(); break;
-        case 19: _t->valueChanged_velRampa(); break;
-        case 20: _t->pressed_enSweep(); break;
-        case 21: _t->valueChanged_freqPrincipale(); break;
-        case 22: _t->valueChanged_ampModSweep(); break;
-        case 23: _t->valueChanged_freqModSweep(); break;
-        case 24: _t->valueChanged_vInvRectGain(); break;
-        case 25: _t->valueChanged_vInvRectOffset(); break;
-        case 26: _t->valueChanged_iInvRectGain(); break;
-        case 27: _t->valueChanged_iInvRectOffset(); break;
-        case 28: _t->valueChanged_ntc1Gain(); break;
-        case 29: _t->valueChanged_ntc1Offset(); break;
-        case 30: _t->valueChanged_ntc2Gain(); break;
-        case 31: _t->valueChanged_ntc2Offset(); break;
-        case 32: _t->valueChanged_potGain(); break;
-        case 33: _t->valueChanged_potOffset(); break;
-        case 34: _t->pressed_enProtOvercurr(); break;
-        case 35: _t->valueChanged_valOvercurr(); break;
+        case 10: _t->tableDataChanged_params((*reinterpret_cast< const QModelIndex(*)>(_a[1])),(*reinterpret_cast< const QModelIndex(*)>(_a[2])),(*reinterpret_cast< const QVector<int>(*)>(_a[3]))); break;
+        case 11: _t->onSettingsChanged(); break;
+        case 12: _t->onModbusStateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 13: _t->pressed_ackFault(); break;
+        case 14: _t->pressed_start(); break;
         default: ;
         }
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
@@ -296,13 +197,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 36)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 36;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 36)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 36;
+        _id -= 15;
     }
     return _id;
 }

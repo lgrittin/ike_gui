@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\lgrittin\AppData\Local\Temp\mf00aqn2.zac;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtWidgets;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtSerialPort;C:\Qt\5.15.2\msvc2019_64\include\QtSerialBus;C:\Qt\5.15.2\msvc2019_64\include\QtSql;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Users\lgrittin\AppData\Local\Temp\mf00aqn2.zac;/include;C:\Qt\5.15.2\msvc2019_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\lgrittin\AppData\Local\Temp\shfy1naw.b3o;C:\Qt\5.15.2\msvc2019_64\include;C:\Qt\5.15.2\msvc2019_64\include\QtWidgets;C:\Qt\5.15.2\msvc2019_64\include\QtGui;C:\Qt\5.15.2\msvc2019_64\include\QtANGLE;C:\Qt\5.15.2\msvc2019_64\include\QtSerialPort;C:\Qt\5.15.2\msvc2019_64\include\QtSerialBus;C:\Qt\5.15.2\msvc2019_64\include\QtSql;C:\Qt\5.15.2\msvc2019_64\include\QtCore;C:\Users\lgrittin\AppData\Local\Temp\shfy1naw.b3o;/include;C:\Qt\5.15.2\msvc2019_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>

@@ -23,7 +23,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_SettingsDialog_t {
     QByteArrayData data[8];
-    char stringdata0[103];
+    char stringdata0[111];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -39,12 +39,13 @@ QT_MOC_LITERAL(3, 29, 3), // "idx"
 QT_MOC_LITERAL(4, 33, 5), // "apply"
 QT_MOC_LITERAL(5, 39, 25), // "checkCustomBaudRatePolicy"
 QT_MOC_LITERAL(6, 65, 27), // "checkCustomDevicePathPolicy"
-QT_MOC_LITERAL(7, 93, 9) // "hideBoxes"
+QT_MOC_LITERAL(7, 93, 17) // "onProtocolChanged"
 
     },
     "SettingsDialog\0showPortInfo\0\0idx\0apply\0"
     "checkCustomBaudRatePolicy\0"
-    "checkCustomDevicePathPolicy\0hideBoxes"
+    "checkCustomDevicePathPolicy\0"
+    "onProtocolChanged"
 };
 #undef QT_MOC_LITERAL
 
@@ -88,7 +89,7 @@ void SettingsDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 1: _t->apply(); break;
         case 2: _t->checkCustomBaudRatePolicy((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 3: _t->checkCustomDevicePathPolicy((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 4: _t->hideBoxes((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 4: _t->onProtocolChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }

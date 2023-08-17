@@ -1,15 +1,15 @@
-id_address,dsp_family,type,decimals,val_actual,val_min,val_max,unit,description,dsp_name,kp_to_modbus,precisione
-200,CTRL_OUTPUT,word,0,0,0,65535,-,word stato 1,sts_out.sts_wd_1,1.00000,1.00000
-201,CTRL_OUTPUT,uint,0,0,0,65535,-,word allarme 1,sts_out.alm_wd_1,1.00000,1.00000
-202,ADC_OUTPUT,real,2,0.00,0.00,600.00,V,tensione uscita (rms),adc_out.adc_ctrl_fdb.v_inv_f,109.22500,0.00916
-203,ADC_OUTPUT,real,3,0.000,0.000,50.000,A,corrente uscita (rms),adc_out.adc_ctrl_fdb.i_inv_f,1310.70000,0.00076
-204,ADC_OUTPUT,real,2,0.00,0.00,600.00,V,tensione uscita (rettificata),adc_out.adc_ctrl_fdb_rect.v_inv_rect_f,109.22500,0.00916
-205,ADC_OUTPUT,real,3,0.000,0.000,50.000,A,corrente uscita (rettificata),adc_out.adc_ctrl_fdb_rect.i_inv_rect_f,1310.70000,0.00076
-206,ADC_OUTPUT,real,2,0.00,-20.00,180.00,cels,temperatura ntc1,adc_out.adc_sys.ntc1_f,327.67500,0.00305
-207,ADC_OUTPUT,real,2,0.00,-20.00,180.00,cels,temperatura ntc2,adc_out.adc_sys.ntc2_f,327.67500,0.00305
-208,ADC_OUTPUT,real,3,0.000,0.000,1.000,pu,valore potenziometro,adc_out.adc_sys.pot_f,65535.00000,0.00002
-209,SCR_OUTPUT,real,2,0.00,0.00,359.99,deg,apertura scr,scr_out.cmd_alfa,182.04672,0.00549
-210,IGBT_OUTPUT,real,3,0.000,0.000,50.000,kHz,frequenza attuale igbt,igbt_out.igbt_actual_freq,1310.70000,0.00076
-211,DGN_OUTPUT,uint,0,0,0,65535,ms,contatore isr timer 0,diagn_out.main_fsm_loop_time_ms,1.00000,1.00000
-212,DGN_OUTPUT,uint,0,0,0,65535,-,numero conteggi invalidi misura frequenza,diagn_out.scr_synch_invalid_cnt,1.00000,1.00000
-213,SCR_OUTPUT,real,2,0.00,0.00,65.00,Hz,frequenza attuale ingresso,scr_out.scr_synch_freq,1008.23077,0.00099
+id_address,dsp_family,type,decimal,val_actual,val_min,val_max,unit,description,dsp_name,kp_to_modbus,precision,val_modbus
+200,CTRL_OUTPUT,word,0,0,0,65535,-,word stato 1,sts_out.sts_wd_1,1.00000,1.00000,0
+201,CTRL_OUTPUT,uint,0,0,0,65535,-,word allarme 1,sts_out.alm_wd_1,1.00000,1.00000,0
+202,ADC_OUTPUT,real,2,0.00,0.00,600.00,V,tensione uscita (rms),adc_out.adc_ctrl_fdb.v_inv_f,109.22500,0.00916,0
+203,ADC_OUTPUT,real,3,0.000,0.000,50.000,A,corrente uscita (rms),adc_out.adc_ctrl_fdb.i_inv_f,1310.70000,0.00076,0
+204,ADC_OUTPUT,real,2,0.00,0.00,600.00,V,tensione uscita (rettificata),adc_out.adc_ctrl_fdb_rect.v_inv_rect_f,109.22500,0.00916,0
+205,ADC_OUTPUT,real,3,0.000,0.000,50.000,A,corrente uscita (rettificata),adc_out.adc_ctrl_fdb_rect.i_inv_rect_f,1310.70000,0.00076,0
+206,ADC_OUTPUT,real,2,0.00,-20.00,180.00,cels,temperatura ntc1,adc_out.adc_sys.ntc1_f,327.67500,0.00305,6554
+207,ADC_OUTPUT,real,2,0.00,-20.00,180.00,cels,temperatura ntc2,adc_out.adc_sys.ntc2_f,327.67500,0.00305,6554
+208,ADC_OUTPUT,real,3,0.000,0.000,1.000,pu,valore potenziometro,adc_out.adc_sys.pot_f,65535.00000,0.00002,0
+209,SCR_OUTPUT,real,2,0.00,0.00,359.99,deg,apertura scr,scr_out.cmd_alfa,182.04672,0.00549,0
+210,IGBT_OUTPUT,real,3,0.000,0.000,50.000,kHz,frequenza attuale igbt,igbt_out.igbt_actual_freq,1310.70000,0.00076,0
+211,DGN_OUTPUT,uint,0,0,0,65535,ms,contatore isr timer 0,diagn_out.main_fsm_loop_time_ms,1.00000,1.00000,0
+212,DGN_OUTPUT,uint,0,0,0,65535,-,numero conteggi invalidi misura frequenza,diagn_out.scr_synch_invalid_cnt,1.00000,1.00000,0
+213,SCR_OUTPUT,real,2,0.00,0.00,65.00,Hz,frequenza attuale ingresso,scr_out.scr_synch_freq,1008.23077,0.00099,0

@@ -40,5 +40,8 @@
         <file>images/icons8-synchronize-32.png</file>
         <file>db/params_data.csv</file>
         <file>db/process_data.csv</file>
+        <file>images/icons8-caricare-50.png</file>
+        <file>images/icons8-scaricare-50.png</file>
+        <file>images/icons8-agopressione-50.png</file>
     </qresource>
 </RCC>

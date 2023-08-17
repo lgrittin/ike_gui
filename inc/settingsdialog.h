@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSerialPort>
+#include <qpushbutton.h>
 
 enum CommProtocol
 {
@@ -40,20 +41,23 @@ public:
         QSerialPort::FlowControl flowControl;
         QString stringFlowControl;
         QString ipAddressAndPort;
+        int modbusServerAddress = 1;
+        int readInterval_ms = 1000;
+        int responseTime_ms = 1000;
+        int numberOfRetries = 3;
         bool localEchoEnabled;
     };
-
     explicit SettingsDialog(QWidget *parent = nullptr);
     ~SettingsDialog();
-
     Settings settings() const;
+    QPushButton* get_applyPushButton();
 
 private slots:
     void showPortInfo(int idx);
     void apply();
     void checkCustomBaudRatePolicy(int idx);
     void checkCustomDevicePathPolicy(int idx);
-    void hideBoxes(int idx);
+    void onProtocolChanged(int idx);
 
 private:
     void fillPortsParameters();

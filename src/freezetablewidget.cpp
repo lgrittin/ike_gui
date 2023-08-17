@@ -61,7 +61,7 @@ FreezeTableWidget::FreezeTableWidget(QAbstractItemModel * model)
 
       init();
 
-      //connect the headers and scrollbars of both tableviews together
+      //connect the headers_params and scrollbars of both tableviews together
       connect(horizontalHeader(),&QHeaderView::sectionResized, this,
               &FreezeTableWidget::updateSectionWidth);
       connect(verticalHeader(),&QHeaderView::sectionResized, this,

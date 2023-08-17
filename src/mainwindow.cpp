@@ -35,9 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_status_label_4(new QLabel),
     m_status_label_5(new QLabel),
     m_settings(new SettingsDialog),
-    model(new QStandardItemModel),
-    m_serial(new QSerialPort(this)
-    )
+    model_params(new QStandardItemModel),
+    model_process(new QStandardItemModel)
 {
     // ---------------------------------------
     // INIT ELEMENTI GUI
@@ -86,70 +85,127 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->label_impulsiAttivi->setAutoFillBackground(true);
     m_ui->label_ImpulsiSpenti->setAutoFillBackground(true);
 
-    // ---------------------------------------
-    // IMPORTAZIONE DATABASE E COSTRUZIONE
-    // TABELLA PARAMETRI /DATI DI PROCESSO
-    // ---------------------------------------
-    QFile file(":/db/params_data.csv");
-    if (file.open(QFile::ReadOnly)) {
-        QTextStream stream(&file);
+    // ---------------------------------------------------------- //
+    // IMPORTAZIONE DATABASE E COSTRUZIONE TABELLA PARAMETRI
+    // ---------------------------------------------------------- //
+    QFile file_params(":/db/params_data.csv");
+    if (file_params.open(QFile::ReadOnly)) {
+        QTextStream stream(&file_params);
 
         char separator_file = ',';
         QString line = stream.readLine();
-        list_columns = line.simplified().split(separator_file);
-        model->setHorizontalHeaderLabels(list_columns);
+        list_columns_params = line.simplified().split(separator_file);
+        model_params->setHorizontalHeaderLabels(list_columns_params);
 
         int row = 0;
         QStandardItem* newItem = nullptr;
         while (!stream.atEnd()) {
             line = stream.readLine();
             if (!line.startsWith('#') && line.contains(separator_file)) {
-                list_row = line.simplified().split(separator_file);
-                for (int col = 0; col < list_row.length(); ++col) {
-                    newItem = new QStandardItem(list_row.at(col));
-                    model->setItem(row, col, newItem);
-                    if (col != list_columns.indexOf("val_actual"))
+                list_row_params = line.simplified().split(separator_file);
+                for (int col = 0; col < list_row_params.length(); ++col) {
+                    newItem = new QStandardItem(list_row_params.at(col));
+                    model_params->setItem(row, col, newItem);
+                    if (col != list_columns_params.indexOf("val_actual"))
                     {
-                        auto currentFlags = model->item(row, col)->flags();
-                        model->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
+                        auto currentFlags = model_params->item(row, col)->flags();
+                        model_params->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
 
-                        if (col < list_columns.indexOf("val_actual"))
-                            model->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
-                        else if (col > list_columns.indexOf("val_actual"))
-                            model->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
+                        if (col < list_columns_params.indexOf("val_actual"))
+                            model_params->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
+                        else if (col > list_columns_params.indexOf("val_actual"))
+                            model_params->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
                     }
                     else
-                        model->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
+                        model_params->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
                 }
                 ++row;
             }
         }
     }
-    file.close();
+    file_params.close();
 
-    FreezeTableWidget* tableView = new FreezeTableWidget(model);
-    QStringList headers;
-    SpinBoxDelegate* delegate_doubleSpinBox = new SpinBoxDelegate;
-    int rowCount = model->rowCount();
-    int colunCount = model->columnCount();
+    FreezeTableWidget* tableView_params = new FreezeTableWidget(model_params);
+    QStringList headers_params;
+    SpinBoxDelegate* delegate_doubleSpinBox_params = new SpinBoxDelegate;
+    params_startAddress = model_params->data(model_params->index(0, list_columns_params.indexOf("id_address"))).toInt();
     
-    for (int i = 0; i < colunCount; i++)
-        headers.append(tableView->model()->headerData(i, Qt::Horizontal).toString());
+    for (int i = 0; i < model_params->columnCount(); i++)
+        headers_params.append(tableView_params->model()->headerData(i, Qt::Horizontal).toString());
 
-    delegate_doubleSpinBox->headers = headers;
-    delegate_doubleSpinBox->model = model;
-    tableView->setItemDelegateForColumn(list_columns.indexOf("val_actual"), delegate_doubleSpinBox);
-    tableView->setColumnHidden(list_columns.indexOf("type"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("decimal"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("single_steps"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("dsp_name"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("kp_to_modbus"), 1);
-    tableView->setColumnHidden(list_columns.indexOf("precision"), 1);
-    tableView->horizontalHeader()->setStretchLastSection(true);
-    tableView->setWindowTitle(QObject::tr("PARAMETERS"));
-    //tableView->resize(560, 680);
-    //tableView->resizeColumnsToContents();
-    m_ui->verticalLayout_2->addWidget(tableView);
+    delegate_doubleSpinBox_params->headers_params = headers_params;
+    delegate_doubleSpinBox_params->model = model_params;
+    tableView_params->setItemDelegateForColumn(list_columns_params.indexOf("val_actual"), delegate_doubleSpinBox_params);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("type"), 1);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("decimal"), 1);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("single_steps"), 1);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("dsp_name"), 1);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("kp_to_modbus"), 1);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("precision"), 1);
+    tableView_params->setColumnHidden(list_columns_params.indexOf("val_modbus"), 1);
+    tableView_params->horizontalHeader()->setStretchLastSection(true);
+    tableView_params->setWindowTitle(QObject::tr("PARAMETERS"));
+    //tableView_params->resize(100, 200);
+    //tableView_params->resizeColumnsToContents();
+    m_ui->horizontalLayout_params->addWidget(tableView_params);
+
+    // ---------------------------------------------------------- //
+    // IMPORTAZIONE DATABASE E COSTRUZIONE TABELLA DATI DI PROCESSO
+    // ---------------------------------------------------------- //
+    QFile file_process(":/db/process_data.csv");
+    if (file_process.open(QFile::ReadOnly)) {
+        QTextStream stream(&file_process);
+
+        char separator_file = ',';
+        QString line = stream.readLine();
+        list_columns_process = line.simplified().split(separator_file);
+        model_process->setHorizontalHeaderLabels(list_columns_process);
+
+        int row = 0;
+        QStandardItem* newItem = nullptr;
+        while (!stream.atEnd()) {
+            line = stream.readLine();
+            if (!line.startsWith('#') && line.contains(separator_file)) {
+                list_row_process = line.simplified().split(separator_file);
+                for (int col = 0; col < list_row_process.length(); ++col) {
+                    newItem = new QStandardItem(list_row_process.at(col));
+                    model_process->setItem(row, col, newItem);
+                    auto currentFlags = model_process->item(row, col)->flags();
+                    model_process->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
+
+                    if (col == list_columns_process.indexOf("val_actual"))
+                        model_process->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
+                    else if (col < list_columns_process.indexOf("val_actual"))
+                        model_process->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
+                    else
+                        model_process->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
+                }
+                ++row;
+            }
+        }
+    }
+    file_process.close();
+
+    FreezeTableWidget* tableView_process = new FreezeTableWidget(model_process);
+    process_startAddress = model_process->data(model_process->index(0, list_columns_process.indexOf("id_address"))).toInt();
+    QStringList headers_process;
+
+    for (int i = 0; i < model_process->columnCount(); i++)
+        headers_process.append(tableView_process->model()->headerData(i, Qt::Horizontal).toString());
+
+    tableView_process->setColumnHidden(list_columns_process.indexOf("type"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("decimal"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("val_min"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("val_max"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("dsp_name"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("kp_to_modbus"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("precision"), 1);
+    tableView_process->setColumnHidden(list_columns_process.indexOf("val_modbus"), 1);
+    tableView_process->horizontalHeader()->setStretchLastSection(true);
+    tableView_process->setWindowTitle(QObject::tr("PARAMETERS"));
+    tableView_process->resize(100, 200);
+    //tableView_params->resizeColumnsToContents();
+    m_ui->horizontalLayout_process->addWidget(tableView_process);
 
     // ---------------------------------------
     // GUI TIMERS
@@ -163,65 +219,303 @@ MainWindow::MainWindow(QWidget *parent) :
     // CONNESSIONI
     // ---------------------------------------
     initActionsConnections();
-
-    connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
-    connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
-    connect(m_serialReadParams, SIGNAL(timeout()), this, SLOT(askToReadParam()));
-    connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged(QModelIndex, QModelIndex, QVector<int>)));
-
     m_serialScanTimer->start();
 }
 
 MainWindow::~MainWindow()
 {
+    if (modbusDevice)
+        modbusDevice->disconnectDevice();
+    delete modbusDevice;
     delete m_settings;
     delete m_ui;
 }
 
-void MainWindow::tableDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+void MainWindow::initActionsConnections()
 {
-    
-    double val = model->data(model->index(topLeft.row(), list_columns.indexOf("val_actual"))).toDouble();
-    double kp_modbus = model->data(model->index(topLeft.row(), list_columns.indexOf("kp_to_modbus"))).toDouble();
-    double min_val = model->data(model->index(topLeft.row(), list_columns.indexOf("val_min"))).toDouble();
-    unsigned int val_u16 = (unsigned int)round((val - min_val) * kp_modbus);
-    QString id_addr = model->data(model->index(topLeft.row(), list_columns.indexOf("id_address"))).toString();
+    connect(m_ui->actionConnect, &QAction::triggered, this, &MainWindow::openSerialPort);
+    connect(m_ui->actionDisconnect, &QAction::triggered, this, &MainWindow::closeSerialPort);
+    connect(m_ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
+    connect(m_ui->actionConfigure, &QAction::triggered, m_settings, &SettingsDialog::show);
+    connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
+    connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
+    connect(m_ui->actionSynchronizeParams, &QAction::triggered, this, &MainWindow::synchronizeParams);
+    //connect(m_ui->pushButton_ackFault, &QPushButton::pressed, this, &MainWindow::pressed_ackFault);
+    connect(m_ui->pushButton_start, &QPushButton::pressed, this, &MainWindow::pressed_start);
+    connect(m_serialReadParams, SIGNAL(timeout()), this, SLOT(askToReadParam()));
+    connect(model_params, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged_params(QModelIndex, QModelIndex, QVector<int>)));
+    QPushButton* settings_applyButton = m_settings->get_applyPushButton();
+    connect(settings_applyButton, &QPushButton::clicked,
+        this, &MainWindow::onSettingsChanged);
+}
 
-    qDebug() << "id_addr: " << id_addr << " - val: " << QString::number(val) << " - val_modbus: " << QString::number(val_u16);
+void MainWindow::onSettingsChanged()
+{
+    // unlink modbusDevice
+    if (modbusDevice) {
+        modbusDevice->disconnectDevice();
+        delete modbusDevice;
+        modbusDevice = nullptr;
+    }
+
+    // unlink m_serial
+    if (m_serial) {
+        m_serial->disconnect();
+        delete m_serial;
+        m_serial = nullptr;
+    }
+
+    switch (m_settings->settings().protocol)
+    {
+    case CustomSerial_9B:
+        m_serial = new QSerialPort(this);
+        connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
+        connect(m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
+        break;
+    case Modbus_RTU:
+        modbusDevice = new QModbusRtuSerialMaster(this);
+        connect(modbusDevice, &QModbusClient::errorOccurred, [this](QModbusDevice::Error) {
+            m_status_label_5->setText(modbusDevice->errorString() + QStringLiteral(" - Could not create Modbus master.")); });
+        break;
+    case Modbus_TCP:
+        modbusDevice = new QModbusTcpClient(this);
+        connect(modbusDevice, &QModbusClient::errorOccurred, [this](QModbusDevice::Error) {
+            m_status_label_5->setText(modbusDevice->errorString() + QStringLiteral(" - Could not create Modbus client.")); });
+        break;
+    default:
+        break;
+    }
+
+    // Manage Modbus Object
+    if (modbusDevice)
+        connect(modbusDevice, &QModbusClient::stateChanged, this, &MainWindow::onModbusStateChanged);
+}
+
+void MainWindow::onModbusStateChanged(int state)
+{
+    bool connected = (state != QModbusDevice::UnconnectedState);
+    if (modbusDevice)
+    {
+        m_ui->actionConnect->setEnabled(!connected);
+        m_ui->actionDisconnect->setEnabled(connected);
+
+        if (state == QModbusDevice::UnconnectedState)
+            m_status_label_5->setText("Modbus Disconnected");
+        else if (state == QModbusDevice::ConnectedState)
+            m_status_label_5->setText("Modbus Connected");
+    }
+}
+
+void MainWindow::sendModbusRequest(int start_address, int address_length, int cmd)
+{
+    if (!modbusDevice)
+        return;
+
+    Q_ASSERT((start_address >= 0) && (address_length >= 0));
+    QModbusDataUnit modbus_data_unit = QModbusDataUnit(QModbusDataUnit::RegisterType::HoldingRegisters, start_address, address_length);
+    
+    // Write Params
+    if (cmd == CMD_WRITE)
+    {
+        int col = list_columns_params.indexOf("val_modbus");
+        for (int i = 0, total = int(modbus_data_unit.valueCount()); i < total; ++i)
+        {
+            int data_write = model_params->data(model_params->index((start_address - params_startAddress) + i, col)).toInt();
+            modbus_data_unit.setValue(i, data_write);
+        }
+        if (auto* reply = modbusDevice->sendWriteRequest(modbus_data_unit, m_settings->settings().modbusServerAddress))
+        {
+            if (!reply->isFinished())
+            {
+                connect(reply, &QModbusReply::finished, this, [this, reply]() {
+                    if (reply->error() == QModbusDevice::ProtocolError)
+                    {
+                        m_status_label_5->setText(tr("Write response error: %1 (Mobus exception: 0x%2)")
+                            .arg(reply->errorString()).arg(reply->rawResult().exceptionCode(), -1, 16));
+                    }
+                    else if (reply->error() != QModbusDevice::NoError)
+                    {
+                        m_status_label_5->setText(tr("Write response error: %1 (code: 0x%2)").
+                            arg(reply->errorString()).arg(reply->error(), -1, 16));
+                    }
+                    reply->deleteLater();
+                    });
+            }
+            else {
+                // broadcast replies return immediately
+                reply->deleteLater();
+            }
+        }
+        else {
+            m_status_label_5->setText(tr("Write error: ") + modbusDevice->errorString());
+        }
+    }
+    // Read Params/Process
+    else if (cmd == CMD_READ)
+    {
+        if (auto* reply = modbusDevice->sendReadRequest(modbus_data_unit, m_settings->settings().modbusServerAddress)) {
+            if (!reply->isFinished())
+                connect(reply, &QModbusReply::finished, this, &MainWindow::onReadReady);
+            else
+                delete reply; // broadcast replies return immediately
+        }
+        else {
+            m_status_label_5->setText(tr("Read error: ") + modbusDevice->errorString());
+        }
+    }
+}
+
+void MainWindow::onReadReady()
+{
+    auto reply = qobject_cast<QModbusReply*>(sender());
+    if (!reply)
+        return;
+
+    if (reply->error() == QModbusDevice::NoError)
+    {
+        const QModbusDataUnit unit = reply->result();
+        QStandardItemModel* model_generic;
+        int baseAddress = 0;
+        QStringList* list_column_generic;
+
+        if (unit.startAddress() >= process_startAddress)
+        {
+            model_generic = model_process;
+            list_column_generic = &list_columns_process;
+            baseAddress = process_startAddress;
+        }
+        else
+        {
+            model_generic = model_params;
+            list_column_generic = &list_columns_params;
+            baseAddress = params_startAddress;
+        }
+
+        for (int i = 0, total = int(unit.valueCount()); i < total; ++i)
+        {
+            model_generic->setData(
+                model_generic->index((unit.startAddress() - baseAddress) + i, list_column_generic->indexOf("val_modbus")),
+                unit.value(i));
+            computeValDoubleFromU16(model_generic, (unit.startAddress() - baseAddress) + i);
+
+        }
+    }
+    else if (reply->error() == QModbusDevice::ProtocolError)
+    {
+        m_status_label_5->setText(tr("Read response error: %1 (Mobus exception: 0x%2)").
+            arg(reply->errorString()).
+            arg(reply->rawResult().exceptionCode(), -1, 16));
+    }
+    else
+    {
+        m_status_label_5->setText(tr("Read response error: %1 (code: 0x%2)").
+            arg(reply->errorString()).
+            arg(reply->error(), -1, 16));
+    }
+
+    reply->deleteLater();
+}
+
+void MainWindow::tableDataChanged_params(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
+{
+    computeValU16FromDouble(model_params, topLeft.row());
+    qDebug() << "id_addr: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("id_address"))).toInt())
+        << " - val_actual: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("val_actual"))).toDouble())
+        << " - val_modbus: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("val_modbus"))).toDouble());
 }
 
 void MainWindow::openSerialPort()
-{
-    const SettingsDialog::Settings p = m_settings->settings();
-    m_serial->setPortName(p.name);
-    m_serial->setBaudRate(p.baudRate);
-    m_serial->setDataBits(p.dataBits);
-    m_serial->setParity(p.parity);
-    m_serial->setStopBits(p.stopBits);
-    m_serial->setFlowControl(p.flowControl);
-    if (m_serial->open(QIODevice::ReadWrite)) {
-        m_ui->actionConnect->setEnabled(false);
-        m_ui->actionDisconnect->setEnabled(true);
-        m_ui->actionConfigure->setEnabled(false);
-        showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
-                          .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
-                          .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
-        synchronizeParams();
-    } else {
-        QMessageBox::critical(this, tr("Error"), m_serial->errorString());
-
-        showStatusMessage(tr("Open error"));
+{    
+    // Serial connection
+    if ((m_serial)&&(!modbusDevice))
+    {
+        m_serial->setPortName(m_settings->settings().name);
+        m_serial->setBaudRate(m_settings->settings().baudRate);
+        m_serial->setDataBits(m_settings->settings().dataBits);
+        m_serial->setParity(m_settings->settings().parity);
+        m_serial->setStopBits(m_settings->settings().stopBits);
+        m_serial->setFlowControl(m_settings->settings().flowControl);
+        if (m_serial->open(QIODevice::ReadWrite)) {
+            m_ui->actionConnect->setEnabled(false);
+            m_ui->actionDisconnect->setEnabled(true);
+            m_ui->actionConfigure->setEnabled(false);
+            showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
+                .arg(m_settings->settings().name)
+                .arg(m_settings->settings().stringBaudRate)
+                .arg(m_settings->settings().stringDataBits)
+                .arg(m_settings->settings().stringParity)
+                .arg(m_settings->settings().stringStopBits)
+                .arg(m_settings->settings().stringFlowControl));
+            //synchronizeParams();
+        }
+        else {
+            QMessageBox::critical(this, tr("Error"), m_serial->errorString());
+            showStatusMessage(tr("Open error"));
+        }
     }
+    // Modbus connection
+    else if ((!m_serial) && (modbusDevice))
+    {
+        m_status_label_5->setText("");
+        if (modbusDevice->state() != QModbusDevice::ConnectedState)
+        {
+            if (m_settings->settings().protocol == Modbus_RTU)
+            {
+                modbusDevice->setConnectionParameter(QModbusDevice::SerialPortNameParameter,
+                    m_settings->settings().name);
+                modbusDevice->setConnectionParameter(QModbusDevice::SerialParityParameter,
+                    m_settings->settings().parity);
+                modbusDevice->setConnectionParameter(QModbusDevice::SerialBaudRateParameter,
+                    m_settings->settings().baudRate);
+                modbusDevice->setConnectionParameter(QModbusDevice::SerialDataBitsParameter,
+                    m_settings->settings().dataBits);
+                modbusDevice->setConnectionParameter(QModbusDevice::SerialStopBitsParameter,
+                    m_settings->settings().stopBits);
+            }
+            else
+            {
+                const QUrl url = m_settings->settings().ipAddressAndPort;
+                modbusDevice->setConnectionParameter(QModbusDevice::NetworkPortParameter, url.port());
+                modbusDevice->setConnectionParameter(QModbusDevice::NetworkAddressParameter, url.host());
+            }
+            modbusDevice->setTimeout(m_settings->settings().responseTime_ms);
+            modbusDevice->setNumberOfRetries(m_settings->settings().numberOfRetries);
+
+            if (!modbusDevice->connectDevice())
+            {
+                statusBar()->showMessage(tr("Connect failed: ") + modbusDevice->errorString(), 5000);
+            }
+            else
+            {
+                m_ui->actionConnect->setEnabled(false);
+                m_ui->actionDisconnect->setEnabled(true);
+            }
+        }
+        else
+        {
+            modbusDevice->disconnectDevice();
+            m_ui->actionConnect->setEnabled(true);
+            m_ui->actionDisconnect->setEnabled(false);
+        }
+    }
+    // Unmanaged
+    else
+    { }
 }
 
 void MainWindow::closeSerialPort()
 {
-    if (m_serial->isOpen())
-        m_serial->close();
-    m_ui->actionConnect->setEnabled(true);
-    m_ui->actionDisconnect->setEnabled(false);
-    m_ui->actionConfigure->setEnabled(true);
-    showStatusMessage(tr("Disconnected"));
+    if (m_serial)
+    {
+        if (m_serial->isOpen())
+            m_serial->close();
+        m_ui->actionConnect->setEnabled(true);
+        m_ui->actionDisconnect->setEnabled(false);
+        m_ui->actionConfigure->setEnabled(true);
+        showStatusMessage(tr("Disconnected"));
+    }
+    else if (modbusDevice)
+        modbusDevice->disconnectDevice();
 }
 
 void MainWindow::about()
@@ -239,7 +533,7 @@ void MainWindow::synchronizeParams()
 
 void MainWindow::askToReadParam()
 {
-    MainWindow::sendDataThroughSerial(CMD_READ, QByteArrayLiteral("\x00\x00\x00\x00"), param_data[id].id);
+    MainWindow::sendDataThroughSerial(CMD_READ, 0U, param_data[id].id);
     id++;
     showStatusMessage(tr("Synchronizing... %1").arg(id));
     if (id == SDO_LENGTH)
@@ -252,9 +546,13 @@ void MainWindow::askToReadParam()
     }
 }
 
-void MainWindow::sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, unsigned int data_id)
+void MainWindow::sendDataThroughSerial(unsigned int cmd, unsigned int data_val, unsigned int data_id)
 {
-    if (m_serial->isOpen()) {
+    QByteArray data_tx_serial = QByteArray::number(data_val, 16);
+
+    if (m_serial)
+    { 
+        if (m_serial->isOpen()) {
 
         m_status_label_1->setStyleSheet("background-color: green");
 
@@ -271,10 +569,10 @@ void MainWindow::sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, uns
         uint16_t en_artifact = 0;
         data_cod[0] = ((data_id & 0xFF00) >> 8);
         data_cod[1] = (data_id & 0x00FF);
-        data_cod[2] = data_tx.at(0);
-        data_cod[3] = data_tx.at(1);
-        data_cod[4] = data_tx.at(2);
-        data_cod[5] = data_tx.at(3);
+        data_cod[2] = data_tx_serial.at(0);
+        data_cod[3] = data_tx_serial.at(1);
+        data_cod[4] = data_tx_serial.at(2);
+        data_cod[5] = data_tx_serial.at(3);
         data_cod[6] = (chksum_error_rx & 0xFE) + (cmd & 0x01);
 
         for (int i = 0; i < 7; i++)
@@ -308,6 +606,12 @@ void MainWindow::sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, uns
 
         m_status_label_1->setStyleSheet("background-color: white");
     }
+        else {
+            // notify serial port closed
+            qDebug() << "Serial port not connected!";
+            m_status_label_5->setText("serial port closed");
+        }
+    }
     else {
         // notify serial port closed
         qDebug() << "Serial port not connected!";
@@ -317,7 +621,8 @@ void MainWindow::sendDataThroughSerial(unsigned int cmd, QByteArray data_tx, uns
 
 void MainWindow::writeData(const QByteArray &data)
 {
-    m_serial->write(data);
+    if (m_serial)
+        m_serial->write(data);
 }
 
 void MainWindow::readData()
@@ -330,63 +635,65 @@ void MainWindow::readData()
     uint8_t data_chksm = 0x00;
     USART_RX_MSG usart_rx;
 
-
-    while (m_serial->canReadLine())
+    if (m_serial)
     {
-        QByteArray data = m_serial->readLine();
-
-        if (data.size() == 10)
+        while (m_serial->canReadLine())
         {
-            /**
-             * USART Msg Structure:
-             *
-             * idx:	[0]   [1]   [2]     [3]     [4]     [5]     [6]		 [7]        [8]	 	[9]
-             *  	------------------------------------------------------------------------------
-             *  	| ID1 | ID0 | DATA3 | DATA2 | DATA1 | DATA0 | CMDSTS | ARTIFACT | CHKSM | LF |
-             *  	------------------------------------------------------------------------------
-             */
+            QByteArray data = m_serial->readLine();
 
-            computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
-            data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
-            if (computed_chksm == data_chksm)
+            if (data.size() == 10)
             {
-                artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
-                data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
-                data_dec[1] = ((((artifact & 0x40) >> 6) * 0x0A) + (data.at(1) * (1 - ((artifact & 0x40) >> 6))));
-                data_dec[2] = ((((artifact & 0x20) >> 5) * 0x0A) + (data.at(2) * (1 - ((artifact & 0x20) >> 5))));
-                data_dec[3] = ((((artifact & 0x10) >> 4) * 0x0A) + (data.at(3) * (1 - ((artifact & 0x10) >> 4))));
-                data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
-                data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
-                data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
-                chksum_error_tx = data_dec[6];
-                data_id = (data_dec[0] << 8) + data_dec[1];
-                
-                if ((data_id & 0xFF00) == ID_PDO_00)
-                {
-                    data_idx = data_id - ID_PDO_00;
-                    memcpy(process_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), process_data[data_idx].num_byte);
-                }
-                else if ((data_id & 0xFF00) == ID_SDO_00)
-                {
-                    data_idx = data_id - ID_SDO_00;
-                    memcpy(param_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), param_data[data_idx].num_byte);
-                }
+                /**
+                 * USART Msg Structure:
+                 *
+                 * idx:	[0]   [1]   [2]     [3]     [4]     [5]     [6]		 [7]        [8]	 	[9]
+                 *  	------------------------------------------------------------------------------
+                 *  	| ID1 | ID0 | DATA3 | DATA2 | DATA1 | DATA0 | CMDSTS | ARTIFACT | CHKSM | LF |
+                 *  	------------------------------------------------------------------------------
+                 */
 
-                MainWindow::refreshData(data_id, data_idx);
+                computed_chksm = 0xA5 ^ data.at(0) ^ data.at(1) ^ data.at(2) ^ data.at(3) ^ data.at(4) ^ data.at(5) ^ data.at(6) ^ data.at(7);
+                data_chksm = ((data.at(8) == 0x1A) ? (0x0A) : (data.at(8)));
+                if (computed_chksm == data_chksm)
+                {
+                    artifact = ((data.at(7) == 0x01) ? (0x0A) : (data.at(7)));
+                    data_dec[0] = ((((artifact & 0x80) >> 7) * 0x0A) + (data.at(0) * (1 - ((artifact & 0x80) >> 7))));
+                    data_dec[1] = ((((artifact & 0x40) >> 6) * 0x0A) + (data.at(1) * (1 - ((artifact & 0x40) >> 6))));
+                    data_dec[2] = ((((artifact & 0x20) >> 5) * 0x0A) + (data.at(2) * (1 - ((artifact & 0x20) >> 5))));
+                    data_dec[3] = ((((artifact & 0x10) >> 4) * 0x0A) + (data.at(3) * (1 - ((artifact & 0x10) >> 4))));
+                    data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
+                    data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
+                    data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
+                    chksum_error_tx = data_dec[6];
+                    data_id = (data_dec[0] << 8) + data_dec[1];
+                    
+                    if ((data_id & 0xFF00) == ID_PDO_00)
+                    {
+                        data_idx = data_id - ID_PDO_00;
+                        memcpy(process_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), process_data[data_idx].num_byte);
+                    }
+                    else if ((data_id & 0xFF00) == ID_SDO_00)
+                    {
+                        data_idx = data_id - ID_SDO_00;
+                        memcpy(param_data[data_idx].val, reinterpret_cast<void*>(&data_dec[2]), param_data[data_idx].num_byte);
+                    }
+
+                    MainWindow::refreshData(data_id, data_idx);
+                }
+                else
+                {
+                    chksum_error_rx++;
+                    qDebug() << hex << "errore chksum. parametro/dp. id: " << QString::number(data.at(0), 16) << QString::number(data.at(1), 16);
+                }
             }
             else
             {
-                chksum_error_rx++;
-                qDebug() << hex << "errore chksum. parametro/dp. id: " << QString::number(data.at(0), 16) << QString::number(data.at(1), 16);
+                chksum_error_rx;
+                qDebug() << hex << "errore lunhgezza. parametro/dp. id: " << data.at(0) << data.at(1);
             }
+            m_status_label_3->setText(QString::number(chksum_error_rx));
+            m_status_label_4->setText(QString::number(chksum_error_tx));
         }
-        else
-        {
-            chksum_error_rx;
-            qDebug() << hex << "errore lunhgezza. parametro/dp. id: " << data.at(0) << data.at(1);
-        }
-        m_status_label_3->setText(QString::number(chksum_error_rx));
-        m_status_label_4->setText(QString::number(chksum_error_tx));
     }
 }
 
@@ -464,6 +771,9 @@ void MainWindow::refreshData(unsigned int data_id, unsigned int data_idx)
         if (alm_wd_1.bit.OH2) m_ui->label_OH2->setStyleSheet("background-color: red");
         else m_ui->label_OH2->setStyleSheet("background-color: white");
         break;
+
+        /*
+
     case ID_PDO_02: m_ui->label_vInvVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
     case ID_PDO_03: m_ui->label_iInvVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
     case ID_PDO_04: m_ui->label_vInvRectVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
@@ -477,9 +787,13 @@ void MainWindow::refreshData(unsigned int data_id, unsigned int data_idx)
     case ID_PDO_12: m_ui->label_freqInvalidCntVal->setText(QString::number(*(uint16_t*)process_data[data_idx].val)); break;
     case ID_PDO_13: m_ui->label_lineFreqVal->setText(QString::number(*(float*)process_data[data_idx].val)); break;
 
+        */
+
         /* ---------- */
         /* PARAMETRI  */
         /* ---------- */
+
+        /*
 
     case ID_SDO_00: break;
     case ID_SDO_01: m_ui->doubleSpinBox_durataInit->setValue(*(uint16_t*)param_data[data_idx].val); break;
@@ -519,6 +833,10 @@ void MainWindow::refreshData(unsigned int data_id, unsigned int data_idx)
         m_ui->checkBox_enProtOvercurr->setChecked((*(uint16_t*)param_data[data_idx].val));
         connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::toggled, this, &MainWindow::pressed_enProtOvercurr);
         break;
+
+        */
+
+
     default: break;
     }
 }
@@ -535,47 +853,14 @@ void MainWindow::decode_usart_rx(uint8_t* serial_rx, uint8_t artifact_bitwise)
 
 void MainWindow::handleError(QSerialPort::SerialPortError error)
 {
-    if (error == QSerialPort::ResourceError) {
-        QMessageBox::critical(this, tr("Critical Error"), m_serial->errorString());
-        closeSerialPort();
+    if (m_serial)
+    {
+        if (error == QSerialPort::ResourceError)
+        {
+            QMessageBox::critical(this, tr("Critical Error"), m_serial->errorString());
+            closeSerialPort();
+        }
     }
-}
-
-void MainWindow::initActionsConnections()
-{
-    connect(m_ui->actionConnect, &QAction::triggered, this, &MainWindow::openSerialPort);
-    connect(m_ui->actionDisconnect, &QAction::triggered, this, &MainWindow::closeSerialPort);
-    connect(m_ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
-    connect(m_ui->actionConfigure, &QAction::triggered, m_settings, &SettingsDialog::show);
-    connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
-    connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
-    connect(m_ui->actionSynchronizeParams, &QAction::triggered, this, &MainWindow::synchronizeParams);
-
-    //connect(m_ui->pushButton_ackFault, &QPushButton::pressed, this, &MainWindow::pressed_ackFault);
-    connect(m_ui->pushButton_start, &QPushButton::pressed, this, &MainWindow::pressed_start);
-    connect(m_ui->checkBox_aperturaMan, &QCheckBox::pressed, this, &MainWindow::pressed_aperturaMan);
-    connect(m_ui->doubleSpinBox_valApertura, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valApertura);
-    connect(m_ui->doubleSpinBox_valAperturaFinale, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valAperturaFinale);
-    connect(m_ui->doubleSpinBox_valAperturaRidotta50, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valAperturaRidotta50);
-    connect(m_ui->doubleSpinBox_valAperturaRidotta60, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valAperturaRidotta60);
-    connect(m_ui->doubleSpinBox_durataApRidottaCheck, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_durataApRidottaCheck);
-    connect(m_ui->doubleSpinBox_velRampa, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_velRampa);
-    connect(m_ui->checkBox_enSweep, &QCheckBox::pressed, this, &MainWindow::pressed_enSweep);
-    connect(m_ui->doubleSpinBox_freqPrincipale, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_freqPrincipale);
-    connect(m_ui->doubleSpinBox_ampModSweep, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ampModSweep);
-    connect(m_ui->doubleSpinBox_freqModSweep, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_freqModSweep);
-    connect(m_ui->doubleSpinBox_vInvRectGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_vInvRectGain);
-    connect(m_ui->doubleSpinBox_vInvRectOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_vInvRectOffset);
-    connect(m_ui->doubleSpinBox_iInvRectGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_iInvRectGain);
-    connect(m_ui->doubleSpinBox_iInvRectOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_iInvRectOffset);
-    connect(m_ui->doubleSpinBox_ntc1Gain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc1Gain);
-    connect(m_ui->doubleSpinBox_ntc1Offset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc1Offset);
-    connect(m_ui->doubleSpinBox_ntc2Gain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc2Gain);
-    connect(m_ui->doubleSpinBox_ntc2Offset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_ntc2Offset);
-    connect(m_ui->doubleSpinBox_potGain, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_potGain);
-    connect(m_ui->doubleSpinBox_potOffset, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_potOffset);
-    connect(m_ui->checkBox_enProtOvercurr, &QCheckBox::pressed, this, &MainWindow::pressed_enProtOvercurr);
-    connect(m_ui->doubleSpinBox_valOvercurr, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::valueChanged_valOvercurr);
 }
 
 void MainWindow::showStatusMessage(const QString &message)
@@ -583,226 +868,54 @@ void MainWindow::showStatusMessage(const QString &message)
     m_status_label_5->setText(message);
 }
 
+void MainWindow::computeValU16FromDouble(QAbstractItemModel* model_generic, int row)
+{
+    QStringList* list_column_generic = (model_generic == model_params) ? (&list_columns_params) : (&list_columns_process);
+    double val_double = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_actual"))).toDouble();
+    double kp_modbus = model_generic->data(model_generic->index(row, list_column_generic->indexOf("kp_to_modbus"))).toDouble();
+    double val_min = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_min"))).toDouble();
+    qint16 val_u16 = (val_double - val_min) * kp_modbus;
+    model_generic->setData(model_generic->index(row, list_column_generic->indexOf("val_modbus")), val_u16);
+}
+
+void MainWindow::computeValDoubleFromU16(QAbstractItemModel* model_generic, int row)
+{
+    QStringList* list_column_generic = (model_generic == model_params) ? (&list_columns_params) : (&list_columns_process);
+    qint16 val_u16 = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_modbus"))).toDouble();
+    double kp_modbus = model_generic->data(model_generic->index(row, list_column_generic->indexOf("kp_to_modbus"))).toDouble();
+    double val_min = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_min"))).toDouble();
+    double val_double = (val_u16 / kp_modbus) + val_min;
+    model_generic->setData(model_generic->index(row, list_column_generic->indexOf("val_actual")), val_double);
+}
+
+
 #pragma region callbacks_modifica_dati
 
 void MainWindow::pressed_ackFault()
 {
-    uint32_t data_val;
-    data_val = cmd_wd_1.all | 0x0080;
-    uint16_t data_id = ID_SDO_00;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+    unsigned int data_val = model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).toInt();   // word command 1
+    unsigned int data_val_new = data_val | 0x0080;
+    model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).setValue(data_val_new);
+    MainWindow::sendDataThroughSerial(CMD_WRITE,
+        model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).toInt(),
+        model_params->data(model_params->index(0, list_columns_params.indexOf("id_address"))).toInt());
     QThread::msleep(500);
-    data_val = cmd_wd_1.all &~ 0x0080;
-    data_tx = QByteArray(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+    data_val = data_val_new;
+    data_val_new = data_val & ~0x0080;
+    model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).setValue(data_val_new);
+    MainWindow::sendDataThroughSerial(CMD_WRITE,
+        model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).toInt(),
+        model_params->data(model_params->index(0, list_columns_params.indexOf("id_address"))).toInt());
 }
 
 void MainWindow::pressed_start()
 {
-    uint32_t data_val = (m_ui->pushButton_start->isChecked() == 0) ? (cmd_wd_1.all | 0x0001) : (cmd_wd_1.all &~ 0x0001);
-    uint16_t data_id = ID_SDO_00;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::pressed_aperturaMan()
-{
-    uint32_t data_val;
-    uint16_t data_id = ID_SDO_03;
-    QByteArray data_tx;
-    if (m_ui->checkBox_aperturaMan->isChecked())
-        data_val = 0;
-    else
-        data_val = 1;
-    data_tx = QByteArray(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_valApertura()
-{
-    float data_val = m_ui->doubleSpinBox_valApertura->value();
-    uint16_t data_id = ID_SDO_04;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_valAperturaFinale()
-{
-    float data_val = m_ui->doubleSpinBox_valAperturaFinale->value();
-    uint16_t data_id = ID_SDO_24;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_valAperturaRidotta50()
-{
-    float data_val = m_ui->doubleSpinBox_valAperturaRidotta50->value();
-    uint16_t data_id = ID_SDO_05;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_valAperturaRidotta60()
-{
-    float data_val = m_ui->doubleSpinBox_valAperturaRidotta60->value();
-    uint16_t data_id = ID_SDO_06;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_durataApRidottaCheck()
-{
-    uint32_t data_val = m_ui->doubleSpinBox_durataApRidottaCheck->value();
-    uint16_t data_id = ID_SDO_07;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_velRampa()
-{
-    float data_val = m_ui->doubleSpinBox_velRampa->value();
-    uint16_t data_id = ID_SDO_08;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_freqPrincipale()
-{
-    float data_val = m_ui->doubleSpinBox_freqPrincipale->value();
-    uint16_t data_id = ID_SDO_09;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_ampModSweep()
-{
-    float data_val = m_ui->doubleSpinBox_ampModSweep->value();
-    uint16_t data_id = ID_SDO_10;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_freqModSweep()
-{
-    float data_val = m_ui->doubleSpinBox_freqModSweep->value();
-    uint16_t data_id = ID_SDO_11;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::pressed_enSweep()
-{
-    uint32_t data_val;
-    uint16_t data_id = ID_SDO_23;
-    QByteArray data_tx;
-    if (m_ui->checkBox_enSweep->isChecked())
-        data_val = 0;
-    else
-        data_val = 1;
-    data_tx = QByteArray(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_vInvRectGain()
-{
-    float data_val = m_ui->doubleSpinBox_vInvRectGain->value();
-    uint16_t data_id = ID_SDO_12;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_vInvRectOffset()
-{
-    uint32_t data_val = m_ui->doubleSpinBox_vInvRectOffset->value();
-    uint16_t data_id = ID_SDO_13;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_iInvRectGain()
-{
-    float data_val = m_ui->doubleSpinBox_iInvRectGain->value();
-    uint16_t data_id = ID_SDO_14;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_iInvRectOffset()
-{
-    uint32_t data_val = m_ui->doubleSpinBox_iInvRectOffset->value();
-    uint16_t data_id = ID_SDO_15;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_ntc1Gain()
-{
-    float data_val = m_ui->doubleSpinBox_ntc1Gain->value();
-    uint16_t data_id = ID_SDO_16;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_ntc1Offset()
-{
-    uint32_t data_val = m_ui->doubleSpinBox_ntc1Offset->value();
-    uint16_t data_id = ID_SDO_17;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_ntc2Gain()
-{
-    float data_val = m_ui->doubleSpinBox_ntc2Gain->value();
-    uint16_t data_id = ID_SDO_18;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_ntc2Offset()
-{
-    uint32_t data_val = m_ui->doubleSpinBox_ntc2Offset->value();
-    uint16_t data_id = ID_SDO_19;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_potGain()
-{
-    float data_val = m_ui->doubleSpinBox_potGain->value();
-    uint16_t data_id = ID_SDO_20;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_potOffset()
-{
-    uint32_t data_val = m_ui->doubleSpinBox_potOffset->value();
-    uint16_t data_id = ID_SDO_21;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::valueChanged_valOvercurr()
-{
-    float data_val = m_ui->doubleSpinBox_valOvercurr->value();
-    uint16_t data_id = ID_SDO_22;
-    QByteArray data_tx(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
-}
-
-void MainWindow::pressed_enProtOvercurr()
-{
-    uint32_t data_val;
-    uint16_t data_id = ID_SDO_25;
-    QByteArray data_tx;
-    if (m_ui->checkBox_enProtOvercurr->isChecked())
-        data_val = 0;
-    else
-        data_val = 1;
-    data_tx = QByteArray(reinterpret_cast<const char*>(&data_val), sizeof(data_val));
-    MainWindow::sendDataThroughSerial(CMD_WRITE, data_tx, data_id);
+    unsigned int data_val = model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).toInt();   // word command 1
+    unsigned int data_val_new = (m_ui->pushButton_start->isChecked() == 0) ? (data_val | 0x0001) : (data_val &~ 0x0001);
+    model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).setValue(data_val_new);
+    MainWindow::sendDataThroughSerial(CMD_WRITE,
+        model_params->data(model_params->index(0, list_columns_params.indexOf("val_actual"))).toInt(),
+        model_params->data(model_params->index(0, list_columns_params.indexOf("id_address"))).toInt());
 }
 
 #pragma endregion

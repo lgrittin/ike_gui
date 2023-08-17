@@ -13,7 +13,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     m_intValidator(new QIntValidator(0, 4000000, this))
 {
     m_ui->setupUi(this);
-
     m_ui->baudRateBox->setInsertPolicy(QComboBox::NoInsert);
 
     connect(m_ui->applyButton, &QPushButton::clicked,
@@ -25,7 +24,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SettingsDialog::checkCustomDevicePathPolicy);
     connect(m_ui->protocolListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-        this, &SettingsDialog::hideBoxes);
+            this, &SettingsDialog::onProtocolChanged);
 
     fillPortsParameters();
     fillPortsInfo();
@@ -118,9 +117,18 @@ void SettingsDialog::fillPortsParameters()
     m_ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
 
     m_ui->ipPortLineEdit->setText(tr("127.0.0.1:502"));
+    m_ui->readIntervalSpinner->setValue(1000);
+    m_ui->retriesSpinner->setValue(3);
+    m_ui->timeoutSpinner->setValue(1000);
+    m_ui->modbusServerAddressSpinner->setValue(1);
 }
 
-void SettingsDialog::hideBoxes(int idx)
+QPushButton* SettingsDialog::get_applyPushButton()
+{
+    return m_ui->applyButton;
+}
+
+void SettingsDialog::onProtocolChanged(int idx)
 {
     switch (idx)
     {
@@ -128,16 +136,31 @@ void SettingsDialog::hideBoxes(int idx)
         m_ui->tcpGroupBox->setEnabled(0);
         m_ui->selectBox->setEnabled(1);
         m_ui->parametersBox->setEnabled(1);
+        m_ui->flowControlBox->setEnabled(0);
+        m_ui->timeoutSpinner->setEnabled(1);
+        m_ui->retriesSpinner->setEnabled(1);
+        m_ui->readIntervalSpinner->setEnabled(1);
+        m_ui->modbusServerAddressSpinner->setEnabled(1);
         break;
     case Modbus_TCP:
         m_ui->tcpGroupBox->setEnabled(1);
         m_ui->selectBox->setEnabled(0);
         m_ui->parametersBox->setEnabled(0);
+        m_ui->flowControlBox->setEnabled(0);
+        m_ui->timeoutSpinner->setEnabled(1);
+        m_ui->retriesSpinner->setEnabled(1);
+        m_ui->readIntervalSpinner->setEnabled(1);
+        m_ui->modbusServerAddressSpinner->setEnabled(1);
         break;
     case CustomSerial_9B:
         m_ui->tcpGroupBox->setEnabled(0);
         m_ui->selectBox->setEnabled(1);
         m_ui->parametersBox->setEnabled(1);
+        m_ui->flowControlBox->setEnabled(1);
+        m_ui->timeoutSpinner->setEnabled(0);
+        m_ui->retriesSpinner->setEnabled(0);
+        m_ui->readIntervalSpinner->setEnabled(0);
+        m_ui->modbusServerAddressSpinner->setEnabled(0);
         break;
     default:
         break;
@@ -182,26 +205,23 @@ void SettingsDialog::updateSettings()
                     m_ui->baudRateBox->itemData(m_ui->baudRateBox->currentIndex()).toInt());
     }
     m_currentSettings.stringBaudRate = QString::number(m_currentSettings.baudRate);
-
     m_currentSettings.dataBits = static_cast<QSerialPort::DataBits>(
                 m_ui->dataBitsBox->itemData(m_ui->dataBitsBox->currentIndex()).toInt());
     m_currentSettings.stringDataBits = m_ui->dataBitsBox->currentText();
-
     m_currentSettings.parity = static_cast<QSerialPort::Parity>(
                 m_ui->parityBox->itemData(m_ui->parityBox->currentIndex()).toInt());
     m_currentSettings.stringParity = m_ui->parityBox->currentText();
-
     m_currentSettings.stopBits = static_cast<QSerialPort::StopBits>(
                 m_ui->stopBitsBox->itemData(m_ui->stopBitsBox->currentIndex()).toInt());
     m_currentSettings.stringStopBits = m_ui->stopBitsBox->currentText();
-
     m_currentSettings.flowControl = static_cast<QSerialPort::FlowControl>(
                 m_ui->flowControlBox->itemData(m_ui->flowControlBox->currentIndex()).toInt());
     m_currentSettings.stringFlowControl = m_ui->flowControlBox->currentText();
-
     m_currentSettings.localEchoEnabled = m_ui->localEchoCheckBox->isChecked();
-
     m_currentSettings.protocol = (CommProtocol)m_ui->protocolListBox->currentIndex();
-
     m_currentSettings.ipAddressAndPort = m_ui->ipPortLineEdit->text();
+    m_currentSettings.responseTime_ms = m_ui->timeoutSpinner->value();
+    m_currentSettings.numberOfRetries = m_ui->retriesSpinner->value();
+    m_currentSettings.readInterval_ms = m_ui->readIntervalSpinner->value();
+    m_currentSettings.modbusServerAddress = m_ui->modbusServerAddressSpinner->value();
 }

@@ -63,7 +63,7 @@ class SpinBoxDelegate : public QStyledItemDelegate
 public:
     
     QStandardItemModel* model;
-    QStringList headers;
+    QStringList headers_params;
     SpinBoxDelegate(QObject *parent = nullptr);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const override;
