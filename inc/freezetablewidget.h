@@ -61,7 +61,6 @@ public:
       FreezeTableWidget(QAbstractItemModel * model);
       ~FreezeTableWidget();
 
-
 protected:
       void resizeEvent(QResizeEvent *event) override;
       QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) override;

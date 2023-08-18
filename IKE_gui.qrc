@@ -43,5 +43,7 @@
         <file>images/icons8-caricare-50.png</file>
         <file>images/icons8-scaricare-50.png</file>
         <file>images/icons8-agopressione-50.png</file>
+        <file>images/icons8-upload-64.png</file>
+        <file>images/icons8-restart-50.png</file>
     </qresource>
 </RCC>

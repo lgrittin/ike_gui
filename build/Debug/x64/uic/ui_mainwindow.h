@@ -14,7 +14,6 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
@@ -38,10 +37,9 @@ public:
     QAction *actionClear;
     QAction *actionQuit;
     QAction *actionOpen_Log;
-    QAction *actionSynchronizeParams;
+    QAction *actionReadAll;
     QAction *actionAutoTrigger;
-    QAction *actionWrite_Param;
-    QAction *actionRead_All;
+    QAction *actionRead_Param;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QGroupBox *groupBox_statoInverter;
@@ -51,28 +49,26 @@ public:
     QLabel *label_readyToOp;
     QLabel *label_fault;
     QLabel *label_opEnabled;
-    QGroupBox *groupBox;
-    QVBoxLayout *verticalLayout_3;
-    QVBoxLayout *verticalLayout;
-    QLabel *label_OVER_VOLTAGE;
-    QLabel *label_SYNCH_SCR_LOST;
-    QLabel *label_FREQ_SCR_UNDEF;
-    QLabel *label_UNDER_VOLTAGE;
-    QLabel *label_DESAT;
-    QLabel *label_PSUPLLY;
-    QLabel *label_EXTERNAL_FLT;
-    QLabel *label_OVER_CURRENT;
-    QLabel *label_UNDER_CURRENT;
-    QLabel *label_OH1;
-    QLabel *label_OH2;
     QGroupBox *groupBox_controlloInverter;
     QGridLayout *gridLayout_2;
     QPushButton *pushButton_start;
     QPushButton *pushButton_ackFault;
     QLabel *label_ImpulsiSpenti;
     QLabel *label_impulsiAttivi;
-    QHBoxLayout *horizontalLayout_process;
-    QHBoxLayout *horizontalLayout_params;
+    QGroupBox *groupBox_faults;
+    QVBoxLayout *verticalLayout_3;
+    QGridLayout *gridLayout_3;
+    QLabel *label_UNDER_VOLTAGE;
+    QLabel *label_OVER_VOLTAGE;
+    QLabel *label_DESAT;
+    QLabel *label_PSUPLLY;
+    QLabel *label_FREQ_SCR_UNDEF;
+    QLabel *label_SYNCH_SCR_LOST;
+    QLabel *label_UNDER_CURRENT;
+    QLabel *label_OVER_CURRENT;
+    QLabel *label_OH1;
+    QLabel *label_OH2;
+    QLabel *label_EXTERNAL_FLT;
     QMenuBar *menuBar;
     QMenu *menuCalls;
     QMenu *menuTools;
@@ -84,7 +80,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1164, 678);
+        MainWindow->resize(1164, 574);
         QSizePolicy sizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -122,27 +118,24 @@ public:
         actionQuit->setIcon(icon4);
         actionOpen_Log = new QAction(MainWindow);
         actionOpen_Log->setObjectName(QString::fromUtf8("actionOpen_Log"));
-        actionSynchronizeParams = new QAction(MainWindow);
-        actionSynchronizeParams->setObjectName(QString::fromUtf8("actionSynchronizeParams"));
+        actionReadAll = new QAction(MainWindow);
+        actionReadAll->setObjectName(QString::fromUtf8("actionReadAll"));
+        actionReadAll->setCheckable(true);
         QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/images/icons8-synchronize-32.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionSynchronizeParams->setIcon(icon5);
+        icon5.addFile(QString::fromUtf8(":/images/icons8-restart-50.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionReadAll->setIcon(icon5);
         actionAutoTrigger = new QAction(MainWindow);
         actionAutoTrigger->setObjectName(QString::fromUtf8("actionAutoTrigger"));
         actionAutoTrigger->setCheckable(true);
+        actionAutoTrigger->setEnabled(false);
         QIcon icon6;
         icon6.addFile(QString::fromUtf8(":/images/icons8-agopressione-50.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionAutoTrigger->setIcon(icon6);
-        actionWrite_Param = new QAction(MainWindow);
-        actionWrite_Param->setObjectName(QString::fromUtf8("actionWrite_Param"));
+        actionRead_Param = new QAction(MainWindow);
+        actionRead_Param->setObjectName(QString::fromUtf8("actionRead_Param"));
         QIcon icon7;
-        icon7.addFile(QString::fromUtf8(":/images/icons8-scaricare-50.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionWrite_Param->setIcon(icon7);
-        actionRead_All = new QAction(MainWindow);
-        actionRead_All->setObjectName(QString::fromUtf8("actionRead_All"));
-        QIcon icon8;
-        icon8.addFile(QString::fromUtf8(":/images/icons8-caricare-50.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionRead_All->setIcon(icon8);
+        icon7.addFile(QString::fromUtf8(":/images/icons8-upload-64.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionRead_Param->setIcon(icon7);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -156,6 +149,7 @@ public:
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+        verticalLayout_2->setSizeConstraint(QLayout::SetDefaultConstraint);
         label_init = new QLabel(groupBox_statoInverter);
         label_init->setObjectName(QString::fromUtf8("label_init"));
         label_init->setFocusPolicy(Qt::NoFocus);
@@ -202,77 +196,7 @@ public:
         verticalLayout_2->addWidget(label_opEnabled);
 
 
-        gridLayout->addWidget(groupBox_statoInverter, 2, 1, 1, 1);
-
-        groupBox = new QGroupBox(centralWidget);
-        groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        verticalLayout_3 = new QVBoxLayout(groupBox);
-        verticalLayout_3->setSpacing(6);
-        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setSpacing(6);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        label_OVER_VOLTAGE = new QLabel(groupBox);
-        label_OVER_VOLTAGE->setObjectName(QString::fromUtf8("label_OVER_VOLTAGE"));
-
-        verticalLayout->addWidget(label_OVER_VOLTAGE);
-
-        label_SYNCH_SCR_LOST = new QLabel(groupBox);
-        label_SYNCH_SCR_LOST->setObjectName(QString::fromUtf8("label_SYNCH_SCR_LOST"));
-
-        verticalLayout->addWidget(label_SYNCH_SCR_LOST);
-
-        label_FREQ_SCR_UNDEF = new QLabel(groupBox);
-        label_FREQ_SCR_UNDEF->setObjectName(QString::fromUtf8("label_FREQ_SCR_UNDEF"));
-
-        verticalLayout->addWidget(label_FREQ_SCR_UNDEF);
-
-        label_UNDER_VOLTAGE = new QLabel(groupBox);
-        label_UNDER_VOLTAGE->setObjectName(QString::fromUtf8("label_UNDER_VOLTAGE"));
-
-        verticalLayout->addWidget(label_UNDER_VOLTAGE);
-
-        label_DESAT = new QLabel(groupBox);
-        label_DESAT->setObjectName(QString::fromUtf8("label_DESAT"));
-
-        verticalLayout->addWidget(label_DESAT);
-
-        label_PSUPLLY = new QLabel(groupBox);
-        label_PSUPLLY->setObjectName(QString::fromUtf8("label_PSUPLLY"));
-
-        verticalLayout->addWidget(label_PSUPLLY);
-
-        label_EXTERNAL_FLT = new QLabel(groupBox);
-        label_EXTERNAL_FLT->setObjectName(QString::fromUtf8("label_EXTERNAL_FLT"));
-
-        verticalLayout->addWidget(label_EXTERNAL_FLT);
-
-        label_OVER_CURRENT = new QLabel(groupBox);
-        label_OVER_CURRENT->setObjectName(QString::fromUtf8("label_OVER_CURRENT"));
-
-        verticalLayout->addWidget(label_OVER_CURRENT);
-
-        label_UNDER_CURRENT = new QLabel(groupBox);
-        label_UNDER_CURRENT->setObjectName(QString::fromUtf8("label_UNDER_CURRENT"));
-
-        verticalLayout->addWidget(label_UNDER_CURRENT);
-
-        label_OH1 = new QLabel(groupBox);
-        label_OH1->setObjectName(QString::fromUtf8("label_OH1"));
-
-        verticalLayout->addWidget(label_OH1);
-
-        label_OH2 = new QLabel(groupBox);
-        label_OH2->setObjectName(QString::fromUtf8("label_OH2"));
-
-        verticalLayout->addWidget(label_OH2);
-
-
-        verticalLayout_3->addLayout(verticalLayout);
-
-
-        gridLayout->addWidget(groupBox, 3, 1, 1, 1);
+        gridLayout->addWidget(groupBox_statoInverter, 2, 0, 2, 1);
 
         groupBox_controlloInverter = new QGroupBox(centralWidget);
         groupBox_controlloInverter->setObjectName(QString::fromUtf8("groupBox_controlloInverter"));
@@ -281,6 +205,7 @@ public:
         gridLayout_2->setSpacing(6);
         gridLayout_2->setContentsMargins(11, 11, 11, 11);
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+        gridLayout_2->setSizeConstraint(QLayout::SetDefaultConstraint);
         pushButton_start = new QPushButton(groupBox_controlloInverter);
         pushButton_start->setObjectName(QString::fromUtf8("pushButton_start"));
         pushButton_start->setCheckable(true);
@@ -295,31 +220,112 @@ public:
 
         label_ImpulsiSpenti = new QLabel(groupBox_controlloInverter);
         label_ImpulsiSpenti->setObjectName(QString::fromUtf8("label_ImpulsiSpenti"));
+        label_ImpulsiSpenti->setFrameShape(QFrame::Box);
         label_ImpulsiSpenti->setAlignment(Qt::AlignCenter);
 
         gridLayout_2->addWidget(label_ImpulsiSpenti, 2, 0, 1, 1);
 
         label_impulsiAttivi = new QLabel(groupBox_controlloInverter);
         label_impulsiAttivi->setObjectName(QString::fromUtf8("label_impulsiAttivi"));
+        label_impulsiAttivi->setFrameShape(QFrame::Box);
         label_impulsiAttivi->setAlignment(Qt::AlignCenter);
 
         gridLayout_2->addWidget(label_impulsiAttivi, 2, 1, 1, 1);
 
 
-        gridLayout->addWidget(groupBox_controlloInverter, 0, 1, 2, 1);
+        gridLayout->addWidget(groupBox_controlloInverter, 0, 0, 2, 1);
 
-        horizontalLayout_process = new QHBoxLayout();
-        horizontalLayout_process->setSpacing(6);
-        horizontalLayout_process->setObjectName(QString::fromUtf8("horizontalLayout_process"));
+        groupBox_faults = new QGroupBox(centralWidget);
+        groupBox_faults->setObjectName(QString::fromUtf8("groupBox_faults"));
+        verticalLayout_3 = new QVBoxLayout(groupBox_faults);
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
+        gridLayout_3 = new QGridLayout();
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
+        label_UNDER_VOLTAGE = new QLabel(groupBox_faults);
+        label_UNDER_VOLTAGE->setObjectName(QString::fromUtf8("label_UNDER_VOLTAGE"));
+        label_UNDER_VOLTAGE->setFrameShape(QFrame::Box);
+        label_UNDER_VOLTAGE->setAlignment(Qt::AlignCenter);
 
-        gridLayout->addLayout(horizontalLayout_process, 3, 0, 1, 1);
+        gridLayout_3->addWidget(label_UNDER_VOLTAGE, 0, 0, 1, 1);
 
-        horizontalLayout_params = new QHBoxLayout();
-        horizontalLayout_params->setSpacing(6);
-        horizontalLayout_params->setObjectName(QString::fromUtf8("horizontalLayout_params"));
-        horizontalLayout_params->setSizeConstraint(QLayout::SetDefaultConstraint);
+        label_OVER_VOLTAGE = new QLabel(groupBox_faults);
+        label_OVER_VOLTAGE->setObjectName(QString::fromUtf8("label_OVER_VOLTAGE"));
+        label_OVER_VOLTAGE->setFrameShape(QFrame::Box);
+        label_OVER_VOLTAGE->setAlignment(Qt::AlignCenter);
 
-        gridLayout->addLayout(horizontalLayout_params, 0, 0, 3, 1);
+        gridLayout_3->addWidget(label_OVER_VOLTAGE, 0, 1, 1, 1);
+
+        label_DESAT = new QLabel(groupBox_faults);
+        label_DESAT->setObjectName(QString::fromUtf8("label_DESAT"));
+        label_DESAT->setFrameShape(QFrame::Box);
+        label_DESAT->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_DESAT, 1, 0, 1, 1);
+
+        label_PSUPLLY = new QLabel(groupBox_faults);
+        label_PSUPLLY->setObjectName(QString::fromUtf8("label_PSUPLLY"));
+        label_PSUPLLY->setFrameShape(QFrame::Box);
+        label_PSUPLLY->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_PSUPLLY, 1, 1, 1, 1);
+
+        label_FREQ_SCR_UNDEF = new QLabel(groupBox_faults);
+        label_FREQ_SCR_UNDEF->setObjectName(QString::fromUtf8("label_FREQ_SCR_UNDEF"));
+        label_FREQ_SCR_UNDEF->setFrameShape(QFrame::Box);
+        label_FREQ_SCR_UNDEF->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_FREQ_SCR_UNDEF, 2, 0, 1, 1);
+
+        label_SYNCH_SCR_LOST = new QLabel(groupBox_faults);
+        label_SYNCH_SCR_LOST->setObjectName(QString::fromUtf8("label_SYNCH_SCR_LOST"));
+        label_SYNCH_SCR_LOST->setFrameShape(QFrame::Box);
+        label_SYNCH_SCR_LOST->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_SYNCH_SCR_LOST, 2, 1, 1, 1);
+
+        label_UNDER_CURRENT = new QLabel(groupBox_faults);
+        label_UNDER_CURRENT->setObjectName(QString::fromUtf8("label_UNDER_CURRENT"));
+        label_UNDER_CURRENT->setFrameShape(QFrame::Box);
+        label_UNDER_CURRENT->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_UNDER_CURRENT, 3, 0, 1, 1);
+
+        label_OVER_CURRENT = new QLabel(groupBox_faults);
+        label_OVER_CURRENT->setObjectName(QString::fromUtf8("label_OVER_CURRENT"));
+        label_OVER_CURRENT->setFrameShape(QFrame::Box);
+        label_OVER_CURRENT->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_OVER_CURRENT, 3, 1, 1, 1);
+
+        label_OH1 = new QLabel(groupBox_faults);
+        label_OH1->setObjectName(QString::fromUtf8("label_OH1"));
+        label_OH1->setFrameShape(QFrame::Box);
+        label_OH1->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_OH1, 5, 0, 1, 1);
+
+        label_OH2 = new QLabel(groupBox_faults);
+        label_OH2->setObjectName(QString::fromUtf8("label_OH2"));
+        label_OH2->setFrameShape(QFrame::Box);
+        label_OH2->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_OH2, 5, 1, 1, 1);
+
+        label_EXTERNAL_FLT = new QLabel(groupBox_faults);
+        label_EXTERNAL_FLT->setObjectName(QString::fromUtf8("label_EXTERNAL_FLT"));
+        label_EXTERNAL_FLT->setFrameShape(QFrame::Box);
+        label_EXTERNAL_FLT->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_EXTERNAL_FLT, 4, 0, 1, 1);
+
+
+        verticalLayout_3->addLayout(gridLayout_3);
+
+
+        gridLayout->addWidget(groupBox_faults, 4, 0, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
@@ -356,9 +362,8 @@ public:
         mainToolBar->addAction(actionConfigure);
         mainToolBar->addAction(actionClear);
         mainToolBar->addAction(actionAutoTrigger);
-        mainToolBar->addAction(actionSynchronizeParams);
-        mainToolBar->addAction(actionWrite_Param);
-        mainToolBar->addAction(actionRead_All);
+        mainToolBar->addAction(actionReadAll);
+        mainToolBar->addAction(actionRead_Param);
 
         retranslateUi(MainWindow);
 
@@ -409,47 +414,41 @@ public:
         actionQuit->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+Q", nullptr));
 #endif // QT_CONFIG(shortcut)
         actionOpen_Log->setText(QCoreApplication::translate("MainWindow", "Open Log", nullptr));
-        actionSynchronizeParams->setText(QCoreApplication::translate("MainWindow", "Synchronize Params", nullptr));
+        actionReadAll->setText(QCoreApplication::translate("MainWindow", "Read All", nullptr));
 #if QT_CONFIG(tooltip)
-        actionSynchronizeParams->setToolTip(QCoreApplication::translate("MainWindow", "Write Params And Read All", nullptr));
+        actionReadAll->setToolTip(QCoreApplication::translate("MainWindow", "Read Parameters and Process Data", nullptr));
 #endif // QT_CONFIG(tooltip)
         actionAutoTrigger->setText(QCoreApplication::translate("MainWindow", "AutoTrigger", nullptr));
 #if QT_CONFIG(tooltip)
         actionAutoTrigger->setToolTip(QCoreApplication::translate("MainWindow", "Istantaneous Write Params", nullptr));
 #endif // QT_CONFIG(tooltip)
-        actionWrite_Param->setText(QCoreApplication::translate("MainWindow", "Write Param", nullptr));
+        actionRead_Param->setText(QCoreApplication::translate("MainWindow", "Read Param", nullptr));
 #if QT_CONFIG(tooltip)
-        actionWrite_Param->setToolTip(QCoreApplication::translate("MainWindow", "Write Selected Parameter", nullptr));
+        actionRead_Param->setToolTip(QCoreApplication::translate("MainWindow", "Read Parameter", nullptr));
 #endif // QT_CONFIG(tooltip)
-        actionRead_All->setText(QCoreApplication::translate("MainWindow", "Read All", nullptr));
-#if QT_CONFIG(tooltip)
-        actionRead_All->setToolTip(QCoreApplication::translate("MainWindow", "Read Parameters and Process Data", nullptr));
-#endif // QT_CONFIG(tooltip)
-        groupBox_statoInverter->setTitle(QCoreApplication::translate("MainWindow", "Stato Inverter", nullptr));
+        groupBox_statoInverter->setTitle(QString());
         label_init->setText(QCoreApplication::translate("MainWindow", "INIT", nullptr));
         label_freqEst->setText(QCoreApplication::translate("MainWindow", "FREQ ESTIM.", nullptr));
         label_readyToOp->setText(QCoreApplication::translate("MainWindow", "READY TO OP", nullptr));
         label_fault->setText(QCoreApplication::translate("MainWindow", "FAULT", nullptr));
         label_opEnabled->setText(QCoreApplication::translate("MainWindow", "OP. ENABLED", nullptr));
-        groupBox->setTitle(QCoreApplication::translate("MainWindow", "Active Faults:", nullptr));
-        label_OVER_VOLTAGE->setText(QCoreApplication::translate("MainWindow", "OVER_VOLTAGE", nullptr));
-        label_SYNCH_SCR_LOST->setText(QCoreApplication::translate("MainWindow", "SYNCH_SCR_LOST", nullptr));
-        label_FREQ_SCR_UNDEF->setText(QCoreApplication::translate("MainWindow", "FREQ_SCR_UNDEF", nullptr));
-        label_UNDER_VOLTAGE->setText(QCoreApplication::translate("MainWindow", "UNDER_VOLTAGE", nullptr));
-        label_DESAT->setText(QCoreApplication::translate("MainWindow", "DESAT", nullptr));
-        label_PSUPLLY->setText(QCoreApplication::translate("MainWindow", "PSUPLLY", nullptr));
-        label_EXTERNAL_FLT->setText(QCoreApplication::translate("MainWindow", "EXTERNAL_FLT", nullptr));
-        label_OVER_CURRENT->setText(QCoreApplication::translate("MainWindow", "OVER_CURRENT", nullptr));
-        label_UNDER_CURRENT->setText(QCoreApplication::translate("MainWindow", "UNDER_CURRENT", nullptr));
-        label_OH1->setText(QCoreApplication::translate("MainWindow", "OH1", nullptr));
-        label_OH2->setText(QCoreApplication::translate("MainWindow", "OH2", nullptr));
-        groupBox_controlloInverter->setTitle(QCoreApplication::translate("MainWindow", "Controllo Inverter", nullptr));
+        groupBox_controlloInverter->setTitle(QString());
         pushButton_start->setText(QCoreApplication::translate("MainWindow", "Start / Off", nullptr));
         pushButton_ackFault->setText(QCoreApplication::translate("MainWindow", "Ack Fault", nullptr));
-        label_ImpulsiSpenti->setText(QCoreApplication::translate("MainWindow", "Impulsi\n"
-"Spenti", nullptr));
-        label_impulsiAttivi->setText(QCoreApplication::translate("MainWindow", "Impulsi\n"
-"Abilitati", nullptr));
+        label_ImpulsiSpenti->setText(QCoreApplication::translate("MainWindow", "PULSES OFF", nullptr));
+        label_impulsiAttivi->setText(QCoreApplication::translate("MainWindow", "PULSES ON", nullptr));
+        groupBox_faults->setTitle(QString());
+        label_UNDER_VOLTAGE->setText(QCoreApplication::translate("MainWindow", "LOW VOLT", nullptr));
+        label_OVER_VOLTAGE->setText(QCoreApplication::translate("MainWindow", "HIGH VOLT", nullptr));
+        label_DESAT->setText(QCoreApplication::translate("MainWindow", "DESAT", nullptr));
+        label_PSUPLLY->setText(QCoreApplication::translate("MainWindow", "PSUPLLY", nullptr));
+        label_FREQ_SCR_UNDEF->setText(QCoreApplication::translate("MainWindow", "FREQ UNDEF", nullptr));
+        label_SYNCH_SCR_LOST->setText(QCoreApplication::translate("MainWindow", "PLL LOST", nullptr));
+        label_UNDER_CURRENT->setText(QCoreApplication::translate("MainWindow", "LOW CURR", nullptr));
+        label_OVER_CURRENT->setText(QCoreApplication::translate("MainWindow", "HIGH CURR", nullptr));
+        label_OH1->setText(QCoreApplication::translate("MainWindow", "OH1", nullptr));
+        label_OH2->setText(QCoreApplication::translate("MainWindow", "OH2", nullptr));
+        label_EXTERNAL_FLT->setText(QCoreApplication::translate("MainWindow", "EXT FLT", nullptr));
         menuCalls->setTitle(QCoreApplication::translate("MainWindow", "Calls", nullptr));
         menuTools->setTitle(QCoreApplication::translate("MainWindow", "Tools", nullptr));
         menuHelp->setTitle(QCoreApplication::translate("MainWindow", "Help", nullptr));

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1164</width>
-    <height>678</height>
+    <height>574</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,15 +24,18 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1">
+    <item row="2" column="0" rowspan="2">
      <widget class="QGroupBox" name="groupBox_statoInverter">
       <property name="title">
-       <string>Stato Inverter</string>
+       <string/>
       </property>
       <property name="flat">
        <bool>false</bool>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
        <item>
         <widget class="QLabel" name="label_init">
          <property name="focusPolicy">
@@ -131,105 +134,18 @@
       </layout>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Active Faults:</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QLabel" name="label_OVER_VOLTAGE">
-           <property name="text">
-            <string>OVER_VOLTAGE</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_SYNCH_SCR_LOST">
-           <property name="text">
-            <string>SYNCH_SCR_LOST</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_FREQ_SCR_UNDEF">
-           <property name="text">
-            <string>FREQ_SCR_UNDEF</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_UNDER_VOLTAGE">
-           <property name="text">
-            <string>UNDER_VOLTAGE</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_DESAT">
-           <property name="text">
-            <string>DESAT</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_PSUPLLY">
-           <property name="text">
-            <string>PSUPLLY</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_EXTERNAL_FLT">
-           <property name="text">
-            <string>EXTERNAL_FLT</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_OVER_CURRENT">
-           <property name="text">
-            <string>OVER_CURRENT</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_UNDER_CURRENT">
-           <property name="text">
-            <string>UNDER_CURRENT</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_OH1">
-           <property name="text">
-            <string>OH1</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_OH2">
-           <property name="text">
-            <string>OH2</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="2">
+    <item row="0" column="0" rowspan="2">
      <widget class="QGroupBox" name="groupBox_controlloInverter">
       <property name="title">
-       <string>Controllo Inverter</string>
+       <string/>
       </property>
       <property name="flat">
        <bool>false</bool>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetDefaultConstraint</enum>
+       </property>
        <item row="1" column="0" colspan="2">
         <widget class="QPushButton" name="pushButton_start">
          <property name="text">
@@ -252,9 +168,11 @@
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_ImpulsiSpenti">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
          <property name="text">
-          <string>Impulsi
-Spenti</string>
+          <string>PULSES OFF</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -263,9 +181,11 @@ Spenti</string>
        </item>
        <item row="2" column="1">
         <widget class="QLabel" name="label_impulsiAttivi">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
          <property name="text">
-          <string>Impulsi
-Abilitati</string>
+          <string>PULSES ON</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -275,15 +195,161 @@ Abilitati</string>
       </layout>
      </widget>
     </item>
-    <item row="3" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_process"/>
-    </item>
-    <item row="0" column="0" rowspan="3">
-     <layout class="QHBoxLayout" name="horizontalLayout_params">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+    <item row="4" column="0">
+     <widget class="QGroupBox" name="groupBox_faults">
+      <property name="title">
+       <string/>
       </property>
-     </layout>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_UNDER_VOLTAGE">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>LOW VOLT</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_OVER_VOLTAGE">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>HIGH VOLT</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_DESAT">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>DESAT</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_PSUPLLY">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>PSUPLLY</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_FREQ_SCR_UNDEF">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>FREQ UNDEF</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="label_SYNCH_SCR_LOST">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>PLL LOST</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_UNDER_CURRENT">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>LOW CURR</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="label_OVER_CURRENT">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>HIGH CURR</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_OH1">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>OH1</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="label_OH2">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>OH2</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_EXTERNAL_FLT">
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="text">
+            <string>EXT FLT</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -337,9 +403,8 @@ Abilitati</string>
    <addaction name="actionConfigure"/>
    <addaction name="actionClear"/>
    <addaction name="actionAutoTrigger"/>
-   <addaction name="actionSynchronizeParams"/>
-   <addaction name="actionWrite_Param"/>
-   <addaction name="actionRead_All"/>
+   <addaction name="actionReadAll"/>
+   <addaction name="actionRead_Param"/>
   </widget>
   <action name="actionAbout">
    <property name="text">
@@ -434,21 +499,27 @@ Abilitati</string>
     <string>Open Log</string>
    </property>
   </action>
-  <action name="actionSynchronizeParams">
+  <action name="actionReadAll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="../IKE_gui.qrc">
-     <normaloff>:/images/icons8-synchronize-32.png</normaloff>:/images/icons8-synchronize-32.png</iconset>
+     <normaloff>:/images/icons8-restart-50.png</normaloff>:/images/icons8-restart-50.png</iconset>
    </property>
    <property name="text">
-    <string>Synchronize Params</string>
+    <string>Read All</string>
    </property>
    <property name="toolTip">
-    <string>Write Params And Read All</string>
+    <string>Read Parameters and Process Data</string>
    </property>
   </action>
   <action name="actionAutoTrigger">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="../IKE_gui.qrc">
@@ -461,28 +532,16 @@ Abilitati</string>
     <string>Istantaneous Write Params</string>
    </property>
   </action>
-  <action name="actionWrite_Param">
+  <action name="actionRead_Param">
    <property name="icon">
     <iconset resource="../IKE_gui.qrc">
-     <normaloff>:/images/icons8-scaricare-50.png</normaloff>:/images/icons8-scaricare-50.png</iconset>
+     <normaloff>:/images/icons8-upload-64.png</normaloff>:/images/icons8-upload-64.png</iconset>
    </property>
    <property name="text">
-    <string>Write Param</string>
+    <string>Read Param</string>
    </property>
    <property name="toolTip">
-    <string>Write Selected Parameter</string>
-   </property>
-  </action>
-  <action name="actionRead_All">
-   <property name="icon">
-    <iconset resource="../IKE_gui.qrc">
-     <normaloff>:/images/icons8-caricare-50.png</normaloff>:/images/icons8-caricare-50.png</iconset>
-   </property>
-   <property name="text">
-    <string>Read All</string>
-   </property>
-   <property name="toolTip">
-    <string>Read Parameters and Process Data</string>
+    <string>Read Parameter</string>
    </property>
   </action>
  </widget>

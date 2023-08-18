@@ -66,7 +66,7 @@ SpinBoxDelegate::SpinBoxDelegate(QObject *parent)
 
 //! [1]
 QWidget *SpinBoxDelegate::createEditor(QWidget *parent,
-                                       const QStyleOptionViewItem &option,
+                                       const QStyleOptionViewItem & option,
                                        const QModelIndex &index) const
 {
     editor = new QDoubleSpinBox(parent);
@@ -75,7 +75,6 @@ QWidget *SpinBoxDelegate::createEditor(QWidget *parent,
     editor->setFrame(false);
     editor->setMinimum(model->data(model->index(index.row(), headers_params.indexOf("val_min"))).toDouble());
     editor->setMaximum(model->data(model->index(index.row(), headers_params.indexOf("val_max"))).toDouble());
-    QObject::connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SpinBoxDelegate::setData);
     return editor;
 }
 //! [1]
@@ -85,7 +84,6 @@ void SpinBoxDelegate::setEditorData(QWidget *editor,
                                     const QModelIndex &index) const
 {
     double value = index.model()->data(index, Qt::EditRole).toDouble();
-
     QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
     spinBox->setValue(value);
     spinBox->valueChanged(value);
@@ -99,7 +97,6 @@ void SpinBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
     QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
     spinBox->interpretText();
     double value = spinBox->value();
-
     model->setData(index, value, Qt::EditRole);
 }
 //! [3]
@@ -122,4 +119,12 @@ QSize SpinBoxDelegate::sizeHint(const QStyleOptionViewItem&option,
 void SpinBoxDelegate::setData(double val)
 {
     emit commitData(editor);
+}
+
+void SpinBoxDelegate::editDataChangedConnection()
+{
+    //if (en_auto_trigger)
+    //    connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SpinBoxDelegate::setData);
+    //else
+    //    disconnect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &SpinBoxDelegate::setData);
 }

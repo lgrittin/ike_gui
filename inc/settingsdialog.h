@@ -9,7 +9,7 @@ enum CommProtocol
 {
     Modbus_RTU = 0,
     Modbus_TCP = 1,
-    CustomSerial_9B = 2
+    CustomSerial10B = 2
 };
 
 QT_BEGIN_NAMESPACE

@@ -85,7 +85,7 @@ void SettingsDialog::fillPortsParameters()
 {
     m_ui->protocolListBox->addItem(tr("Modbus_RTU"));
     m_ui->protocolListBox->addItem(tr("Modbus_TCP"));
-    m_ui->protocolListBox->addItem(tr("CustomSerial_9B"));
+    m_ui->protocolListBox->addItem(tr("CustomSerial10B"));
 
     m_ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
     m_ui->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
@@ -152,7 +152,7 @@ void SettingsDialog::onProtocolChanged(int idx)
         m_ui->readIntervalSpinner->setEnabled(1);
         m_ui->modbusServerAddressSpinner->setEnabled(1);
         break;
-    case CustomSerial_9B:
+    case CustomSerial10B:
         m_ui->tcpGroupBox->setEnabled(0);
         m_ui->selectBox->setEnabled(1);
         m_ui->parametersBox->setEnabled(1);
