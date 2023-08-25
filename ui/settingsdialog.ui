@@ -65,6 +65,9 @@
        <property name="text">
         <string>Apply</string>
        </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>

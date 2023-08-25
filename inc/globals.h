@@ -73,8 +73,8 @@ struct STS_BIT {
     uint16_t FAULT : 1;             // bit4
     uint16_t PULSE_ENABLED : 1;     // bit5
     uint16_t WARNING : 1;           // bit6
-    uint16_t b7 : 1;                // bit7
-    uint16_t b8 : 1;                // bit8
+    uint16_t SDCARD_ENABLED : 1;    // bit7
+    uint16_t RTC_ENABLED : 1;       // bit8
     uint16_t b9 : 1;                // bit9
     uint16_t b10 : 1;               // bit10
     uint16_t b11 : 1;               // bit11

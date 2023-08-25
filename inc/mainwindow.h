@@ -56,11 +56,13 @@ private slots:
     void tableDataChanged_params(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void sendRequest_Modbus(quint16 start_address, quint16 address_length, int cmd);
     void onSettingsChanged();
+    void resetData();
     void onModbusStateChanged(int state);
     void blinkEndRxLabel();
     void blinkEndTxLabel();
     void pressed_ackFault();
     void pressed_start();
+
 
 private:
     void initActionsConnections();
@@ -68,6 +70,7 @@ private:
     void showStatusMessage(const QString& message);
     void autoChangePressParameter();
     void readParam();
+    void writeParam();
     void blinkRxLabel();
     void blinkTxLabel();
     void refreshData(quint16 start_address, quint16 address_length, QVector<quint16> val_u16_list);
@@ -101,7 +104,20 @@ private:
     quint16 startAddress_params = 0;
     quint16 address_sts_wd_1 = 0;
     quint16 address_alm_wd_1 = 0;
+    quint16 address_datetime_sec = 0;
+    quint16 address_datetime_min = 0;
+    quint16 address_datetime_hour = 0;
+    quint16 address_datetime_day = 0;
+    quint16 address_datetime_dayOfWeek = 0;
+    quint16 address_datetime_month = 0;
+    quint16 address_datetime_year = 0;
+    quint16 address_fmwvers_h1 = 0;
+    quint16 address_fmwvers_h2 = 0;
+    quint16 address_fmwvers_l1 = 0;
+    quint16 address_fmwvers_l2 = 0;
+    quint16 address_fmwvers_type = 0;
     quint16 address_cmd_wd_1 = 0;
+    bool read_params = 0;
 };
 
 #endif // MAINWINDOW_H

@@ -58,18 +58,6 @@
     <QtRcc Include="IKE_gui.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <None Include="images\application-exit.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="images\clear.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="images\connect.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="images\disconnect.png">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="images\settings.png">
       <Filter>Resource Files</Filter>
     </None>

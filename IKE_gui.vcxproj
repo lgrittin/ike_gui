@@ -22,7 +22,7 @@
     <ProjectGuid>{E321D070-E163-3451-9D85-2FDD1FF43696}</ProjectGuid>
     <RootNamespace>IKE_gui</RootNamespace>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformMinVersion>10.0.22000.0</WindowsTargetPlatformMinVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
@@ -419,10 +419,6 @@
     </QtRcc>
     <None Include="db\ike_params_data.csv" />
     <None Include="db\ike_process_data.csv" />
-    <None Include="images\application-exit.png" />
-    <None Include="images\clear.png" />
-    <None Include="images\connect.png" />
-    <None Include="images\disconnect.png" />
     <None Include="images\settings.png" />
   </ItemGroup>
   <ItemGroup>
