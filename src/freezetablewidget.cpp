@@ -168,5 +168,3 @@ void FreezeTableWidget::updateFrozenTableGeometry()
                                    viewport()->height()+horizontalHeader()->height());
 }
 //! [geometry]
-
-

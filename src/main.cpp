@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
     w.setWindowTitle("IKE GUI");
-    w.setWindowIcon(QIcon(":/images/AUTTEK logo.bmp"));
+    w.setWindowIcon(QIcon(":/images/icons8-microchip-64.png"));
     w.show();
     return a.exec();
 }

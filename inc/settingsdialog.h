@@ -52,12 +52,13 @@ public:
     Settings settings() const;
     QPushButton* get_applyPushButton();
 
-private slots:
+public slots:
     void showPortInfo(int idx);
     void apply();
     void checkCustomBaudRatePolicy(int idx);
     void checkCustomDevicePathPolicy(int idx);
     void onProtocolChanged(int idx);
+    void applyButton_setUnchecked();
 
 private:
     void fillPortsParameters();

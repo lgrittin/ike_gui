@@ -74,7 +74,6 @@ public:
                               const QModelIndex &index) const override;
     QSize SpinBoxDelegate::sizeHint(const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
-    void editDataChangedConnection();
     mutable QDoubleSpinBox* editor;
     mutable bool en_auto_trigger = 0;
 

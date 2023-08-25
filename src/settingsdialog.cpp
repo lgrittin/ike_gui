@@ -15,16 +15,25 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     m_ui->setupUi(this);
     m_ui->baudRateBox->setInsertPolicy(QComboBox::NoInsert);
 
-    connect(m_ui->applyButton, &QPushButton::clicked,
-            this, &SettingsDialog::apply);
-    connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &SettingsDialog::showPortInfo);
-    connect(m_ui->baudRateBox,  QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &SettingsDialog::checkCustomBaudRatePolicy);
-    connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &SettingsDialog::checkCustomDevicePathPolicy);
-    connect(m_ui->protocolListBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &SettingsDialog::onProtocolChanged);
+    connect(m_ui->applyButton, &QPushButton::clicked, this, &SettingsDialog::apply);
+    connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::showPortInfo);
+    connect(m_ui->baudRateBox,  QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::checkCustomBaudRatePolicy);
+    connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::checkCustomDevicePathPolicy);
+    connect(m_ui->protocolListBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::onProtocolChanged);
+
+    connect(m_ui->protocolListBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->parityBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->baudRateBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->dataBitsBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->stopBitsBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->flowControlBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->ipPortLineEdit, &QLineEdit::textChanged, this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->localEchoCheckBox, QOverload<int>::of(&QCheckBox::stateChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->readIntervalSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->retriesSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->timeoutSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->modbusServerAddressSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
 
     fillPortsParameters();
     fillPortsInfo();
@@ -59,7 +68,12 @@ void SettingsDialog::showPortInfo(int idx)
 void SettingsDialog::apply()
 {
     updateSettings();
-    //hide();
+    m_ui->applyButton->setEnabled(0);
+}
+
+void SettingsDialog::applyButton_setUnchecked()
+{
+    m_ui->applyButton->setEnabled(1);
 }
 
 void SettingsDialog::checkCustomBaudRatePolicy(int idx)
