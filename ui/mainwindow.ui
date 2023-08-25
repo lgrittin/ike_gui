@@ -430,7 +430,7 @@
    </property>
    <widget class="QMenu" name="menuCalls">
     <property name="title">
-     <string>Calls</string>
+     <string>Communication</string>
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
@@ -443,7 +443,10 @@
     </property>
     <addaction name="actionConfigure"/>
     <addaction name="actionResetDeafult_Param"/>
-    <addaction name="actionOpen_Log"/>
+    <addaction name="actionReadAll"/>
+    <addaction name="actionAutoTrigger"/>
+    <addaction name="actionRead_Param"/>
+    <addaction name="actionWrite_Param"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">

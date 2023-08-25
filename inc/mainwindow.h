@@ -118,6 +118,8 @@ private:
     quint16 address_fmwvers_type = 0;
     quint16 address_cmd_wd_1 = 0;
     bool read_params = 0;
+    unsigned int comm_error_rx_num = 0;
+    unsigned int comm_error_tx_num = 0;
 };
 
 #endif // MAINWINDOW_H

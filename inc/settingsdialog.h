@@ -41,10 +41,10 @@ public:
         QSerialPort::FlowControl flowControl;
         QString stringFlowControl;
         QString ipAddressAndPort;
-        int modbusServerAddress = 1;
-        int readInterval_ms = 1000;
-        int responseTime_ms = 1000;
-        int numberOfRetries = 3;
+        unsigned int modbusServerAddress = 1;
+        unsigned int readInterval_ms = 1000;
+        unsigned int responseTime_ms = 1000;
+        unsigned int numberOfRetries = 3;
         bool localEchoEnabled;
     };
     explicit SettingsDialog(QWidget *parent = nullptr);

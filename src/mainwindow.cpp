@@ -19,10 +19,6 @@
 #include <QTableView>
 #include <QSplitter>
 
-static uint8_t chksum_error_rx = 0;
-static uint8_t chksum_error_tx = 0;
-static uint16_t id = 0;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::MainWindow),
@@ -47,8 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QLabel* label_tx = new QLabel("Tx: ", this);
     QLabel* label_rx = new QLabel("Rx: ", this);
-    QLabel* label_tx_chksm = new QLabel("TxChksmErr: ", this);
-    QLabel* label_rx_chksm = new QLabel("RxChksmErr: ", this);
+    QLabel* label_tx_chksm = new QLabel("TxCommErr: ", this);
+    QLabel* label_rx_chksm = new QLabel("RxCommErr: ", this);
     m_status_label_1->setText(" ");
     m_status_label_1->setFrameShape(QFrame::StyledPanel);
     m_status_label_1->setAutoFillBackground(true);
@@ -616,6 +612,7 @@ void MainWindow::blinkRxLabel()
 {
     QTimer::singleShot(200, this, [this] {blinkEndRxLabel(); });    //SLOT(blinkEndRxLabel()));
     m_status_label_1->setStyleSheet("background-color: green");
+    m_status_label_3->setText(QString::number(comm_error_rx_num));
 }
 
 void MainWindow::blinkEndRxLabel()
@@ -627,6 +624,7 @@ void MainWindow::blinkTxLabel()
 {
     QTimer::singleShot(200, this, [this] {blinkEndTxLabel(); });    //SLOT(blinkEndTxLabel()));
     m_status_label_2->setStyleSheet("background-color: green");
+    m_status_label_4->setText(QString::number(comm_error_tx_num));
 }
 
 void MainWindow::blinkEndTxLabel()
@@ -828,7 +826,7 @@ void MainWindow::sendRequest_CustomSerial10B(quint16 start_address, quint16 addr
             data_cod[3] = data_tx_serial.at(1);
             data_cod[4] = data_tx_serial.at(2);
             data_cod[5] = data_tx_serial.at(3);
-            data_cod[6] = (chksum_error_rx & 0xFE) + (cmd & 0x01);
+            data_cod[6] = (comm_error_rx_num & 0xFE) + (cmd & 0x01);
 
             for (int i = 0; i < 7; i++)
             {
@@ -915,7 +913,7 @@ void MainWindow::receiveMessage_CustomSerial10B()
                     data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
                     data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
                     data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
-                    chksum_error_tx = data_dec[6];
+                    comm_error_tx_num = data_dec[6];
                     start_address = (data_dec[0] << 8) + data_dec[1];
                     quint16 val_u16 = (data_dec[2] << 8) + data_dec[3];
                     val_u16_list.append(val_u16);
@@ -923,17 +921,15 @@ void MainWindow::receiveMessage_CustomSerial10B()
                 }
                 else
                 {
-                    chksum_error_rx++;
+                    comm_error_rx_num++;
                     qDebug() << hex << "errore chksum. parametro/dp. id: " << QString::number(data.at(0), 16) << QString::number(data.at(1), 16);
                 }
             }
             else
             {
-                chksum_error_rx;
+                comm_error_rx_num++;
                 qDebug() << hex << "errore lunhgezza. parametro/dp. id: " << data.at(0) << data.at(1);
             }
-            m_status_label_3->setText(QString::number(chksum_error_rx));
-            m_status_label_4->setText(QString::number(chksum_error_tx));
         }
     }
 }
@@ -1007,22 +1003,27 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
                     {
                         showStatusMessage(tr("Write response error: %1 (Mobus exception: 0x%2)")
                             .arg(reply->errorString()).arg(reply->rawResult().exceptionCode(), -1, 16));
+                        comm_error_tx_num++;
                     }
                     else if (reply->error() != QModbusDevice::NoError)
                     {
                         showStatusMessage(tr("Write response error: %1 (code: 0x%2)").
                             arg(reply->errorString()).arg(reply->error(), -1, 16));
+                        comm_error_tx_num++;
                     }
                     reply->deleteLater();
                     });
             }
-            else {
+            else
+            {
                 // broadcast replies return immediately
                 reply->deleteLater();
             }
         }
-        else {
+        else
+        {
             showStatusMessage(tr("Write error: ") + modbusDevice->errorString());
+            comm_error_tx_num++;
         }
     }
     // Read Params/Process
@@ -1034,8 +1035,10 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
             else
                 delete reply; // broadcast replies return immediately
         }
-        else {
+        else
+        {
             showStatusMessage(tr("Read error: ") + modbusDevice->errorString());
+            comm_error_tx_num++;
         }
     }
 }
@@ -1063,12 +1066,14 @@ void MainWindow::receiveMessage_Modbus()
         showStatusMessage(tr("Read response error: %1 (Mobus exception: 0x%2)").
             arg(reply->errorString()).
             arg(reply->rawResult().exceptionCode(), -1, 16));
+        comm_error_rx_num++;
     }
     else
     {
         showStatusMessage(tr("Read response error: %1 (code: 0x%2)").
             arg(reply->errorString()).
             arg(reply->error(), -1, 16));
+        comm_error_rx_num++;
     }
 
     reply->deleteLater();
