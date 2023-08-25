@@ -1,10 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/application-exit.png</file>
-        <file>images/clear.png</file>
-        <file>images/connect.png</file>
-        <file>images/disconnect.png</file>
-        <file>images/settings.png</file>
         <file>images/AssociationEditor.ico</file>
         <file>images/AssociationEditor_5849.png</file>
         <file>images/AUTTEK logo.bmp</file>
@@ -38,5 +33,16 @@
         <file>images/icons8-settings-32.png</file>
         <file>images/icons8-broom-32.png</file>
         <file>images/icons8-synchronize-32.png</file>
+        <file>db/params_data.csv</file>
+        <file>db/process_data.csv</file>
+        <file>images/icons8-caricare-50.png</file>
+        <file>images/icons8-scaricare-50.png</file>
+        <file>images/icons8-agopressione-50.png</file>
+        <file>images/icons8-upload-64.png</file>
+        <file>images/icons8-restart-50.png</file>
+        <file>images/icons8-riproduci-50.png</file>
+        <file>images/icons8-scaricare-64.png</file>
+        <file>images/icons8-microchip-64.png</file>
+        <file>images/microchip-icon-20.jpg</file>
     </qresource>
 </RCC>
