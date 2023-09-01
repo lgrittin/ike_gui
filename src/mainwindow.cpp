@@ -19,10 +19,6 @@
 #include <QTableView>
 #include <QSplitter>
 
-static uint8_t chksum_error_rx = 0;
-static uint8_t chksum_error_tx = 0;
-static uint16_t id = 0;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::MainWindow),
@@ -31,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_status_label_3(new QLabel),
     m_status_label_4(new QLabel),
     m_status_label_5(new QLabel),
+    m_status_label_dbVersion(new QLabel),
     m_settings(new SettingsDialog),
     model_params(new QStandardItemModel),
     model_process(new QStandardItemModel)
@@ -39,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // INIT ELEMENTI GUI
     // ---------------------------------------
     m_ui->setupUi(this);
-
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
     m_ui->actionQuit->setEnabled(true);
@@ -47,8 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QLabel* label_tx = new QLabel("Tx: ", this);
     QLabel* label_rx = new QLabel("Rx: ", this);
-    QLabel* label_tx_chksm = new QLabel("TxChksmErr: ", this);
-    QLabel* label_rx_chksm = new QLabel("RxChksmErr: ", this);
+    QLabel* label_tx_chksm = new QLabel("TxCommErr: ", this);
+    QLabel* label_rx_chksm = new QLabel("RxCommErr: ", this);
     m_status_label_1->setText(" ");
     m_status_label_1->setFrameShape(QFrame::StyledPanel);
     m_status_label_1->setAutoFillBackground(true);
@@ -64,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_status_label_3->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_status_label_4->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_status_label_5->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_status_label_dbVersion->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_ui->bottomStatusBar->addPermanentWidget(label_tx, 1);
     m_ui->bottomStatusBar->addPermanentWidget(m_status_label_1, 2);
     m_ui->bottomStatusBar->addPermanentWidget(label_tx_chksm, 5);
@@ -73,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->bottomStatusBar->addPermanentWidget(label_rx_chksm, 5);
     m_ui->bottomStatusBar->addPermanentWidget(m_status_label_3, 5);
     m_ui->bottomStatusBar->addPermanentWidget(m_status_label_5, 40);
-
+    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_dbVersion, 5);
     m_ui->label_init->setAutoFillBackground(true);
     m_ui->label_freqEst->setAutoFillBackground(true);
     m_ui->label_readyToOp->setAutoFillBackground(true);
@@ -83,154 +80,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->label_ImpulsiSpenti->setAutoFillBackground(true);
 
     // ---------------------------------------------------------- //
-    // IMPORTAZIONE DATABASE E COSTRUZIONE TABELLA PARAMETRI
+    // IMPORTAZIONE DATABASE E COSTRUZIONE TABELLE
     // ---------------------------------------------------------- //
-    QFile file_params(":/db/params_data.csv");
-    if (file_params.open(QFile::ReadOnly)) {
-        QTextStream stream(&file_params);
-
-        char separator_file = ',';
-        QString line = stream.readLine();
-        list_columns_params = line.simplified().split(separator_file);
-        model_params->setHorizontalHeaderLabels(list_columns_params);
-
-        int row = 0;
-        QStandardItem* newItem = nullptr;
-        while (!stream.atEnd()) {
-            line = stream.readLine();
-            if (!line.startsWith('#') && line.contains(separator_file)) {
-                list_row_params = line.simplified().split(separator_file);
-                for (int col = 0; col < list_row_params.length(); ++col) {
-                    newItem = new QStandardItem(list_row_params.at(col));
-                    model_params->setItem(row, col, newItem);
-
-                    if (col != list_columns_params.indexOf("val_actual"))
-                    {
-                        auto currentFlags = model_params->item(row, col)->flags();
-                        model_params->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
-
-                        if (col < list_columns_params.indexOf("val_actual"))
-                            model_params->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
-                        else if (col > list_columns_params.indexOf("val_actual"))
-                            model_params->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
-                    }
-                    else
-                        model_params->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
-                }
-                ++row;
-            }
-        }
-    }
-    file_params.close();
-
-    //FreezeTableWidget* tableView_params = new FreezeTableWidget(model_params);
-    tableView_params = new FreezeTableWidget(model_params);
-    QStringList headers_params;
-    startAddress_params = model_params->data(model_params->index(0, list_columns_params.indexOf("id_address"))).toInt();
-    address_cmd_wd_1 = startAddress_params; // CMD_WD_1 è il primo parametro
-    
-    for (int i = 0; i < model_params->columnCount(); i++)
-        headers_params.append(tableView_params->model()->headerData(i, Qt::Horizontal).toString());
-
-    //SpinBoxDelegate* delegate_doubleSpinBox_params = new SpinBoxDelegate;
-    delegate_doubleSpinBox_params = new SpinBoxDelegate;
-    delegate_doubleSpinBox_params->headers_params = headers_params;
-    delegate_doubleSpinBox_params->model = model_params;
-    tableView_params->setItemDelegateForColumn(list_columns_params.indexOf("val_actual"), delegate_doubleSpinBox_params);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("type"), 1);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("decimal"), 1);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("single_steps"), 1);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("dsp_name"), 1);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("kp_to_modbus"), 1);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("precision"), 1);
-    tableView_params->setColumnHidden(list_columns_params.indexOf("val_modbus"), 1);
-    tableView_params->verticalHeader()->setVisible(false);
-    tableView_params->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    tableView_params->horizontalHeader()->setStretchLastSection(true);
-
-    // ---------------------------------------------------------- //
-    // IMPORTAZIONE DATABASE E COSTRUZIONE TABELLA DATI DI PROCESSO
-    // ---------------------------------------------------------- //
-    QFile file_process(":/db/process_data.csv");
-    if (file_process.open(QFile::ReadOnly)) {
-        QTextStream stream(&file_process);
-
-        char separator_file = ',';
-        QString line = stream.readLine();
-        list_columns_process = line.simplified().split(separator_file);
-        model_process->setHorizontalHeaderLabels(list_columns_process);
-
-        int row = 0;
-        QStandardItem* newItem = nullptr;
-        bool first_line = 1;
-        while (!stream.atEnd()) {
-            line = stream.readLine();
-            if (!line.startsWith('#') && line.contains(separator_file)) {
-                list_row_process = line.simplified().split(separator_file);
-                for (int col = 0; col < list_row_process.length(); ++col) {
-                    newItem = new QStandardItem(list_row_process.at(col));
-                    model_process->setItem(row, col, newItem);
-                    auto currentFlags = model_process->item(row, col)->flags();
-                    model_process->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
-
-                    if (col == list_columns_process.indexOf("val_actual"))
-                        model_process->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
-                    else if (col < list_columns_process.indexOf("val_actual"))
-                        model_process->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
-                    else
-                        model_process->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
-                }
-
-                if (first_line)
-                {
-                    startAddress_process = list_row_process.at(0).toInt();
-                    first_line = 0;
-                }
-
-                if (list_row_process.contains("sts_out.sts_wd_1"))
-                    address_sts_wd_1 = list_row_process.at(0).toInt();
-                else if (list_row_process.contains("sts_out.alm_wd_1"))
-                    address_alm_wd_1 = list_row_process.at(0).toInt();
-                else if (list_row_process.contains("diagn_out.datetime.SEC"))
-                {
-                    address_datetime_sec = list_row_process.at(0).toInt();
-                    address_datetime_min = address_datetime_sec + 1;
-                    address_datetime_hour = address_datetime_min + 1;
-                    address_datetime_day = address_datetime_hour + 1;
-                    address_datetime_dayOfWeek = address_datetime_day + 1;
-                    address_datetime_month = address_datetime_dayOfWeek + 1;
-                    address_datetime_year = address_datetime_month + 1;
-                }
-
-                if (list_row_process.contains("diagn_out.fmw_version.FMW_VER_H1"))
-                {
-                    address_fmwvers_h1 = list_row_process.at(0).toInt();
-                    address_fmwvers_h2 = address_fmwvers_h1 + 1;
-                    address_fmwvers_l1 = address_fmwvers_h2 + 1;
-                    address_fmwvers_l2 = address_fmwvers_l1 + 1;
-                    address_fmwvers_type = address_fmwvers_l2 + 1;
-                }
-                ++row;
-            }
-        }
-    }
-    file_process.close();
-
-    //FreezeTableWidget* tableView_process = new FreezeTableWidget(model_process);
-    tableView_process = new FreezeTableWidget(model_process);
-    QStringList headers_process;
-    for (int i = 0; i < model_process->columnCount(); i++)
-        headers_process.append(tableView_process->model()->headerData(i, Qt::Horizontal).toString());
-
-    tableView_process->setColumnHidden(list_columns_process.indexOf("type"), 1);
-    tableView_process->setColumnHidden(list_columns_process.indexOf("decimal"), 1);
-    tableView_process->setColumnHidden(list_columns_process.indexOf("dsp_name"), 1);
-    tableView_process->setColumnHidden(list_columns_process.indexOf("kp_to_modbus"), 1);
-    tableView_process->setColumnHidden(list_columns_process.indexOf("precision"), 1);
-    tableView_process->setColumnHidden(list_columns_process.indexOf("val_modbus"), 1);
-    tableView_process->verticalHeader()->setVisible(false);
-    tableView_process->setSelectionMode(QAbstractItemView::NoSelection);
-    tableView_process->horizontalHeader()->setStretchLastSection(true);
+    delegate_doubleSpinBox_params = new SpinBoxDelegate;        //SpinBoxDelegate* delegate_doubleSpinBox_params = new SpinBoxDelegate;
+    if (setupModelAndTables(true) != NO_ERRORS)
+        throw std::invalid_argument("DEFAULT DATABASE NOT VALID!");
 
     // ---------------------------------------
     // GUI TIMERS
@@ -244,14 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // MAINWINDOW SETUP
     // ---------------------------------------
     createDockWindows();
-    QHBoxLayout* tableLowerLayout = new QHBoxLayout;
-    QHBoxLayout* tableUpperLayout = new QHBoxLayout;
-    tableView_params->setLayout(tableLowerLayout);
-    tableView_process->setLayout(tableUpperLayout);
-    QSplitter* poSplitter = new QSplitter(Qt::Vertical, this);
-    poSplitter->addWidget(tableView_params);
-    poSplitter->addWidget(tableView_process);
-    setCentralWidget(poSplitter);
+    createCentralWidget();
 
     // ---------------------------------------
     // CONNESSIONI
@@ -277,6 +124,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionConfigure, &QAction::triggered, m_settings, &SettingsDialog::show);
     connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(m_ui->actionReadAll, &QAction::triggered, this, &MainWindow::readAll);
+    connect(m_ui->actionLoadDatabase, &QAction::triggered, this, &MainWindow::onLoadDatabase);
     connect(m_ui->actionAutoTrigger, &QAction::triggered, this, &MainWindow::autoChangePressParameter);
     connect(m_ui->actionResetDeafult_Param, &QAction::triggered, this, &MainWindow::resetData);
     connect(m_ui->actionRead_Param, &QAction::triggered, this, &MainWindow::readParam);
@@ -291,6 +139,284 @@ void MainWindow::initActionsConnections()
 }
 
 #pragma region Callbacks Elementi GUI
+
+error_db MainWindow::setupModelAndTables(bool default_db)
+{
+    QString params_csv_version;
+    QStringList headers_params;
+    QString process_csv_version;
+    QStringList headers_process;
+    error_db error = NO_ERRORS;
+    QStringList file_names_list;
+    int file_params_idx = -1;
+    int file_process_idx = -1;
+    QString params_data_path;
+    QString process_data_path;
+    bool file_names_list_empty = false;
+
+    if (default_db)
+    {
+        params_data_path = "params_data.csv";
+        process_data_path = "process_data.csv";
+        QFile file_params(params_data_path);
+        QFile file_process(process_data_path);
+        if ((!file_params.exists()) || (!file_process.exists()) ||
+            (file_params.size() < MIN_DB_SIZE) || (file_process.size() < MIN_DB_SIZE))
+        {
+            QMessageBox messageBox;
+            params_data_path = ":/db/params_data.csv";
+            process_data_path = ":/db/process_data.csv";
+            QString msg = QStringLiteral("DATABASE NON TROVATI NEL PERCORSO CORRENTE") +
+                QStringLiteral("\n\nVerrà utilizzato il database linkato in fase di compilazione.");
+            messageBox.warning(0, "Warning", msg);
+            messageBox.setFixedSize(700, 400);
+        }
+    }
+    else
+    {
+        file_names_list = QFileDialog::getOpenFileNames(this, tr("Select Csv Files \"params_data.csv\" and \"process_data.csv\""), QDir::homePath(), tr("Csv Files (*.csv)"));
+        if (!file_names_list.empty())
+        {
+            for (unsigned int i = 0; i < file_names_list.size(); i++)
+            {
+                if (file_names_list.at(i).contains("params_data.csv"))
+                    file_params_idx = i;
+                else if (file_names_list.at(i).contains("process_data.csv"))
+                    file_process_idx = i;
+            }
+            if ((file_params_idx == -1) || (file_process_idx == -1))
+            {
+                error = FILES_CSV_NOT_FOUND;
+                params_data_path = ":/db/params_data.csv";
+                process_data_path = ":/db/process_data.csv";
+            }
+            else
+            {
+                params_data_path = file_names_list.at(file_params_idx);
+                process_data_path = file_names_list.at(file_process_idx);
+            }
+        }
+        else
+            file_names_list_empty = true;
+    }
+
+    if (file_names_list_empty == false)
+    {
+        QFile file_params(params_data_path);
+        QFile file_process(process_data_path);
+
+        // ---------------------------------------------------------- //
+        // IMPORTAZIONE DATABASE PARAMETRI
+        // ---------------------------------------------------------- //
+        if ((error == 0) && (file_params.open(QFile::ReadOnly)))
+        {
+            QTextStream stream(&file_params);
+            char separator_file = ',';
+            QString line = stream.readLine();
+            params_csv_version = line.simplified();
+            line = stream.readLine();
+            list_columns_params.clear();
+            list_columns_params = line.simplified().split(separator_file);
+            if (list_columns_params.empty() || list_columns_params.size() == 1)
+                error = FILES_CSV_NOT_VALID;
+            else
+            {
+                model_params->clear();
+                model_params->setHorizontalHeaderLabels(list_columns_params);
+                int row = 0;
+                QStandardItem* newItem = nullptr;
+                while (!stream.atEnd())
+                {
+                    line = stream.readLine();
+                    if (!line.startsWith('#') && line.contains(separator_file))
+                    {
+                        list_row_params = line.simplified().split(separator_file);
+                        for (int col = 0; col < list_row_params.length(); ++col)
+                        {
+                            newItem = new QStandardItem(list_row_params.at(col));
+                            model_params->setItem(row, col, newItem);
+
+                            if (col != list_columns_params.indexOf("val_actual"))
+                            {
+                                auto currentFlags = model_params->item(row, col)->flags();
+                                model_params->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
+                                if (col < list_columns_params.indexOf("val_actual"))
+                                    model_params->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
+                                else if (col > list_columns_params.indexOf("val_actual"))
+                                    model_params->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
+                            }
+                            else
+                                model_params->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
+                        }
+                        ++row;
+                    }
+                }
+                file_params.close();
+                startAddress_params = model_params->data(model_params->index(0, list_columns_params.indexOf("id_address"))).toInt();
+                address_cmd_wd_1 = startAddress_params; // CMD_WD_1 è il primo parametro
+                for (int i = 0; i < model_params->columnCount(); i++)
+                    //headers_params.append(tableView_params->model()->headerData(i, Qt::Horizontal).toString());
+                    headers_params.append(model_params->headerData(i, Qt::Horizontal).toString());
+
+            }
+        }
+
+        // ---------------------------------------------------------- //
+        // IMPORTAZIONE DATABASE DATI DI PROCESSO
+        // ---------------------------------------------------------- //
+        if ((error == 0) && (file_process.open(QFile::ReadOnly)))
+        {
+            QTextStream stream(&file_process);
+            char separator_file = ',';
+            QString line = stream.readLine();
+            process_csv_version = line.simplified();
+            line = stream.readLine();
+            list_columns_process.clear();
+            list_columns_process = line.simplified().split(separator_file);
+            if (list_columns_process.empty() || list_columns_process.size() == 1)
+                error = FILES_CSV_NOT_VALID;
+            else
+            {
+                model_process->clear();
+                model_process->setHorizontalHeaderLabels(list_columns_process);
+                int row = 0;
+                QStandardItem* newItem = nullptr;
+                bool first_line = 1;
+                while (!stream.atEnd())
+                {
+                    line = stream.readLine();
+                    if (!line.startsWith('#') && line.contains(separator_file))
+                    {
+                        list_row_process = line.simplified().split(separator_file);
+                        for (int col = 0; col < list_row_process.length(); ++col)
+                        {
+                            newItem = new QStandardItem(list_row_process.at(col));
+                            model_process->setItem(row, col, newItem);
+                            auto currentFlags = model_process->item(row, col)->flags();
+                            model_process->item(row, col)->setFlags(currentFlags & (~Qt::ItemIsEditable));
+                            if (col == list_columns_process.indexOf("val_actual"))
+                                model_process->item(row, col)->setData(QColor(255, 255, 128), Qt::BackgroundColorRole);
+                            else if (col < list_columns_process.indexOf("val_actual"))
+                                model_process->item(row, col)->setData(QColor(230, 255, 200), Qt::BackgroundColorRole);
+                            else
+                                model_process->item(row, col)->setData(QColor(215, 235, 255), Qt::BackgroundColorRole);
+                        }
+                        if (first_line)
+                        {
+                            startAddress_process = list_row_process.at(0).toInt();
+                            first_line = 0;
+                        }
+                        if (list_row_process.contains("sts_out.sts_wd_1"))
+                            address_sts_wd_1 = list_row_process.at(0).toInt();
+                        else if (list_row_process.contains("sts_out.alm_wd_1"))
+                            address_alm_wd_1 = list_row_process.at(0).toInt();
+                        else if (list_row_process.contains("diagn_out.datetime.Second"))
+                        {
+                            address_datetime_sec = list_row_process.at(0).toInt();
+                            address_datetime_min = address_datetime_sec + 1;
+                            address_datetime_hour = address_datetime_min + 1;
+                            address_datetime_day = address_datetime_hour + 1;
+                            address_datetime_dayOfWeek = address_datetime_day + 1;
+                            address_datetime_month = address_datetime_dayOfWeek + 1;
+                            address_datetime_year = address_datetime_month + 1;
+                        }
+                        if (list_row_process.contains("diagn_out.fmw_version"))
+                            address_fmwVers = list_row_process.at(0).toInt();
+                        ++row;
+                    }
+                }
+                file_process.close();
+                for (int i = 0; i < model_process->columnCount(); i++)
+                    //headers_process.append(tableView_process->model()->headerData(i, Qt::Horizontal).toString());
+                    headers_process.append(model_process->headerData(i, Qt::Horizontal).toString());
+            }
+        }
+
+        if ((error == 0) && (process_csv_version == params_csv_version))
+        {
+            db_version = params_csv_version;
+            db_version.replace("#", "");
+            m_status_label_dbVersion->setText(db_version);
+
+            // ---------------------------------------------------------- //
+            // COSTRUZIONE TABELLA PARAMETRI
+            // ---------------------------------------------------------- //
+            delegate_doubleSpinBox_params->headers_params = headers_params;
+            delegate_doubleSpinBox_params->model = model_params;
+            tableView_params = new FreezeTableWidget(model_params);     //FreezeTableWidget* tableView_params = new FreezeTableWidget(model_params);
+            tableView_params->setItemDelegateForColumn(list_columns_params.indexOf("val_actual"), delegate_doubleSpinBox_params);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("type"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("decimal"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("single_steps"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("dsp_name"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("k_double_to_u16"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("k_u16_to_double"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("precision"), 1);
+            tableView_params->setColumnHidden(list_columns_params.indexOf("val_modbus"), 1);
+            tableView_params->verticalHeader()->setVisible(false);
+            tableView_params->setSelectionMode(QAbstractItemView::ExtendedSelection);
+            tableView_params->horizontalHeader()->setStretchLastSection(true);
+
+            // ---------------------------------------------------------- //
+            // COSTRUZIONE TABELLA DATI DI PROCESSO
+            // ---------------------------------------------------------- //
+            tableView_process = new FreezeTableWidget(model_process);   //FreezeTableWidget* tableView_process = new FreezeTableWidget(model_process);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("type"), 1);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("decimal"), 1);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("dsp_name"), 1);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("k_double_to_u16"), 1);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("k_u16_to_double"), 1);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("precision"), 1);
+            tableView_process->setColumnHidden(list_columns_process.indexOf("val_modbus"), 1);
+            tableView_process->verticalHeader()->setVisible(false);
+            tableView_process->setSelectionMode(QAbstractItemView::NoSelection);
+            tableView_process->horizontalHeader()->setStretchLastSection(true);
+
+            createCentralWidget();
+        }
+        else if ((error == 0) && (process_csv_version != params_csv_version))
+            error = PARAMS_PROCESS_VERSION_DIVERGENT;
+
+        // ---------------------------------------------------------- //
+        // CHECK ERRORS
+        // ---------------------------------------------------------- //
+        if (error)
+        {
+            QMessageBox messageBox;
+            QString msg;
+            switch (error)
+            {
+            case FILES_CSV_NOT_FOUND:
+                msg = QStringLiteral("DATABASE NON TROVATI!") +
+                    QStringLiteral("\n\Selezionare entrambi i files:\n\"params_data.csv\"\n\"process_data.csv\"");
+                break;
+            case FILES_CSV_NOT_VALID:
+                msg = QStringLiteral("DATABASE NON VALIDI!") +
+                    QStringLiteral("\n\nControllare i files selezionati:\n\"params_data.csv\"\n\"process_data.csv\"");
+                break;
+            case PARAMS_PROCESS_VERSION_DIVERGENT:
+                msg = QStringLiteral("DATABASE PARAMETRI E PROCESSO DIVERGENTI!") +
+                    QStringLiteral("\nparams_data.csv: ") + params_csv_version +
+                    QStringLiteral("\nprocess_data.csv: ") + process_csv_version;
+                break;
+            default:
+                break;
+            }
+            messageBox.critical(0, "Error", msg);
+            messageBox.setFixedSize(700, 400);
+        }
+    }
+
+    return(error);
+}
+
+void MainWindow::onLoadDatabase()
+{
+    error_db error = NO_ERRORS;
+    do {
+        error = setupModelAndTables(false);
+    } while (error != NO_ERRORS);
+}
 
 void MainWindow::resetData()
 {
@@ -358,10 +484,13 @@ void MainWindow::tableDataChanged_params(const QModelIndex& topLeft, const QMode
     disconnect(model_params, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged_params(QModelIndex, QModelIndex, QVector<int>)));
     computeValU16FromDouble(model_params, topLeft.row());
     connect(model_params, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged_params(QModelIndex, QModelIndex, QVector<int>)));
-    qDebug() << "SENT: "
-        << "id_addr: " << QString::number(id_address)
-        << " - val_actual: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("val_actual"))).toDouble())
-        << " - val_modbus: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("val_modbus"))).toInt());
+    if ((m_serial) || (modbusDevice))
+    {
+        qDebug() << "SENT: "
+            << "id_addr: " << QString::number(id_address)
+            << " - val_actual: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("val_actual"))).toDouble())
+            << " - val_modbus: " << QString::number(model_params->data(model_params->index(topLeft.row(), list_columns_params.indexOf("val_modbus"))).toInt());
+    }
     if ((!m_serial) && (modbusDevice))
     {
         sendRequest_Modbus(id_address, 1, CMD_WRITE);
@@ -612,10 +741,23 @@ void MainWindow::createDockWindows()
     addDockWidget(Qt::RightDockWidgetArea, dock);
 }
 
+void MainWindow::createCentralWidget()
+{
+    QHBoxLayout* tableLowerLayout = new QHBoxLayout;
+    QHBoxLayout* tableUpperLayout = new QHBoxLayout;
+    tableView_params->setLayout(tableLowerLayout);
+    tableView_process->setLayout(tableUpperLayout);
+    QSplitter* poSplitter = new QSplitter(Qt::Vertical, this);
+    poSplitter->addWidget(tableView_params);
+    poSplitter->addWidget(tableView_process);
+    setCentralWidget(poSplitter);
+}
+
 void MainWindow::blinkRxLabel()
 {
     QTimer::singleShot(200, this, [this] {blinkEndRxLabel(); });    //SLOT(blinkEndRxLabel()));
     m_status_label_1->setStyleSheet("background-color: green");
+    m_status_label_3->setText(QString::number(comm_error_rx_num));
 }
 
 void MainWindow::blinkEndRxLabel()
@@ -627,6 +769,7 @@ void MainWindow::blinkTxLabel()
 {
     QTimer::singleShot(200, this, [this] {blinkEndTxLabel(); });    //SLOT(blinkEndTxLabel()));
     m_status_label_2->setStyleSheet("background-color: green");
+    m_status_label_4->setText(QString::number(comm_error_tx_num));
 }
 
 void MainWindow::blinkEndTxLabel()
@@ -784,15 +927,13 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
     }
 
     // VERSION
-    if ((start_address <= address_fmwvers_h1) && (start_address + address_length >= address_fmwvers_type))
+    if ((start_address <= address_fmwVers) && (start_address + address_length >= address_fmwVers))
     {
-        QString fmwvers_string = QStringLiteral("Fmw Version: ") +
-            model_process->data(model_process->index(address_fmwvers_h1 - startAddress_process, list_columns_process.indexOf("val_actual"))).toString() +
-            model_process->data(model_process->index(address_fmwvers_h2 - startAddress_process, list_columns_process.indexOf("val_actual"))).toString() + QStringLiteral(".") +
-            model_process->data(model_process->index(address_fmwvers_l1 - startAddress_process, list_columns_process.indexOf("val_actual"))).toString() +
-            model_process->data(model_process->index(address_fmwvers_l2 - startAddress_process, list_columns_process.indexOf("val_actual"))).toString() + QStringLiteral(" - Type: ") +
-            model_process->data(model_process->index(address_fmwvers_type - startAddress_process, list_columns_process.indexOf("val_actual"))).toString();
-        m_ui->label_fmwvers->setText(fmwvers_string);
+        fmw_version.all = model_process->data(model_process->index(address_fmwVers - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt();
+        m_ui->label_fmwvers->setText(QStringLiteral("Fmw Version: ") +
+            QString::number(fmw_version.bit.FMW_VER_H1) + QString::number(fmw_version.bit.FMW_VER_H2) + QStringLiteral(".") +
+            QString::number(fmw_version.bit.FMW_VER_L1) + QString::number(fmw_version.bit.FMW_VER_L2) + QStringLiteral(" - Type: ") +
+            QString::number(fmw_version.bit.FMW_VER_TYPE));
     }
 }
 
@@ -828,7 +969,7 @@ void MainWindow::sendRequest_CustomSerial10B(quint16 start_address, quint16 addr
             data_cod[3] = data_tx_serial.at(1);
             data_cod[4] = data_tx_serial.at(2);
             data_cod[5] = data_tx_serial.at(3);
-            data_cod[6] = (chksum_error_rx & 0xFE) + (cmd & 0x01);
+            data_cod[6] = (comm_error_rx_num & 0xFE) + (cmd & 0x01);
 
             for (int i = 0; i < 7; i++)
             {
@@ -915,7 +1056,7 @@ void MainWindow::receiveMessage_CustomSerial10B()
                     data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
                     data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
                     data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
-                    chksum_error_tx = data_dec[6];
+                    comm_error_tx_num = data_dec[6];
                     start_address = (data_dec[0] << 8) + data_dec[1];
                     quint16 val_u16 = (data_dec[2] << 8) + data_dec[3];
                     val_u16_list.append(val_u16);
@@ -923,17 +1064,15 @@ void MainWindow::receiveMessage_CustomSerial10B()
                 }
                 else
                 {
-                    chksum_error_rx++;
+                    comm_error_rx_num++;
                     qDebug() << hex << "errore chksum. parametro/dp. id: " << QString::number(data.at(0), 16) << QString::number(data.at(1), 16);
                 }
             }
             else
             {
-                chksum_error_rx;
+                comm_error_rx_num++;
                 qDebug() << hex << "errore lunhgezza. parametro/dp. id: " << data.at(0) << data.at(1);
             }
-            m_status_label_3->setText(QString::number(chksum_error_rx));
-            m_status_label_4->setText(QString::number(chksum_error_tx));
         }
     }
 }
@@ -1007,22 +1146,27 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
                     {
                         showStatusMessage(tr("Write response error: %1 (Mobus exception: 0x%2)")
                             .arg(reply->errorString()).arg(reply->rawResult().exceptionCode(), -1, 16));
+                        comm_error_tx_num++;
                     }
                     else if (reply->error() != QModbusDevice::NoError)
                     {
                         showStatusMessage(tr("Write response error: %1 (code: 0x%2)").
                             arg(reply->errorString()).arg(reply->error(), -1, 16));
+                        comm_error_tx_num++;
                     }
                     reply->deleteLater();
                     });
             }
-            else {
+            else
+            {
                 // broadcast replies return immediately
                 reply->deleteLater();
             }
         }
-        else {
+        else
+        {
             showStatusMessage(tr("Write error: ") + modbusDevice->errorString());
+            comm_error_tx_num++;
         }
     }
     // Read Params/Process
@@ -1034,8 +1178,10 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
             else
                 delete reply; // broadcast replies return immediately
         }
-        else {
+        else
+        {
             showStatusMessage(tr("Read error: ") + modbusDevice->errorString());
+            comm_error_tx_num++;
         }
     }
 }
@@ -1063,12 +1209,14 @@ void MainWindow::receiveMessage_Modbus()
         showStatusMessage(tr("Read response error: %1 (Mobus exception: 0x%2)").
             arg(reply->errorString()).
             arg(reply->rawResult().exceptionCode(), -1, 16));
+        comm_error_rx_num++;
     }
     else
     {
         showStatusMessage(tr("Read response error: %1 (code: 0x%2)").
             arg(reply->errorString()).
             arg(reply->error(), -1, 16));
+        comm_error_rx_num++;
     }
 
     reply->deleteLater();
@@ -1078,7 +1226,7 @@ void MainWindow::computeValU16FromDouble(QAbstractItemModel* model_generic, quin
 {
     QStringList* list_column_generic = (model_generic == model_params) ? (&list_columns_params) : (&list_columns_process);
     double val_double = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_actual"))).toDouble();
-    double kp_modbus = model_generic->data(model_generic->index(row, list_column_generic->indexOf("kp_to_modbus"))).toDouble();
+    double kp_modbus = model_generic->data(model_generic->index(row, list_column_generic->indexOf("k_double_to_u16"))).toDouble();
     double val_min = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_min"))).toDouble();
     unsigned int val_u32 = round((val_double - val_min) * kp_modbus);
     //unsigned int val_u32 = floor((val_double - val_min) * kp_modbus);
@@ -1092,7 +1240,7 @@ void MainWindow::computeValDoubleFromU16(QAbstractItemModel* model_generic, quin
     quint16 val_u16 = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_modbus"))).toInt();
     quint16 decimal = model_generic->data(model_generic->index(row, list_column_generic->indexOf("decimal"))).toInt();
     double precision = 1/pow(10, decimal);
-    double kp_modbus = model_generic->data(model_generic->index(row, list_column_generic->indexOf("kp_to_modbus"))).toDouble();
+    double kp_modbus = model_generic->data(model_generic->index(row, list_column_generic->indexOf("k_double_to_u16"))).toDouble();
     double val_min = model_generic->data(model_generic->index(row, list_column_generic->indexOf("val_min"))).toDouble();
     double val_double = round(((val_u16 / kp_modbus) + val_min) / precision) * precision;
     model_generic->setData(model_generic->index(row, list_column_generic->indexOf("val_actual")), val_double);

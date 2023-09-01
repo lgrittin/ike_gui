@@ -183,7 +183,7 @@
     </ResourceCompile>
     <QtMoc>
       <CompilerFlavor>msvc</CompilerFlavor>
-      <Include>$(Configuration)\moc_predefs.h</Include>
+      <Include>$(Configuration)\</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <DynamicSource>output</DynamicSource>
       <QtMocDir>$(SolutionDir)\build\$(Configuration)\$(Platform)\moc\</QtMocDir>
@@ -247,7 +247,7 @@
     </ResourceCompile>
     <QtMoc>
       <CompilerFlavor>msvc</CompilerFlavor>
-      <Include>$(Configuration)\moc_predefs.h</Include>
+      <Include>$(Configuration)\</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <DynamicSource>output</DynamicSource>
       <QtMocDir>$(SolutionDir)\build\$(Configuration)\$(Platform)\moc\</QtMocDir>
@@ -307,7 +307,7 @@
     </ResourceCompile>
     <QtMoc>
       <CompilerFlavor>msvc</CompilerFlavor>
-      <Include>$(Configuration)\moc_predefs.h</Include>
+      <Include>$(Configuration)\</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <DynamicSource>output</DynamicSource>
       <QtMocDir>$(SolutionDir)\build\$(Configuration)\$(Platform)\moc\</QtMocDir>
@@ -367,7 +367,7 @@
     </ResourceCompile>
     <QtMoc>
       <CompilerFlavor>msvc</CompilerFlavor>
-      <Include>$(Configuration)\moc_predefs.h</Include>
+      <Include>$(Configuration)\</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <DynamicSource>output</DynamicSource>
       <QtMocDir>$(SolutionDir)\build\$(Configuration)\$(Platform)\moc\</QtMocDir>
@@ -419,7 +419,6 @@
     </QtRcc>
     <None Include="db\ike_params_data.csv" />
     <None Include="db\ike_process_data.csv" />
-    <None Include="images\settings.png" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\console.cpp" />
@@ -427,7 +426,6 @@
     <ClCompile Include="src\freezetablewidget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
-    <ClCompile Include="src\ParamProcessData.cpp" />
     <ClCompile Include="src\settingsdialog.cpp" />
   </ItemGroup>
   <ItemGroup>

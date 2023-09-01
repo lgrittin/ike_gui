@@ -20,6 +20,16 @@ enum ParamProcess
     Process = 1
 };
 
+#define MIN_DB_SIZE 200  // Byte
+
+enum error_db
+{
+    NO_ERRORS = 0,
+    FILES_CSV_NOT_FOUND = 1,
+    FILES_CSV_NOT_VALID = 2,
+    PARAMS_PROCESS_VERSION_DIVERGENT = 3
+};
+
 QT_BEGIN_NAMESPACE
 
 class QLabel;
@@ -62,7 +72,7 @@ private slots:
     void blinkEndTxLabel();
     void pressed_ackFault();
     void pressed_start();
-
+    void onLoadDatabase();
 
 private:
     void initActionsConnections();
@@ -78,6 +88,8 @@ private:
     void computeValU16FromDouble(QAbstractItemModel* model_generic, quint16 row);
     void computeValDoubleFromU16(QAbstractItemModel* model_generic, quint16 row);
     void createDockWindows();
+    void createCentralWidget();
+    error_db setupModelAndTables(bool default_db);
 
     Ui::MainWindow *m_ui = nullptr;
     QLabel* m_status_label_1 = nullptr;
@@ -85,6 +97,7 @@ private:
     QLabel* m_status_label_3 = nullptr;
     QLabel* m_status_label_4 = nullptr;
     QLabel* m_status_label_5 = nullptr;
+    QLabel* m_status_label_dbVersion = nullptr;
     QStandardItemModel* model_params = nullptr;
     QStandardItemModel* model_process = nullptr;
     FreezeTableWidget* tableView_params = nullptr;
@@ -111,13 +124,13 @@ private:
     quint16 address_datetime_dayOfWeek = 0;
     quint16 address_datetime_month = 0;
     quint16 address_datetime_year = 0;
-    quint16 address_fmwvers_h1 = 0;
-    quint16 address_fmwvers_h2 = 0;
-    quint16 address_fmwvers_l1 = 0;
-    quint16 address_fmwvers_l2 = 0;
-    quint16 address_fmwvers_type = 0;
+    quint16 address_fmwVers = 0;
     quint16 address_cmd_wd_1 = 0;
     bool read_params = 0;
+    unsigned int comm_error_rx_num = 0;
+    unsigned int comm_error_tx_num = 0;
+    FMW_VERSION fmw_version;
+    QString db_version;
 };
 
 #endif // MAINWINDOW_H

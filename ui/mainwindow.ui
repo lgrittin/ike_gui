@@ -430,7 +430,7 @@
    </property>
    <widget class="QMenu" name="menuCalls">
     <property name="title">
-     <string>Calls</string>
+     <string>Communication</string>
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
@@ -442,8 +442,12 @@
      <string>Tools</string>
     </property>
     <addaction name="actionConfigure"/>
+    <addaction name="actionLoadDatabase"/>
     <addaction name="actionResetDeafult_Param"/>
-    <addaction name="actionOpen_Log"/>
+    <addaction name="actionReadAll"/>
+    <addaction name="actionAutoTrigger"/>
+    <addaction name="actionRead_Param"/>
+    <addaction name="actionWrite_Param"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -466,6 +470,7 @@
    <addaction name="actionConnect"/>
    <addaction name="actionDisconnect"/>
    <addaction name="actionConfigure"/>
+   <addaction name="actionLoadDatabase"/>
    <addaction name="actionResetDeafult_Param"/>
    <addaction name="actionAutoTrigger"/>
    <addaction name="actionReadAll"/>
@@ -615,6 +620,21 @@
    </property>
    <property name="toolTip">
     <string>Set Parameter Value(s)</string>
+   </property>
+  </action>
+  <action name="actionLoadDatabase">
+   <property name="icon">
+    <iconset resource="../IKE_gui.qrc">
+     <normaloff>:/images/icons8-apri-cartella-24.png</normaloff>:/images/icons8-apri-cartella-24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Load Database</string>
+   </property>
+   <property name="toolTip">
+    <string>Load New Database</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+L</string>
    </property>
   </action>
  </widget>

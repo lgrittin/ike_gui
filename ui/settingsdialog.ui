@@ -235,7 +235,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QSpinBox" name="readIntervalSpinner">
+       <widget class="QSpinBox" name="timeoutSpinner">
         <property name="maximum">
          <number>10000</number>
         </property>
@@ -252,7 +252,7 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QSpinBox" name="timeoutSpinner">
+       <widget class="QSpinBox" name="readIntervalSpinner">
         <property name="maximum">
          <number>10000</number>
         </property>

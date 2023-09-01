@@ -58,9 +58,6 @@
     <QtRcc Include="IKE_gui.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
-    <None Include="images\settings.png">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\console.cpp">
@@ -76,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\mainwindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ParamProcessData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\settingsdialog.cpp">
