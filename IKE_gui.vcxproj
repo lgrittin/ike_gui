@@ -419,7 +419,6 @@
     </QtRcc>
     <None Include="db\ike_params_data.csv" />
     <None Include="db\ike_process_data.csv" />
-    <None Include="images\settings.png" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\console.cpp" />
@@ -427,7 +426,6 @@
     <ClCompile Include="src\freezetablewidget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
-    <ClCompile Include="src\ParamProcessData.cpp" />
     <ClCompile Include="src\settingsdialog.cpp" />
   </ItemGroup>
   <ItemGroup>
