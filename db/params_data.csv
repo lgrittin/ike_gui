@@ -1,26 +1,27 @@
-#DB_IKE_00.00.01
+#02.03.01
 id_address,dsp_family,type,decimal,single_steps,val_actual,val_default,val_min,val_max,unit,description,dsp_name,k_double_to_u16,k_u16_to_double,precision,val_modbus
 0,CTRL_INPUT,word,0,1,0,0,0,65535,-,word comando 1,cmd_in.cmd_wd_1,1,1,1,0
-1,CTRL_INPUT,uint,0,10,500,500,100,15000,ms,durata fase init,cmd_in.init_time_ms,4.39832,0.227359,0.227359,1759
-2,CTRL_INPUT,uint,0,10,1000,1000,100,15000,ms,durata fase misura frequenza,cmd_in.freq_estim_time_ms,4.39832,0.227359,0.227359,3958
-3,SCR_SETTINGS,uint,0,1,0,0,0,1,bool,abilita settaggio manuale apertura scr,scr.en_manual_alfa,65535,1.5259e-05,1.5259e-05,0
-4,SCR_SETTINGS,real,2,0.1,359.99,359.99,0,359.99,deg,valore settaggio manuale apertura scr,scr.scr_cmd_alfa_set,182.047,0.0054931,0.0054931,65535
-5,SCR_SETTINGS,real,2,0.1,357,357,0,359.99,deg,valore apertura scr durante il check a 50Hz,scr.scr_cmd_alfa_check_50hz,182.047,0.0054931,0.0054931,64991
-6,SCR_SETTINGS,real,2,0.1,357,357,0,359.99,deg,valore apertura scr durante il check a 60Hz,scr.scr_cmd_alfa_check_60hz,182.047,0.0054931,0.0054931,64991
-7,SCR_SETTINGS,uint,0,10,2000,2000,0,65535,ms,durata apertura scr ridotta per check,scr.freeze_scr_ramp_time_ms,1,1,1,2000
-8,SCR_SETTINGS,uint,0,10,40000,40000,0,65535,ms,tempo per la rampa scr,scr.scr_ramp_time_ms,1,1,1,40000
-9,IGBT_SETTINGS,real,3,0.1,22,22,15,30,kHz,frequenza principale igbt,igbt.igbt_main_freq,4369,0.000228885,0.000228885,30583
-10,IGBT_SETTINGS,real,3,0.01,10,10,0,20,kHz,range modulante sinusoidale sweep igbt,igbt.sweep_amplitude,3276.75,0.00030518,0.00030518,32768
-11,IGBT_SETTINGS,real,3,0.01,1,1,0,100,Hz,frequenza modulante sinusoidale sweep igbt,igbt.sweep_freq,655.35,0.0015259,0.0015259,655
-12,IGBT_SETTINGS,uint,0,1,0,0,0,1,bool,abilita sweep igbt,igbt.en_sweep,65535,1.5259e-05,1.5259e-05,0
-13,ADC_SETTINGS,real,2,0.01,1,1,0,1000,V,adattamento adc v_inv_rect_gain,adc.adc_ctrl_fdb_rect.v_inv_rect_gain,65.535,0.015259,0.015259,66
-14,ADC_SETTINGS,real,2,0.01,0,0,-500,500,V,adattamento adc v_inv_rect_offset,adc.adc_ctrl_fdb_rect.v_inv_rect_offset,65.535,0.015259,0.015259,32768
-15,ADC_SETTINGS,real,2,0.01,1,1,0,1000,A,adattamento adc i_inv_rect_gain,adc.adc_ctrl_fdb_rect.i_inv_rect_gain,65.535,0.015259,0.015259,66
-16,ADC_SETTINGS,real,2,0.01,0,0,-500,500,A,adattamento adc i_inv_rect_offset,adc.adc_ctrl_fdb_rect.i_inv_rect_offset,65.535,0.015259,0.015259,32768
-17,ADC_SETTINGS,real,2,0.01,1,1,0,1000,cels,adattamento adc ntc1_gain,adc.adc_sys.ntc1_gain,65.535,0.015259,0.015259,66
-18,ADC_SETTINGS,real,2,0.01,0,0,-500,500,cels,adattamento adc ntc1_offset,adc.adc_sys.ntc1_offset,65.535,0.015259,0.015259,32768
-19,ADC_SETTINGS,real,2,0.01,1,1,0,1000,cels,adattamento adc ntc2_gain,adc.adc_sys.ntc2_gain,65.535,0.015259,0.015259,66
-20,ADC_SETTINGS,real,2,0.01,0,0,-500,500,cels,adattamento adc ntc2_offset,adc.adc_sys.ntc2_offset,65.535,0.015259,0.015259,32768
-21,ADC_SETTINGS,real,2,0.01,1,1,0,1000,pu,adattamento adc pot_gain,adc.adc_sys.pot_gain,65.535,0.015259,0.015259,66
-22,ADC_SETTINGS,real,2,0.01,0,0,-500,500,pu,adattamento adc pot_offset,adc.adc_sys.pot_offset,65.535,0.015259,0.015259,32768
-23,PROTECTION,real,3,0.01,1,1,0,10,A,valore di scatto sovracorrente AC,protection.i_inv_oc,6553.5,0.00015259,0.00015259,6554
+1,CTRL_INPUT,uint,0,10,100,100,0,6553,10ms,durata fase init,cmd_in.init_time_ms,10.0008,0.0999924,0.0999924,1000
+2,CTRL_INPUT,uint,0,10,100,100,10,1500,10ms,durata fase misura frequenza,cmd_in.freq_estim_time_ms,43.9832,0.0227359,0.0227359,3958
+3,SCR_SETTINGS,uint,0,1,0,0,0,65535,-,abilita settaggio manuale apertura scr,scr_sett.en_manual_alfa,1,1,1,0
+4,SCR_SETTINGS,real,2,0.1,0.1,0.1,0,1,pu,valore settaggio manuale apertura scr,scr_sett.scr_cmd_alfa_set,65535,1.5259e-05,1.5259e-05,6554
+5,SCR_SETTINGS,real,2,0.1,0.05,0.05,0,1,pu,valore apertura scr durante il check a 50Hz,scr_sett.scr_cmd_alfa_check_50hz,65535,1.5259e-05,1.5259e-05,3277
+6,SCR_SETTINGS,real,2,0.1,0.05,0.05,0,1,pu,valore apertura scr durante il check a 60Hz,scr_sett.scr_cmd_alfa_check_60hz,65535,1.5259e-05,1.5259e-05,3277
+7,SCR_SETTINGS,uint,0,10,200,200,0,6553,10ms,durata apertura scr ridotta per check,scr_sett.scr_freeze_ramp_cnt_end,10.0008,0.0999924,0.0999924,2000
+8,SCR_SETTINGS,uint,0,10,600,600,0,6553,10ms,tempo per la rampa scr,scr_sett.scr_ramp_time_cnt_end,10.0008,0.0999924,0.0999924,6000
+9,IGBT_SETTINGS,uint,0,1,0,0,0,65535,-,abilita sweep igbt,igbt_sett.en_sweep,1,1,1,0
+10,IGBT_SETTINGS,real,1,0.1,22000,22000,15000,30000,Hz,frequenza principale igbt,igbt_sett.igbt_main_freq,4.369,0.228885,0.228885,30583
+11,IGBT_SETTINGS,real,1,0.1,2000,2000,0,20000,Hz,range modulante sinusoidale sweep igbt,igbt_sett.sweep_amplitude,3.27675,0.30518,0.30518,6554
+12,IGBT_SETTINGS,real,1,0.1,2.5,2.5,0,100,Hz,frequenza modulante sinusoidale sweep igbt,igbt_sett.sweep_freq,655.35,0.0015259,0.0015259,1638
+13,IGBT_SETTINGS,uint,0,10,600,600,0,6553,10ms,durata senza sweep igbt per check,igbt_sett.freeze_sweep_cnt_end,10.0008,0.0999924,0.0999924,6000
+14,ADC_SETTINGS,real,2,0.01,1,1,0,1000,V,adattamento adc v_inv_rect_gain,adc.adc_ctrl_fdb_rect.v_inv_rect_gain,65.535,0.015259,0.015259,66
+15,ADC_SETTINGS,real,2,0.01,0,0,-500,500,V,adattamento adc v_inv_rect_offset,adc.adc_ctrl_fdb_rect.v_inv_rect_offset,65.535,0.015259,0.015259,32768
+16,ADC_SETTINGS,real,2,0.01,1,1,0,1000,A,adattamento adc i_inv_rect_gain,adc.adc_ctrl_fdb_rect.i_inv_rect_gain,65.535,0.015259,0.015259,66
+17,ADC_SETTINGS,real,2,0.01,0,0,-500,500,A,adattamento adc i_inv_rect_offset,adc.adc_ctrl_fdb_rect.i_inv_rect_offset,65.535,0.015259,0.015259,32768
+18,ADC_SETTINGS,real,2,0.01,1,1,0,1000,cels,adattamento adc ntc1_gain,adc.adc_sys.ntc1_gain,65.535,0.015259,0.015259,66
+19,ADC_SETTINGS,real,2,0.01,0,0,-500,500,cels,adattamento adc ntc1_offset,adc.adc_sys.ntc1_offset,65.535,0.015259,0.015259,32768
+20,ADC_SETTINGS,real,2,0.01,1,1,0,1000,cels,adattamento adc ntc2_gain,adc.adc_sys.ntc2_gain,65.535,0.015259,0.015259,66
+21,ADC_SETTINGS,real,2,0.01,0,0,-500,500,cels,adattamento adc ntc2_offset,adc.adc_sys.ntc2_offset,65.535,0.015259,0.015259,32768
+22,ADC_SETTINGS,real,2,0.01,1,1,0,1000,pu,adattamento adc pot_gain,adc.adc_sys.pot_gain,65.535,0.015259,0.015259,66
+23,ADC_SETTINGS,real,2,0.01,0,0,-500,500,pu,adattamento adc pot_offset,adc.adc_sys.pot_offset,65.535,0.015259,0.015259,32768
+24,PROTECTION,real,3,0.01,1,1,0,10,A,valore di scatto sovracorrente AC,protection.i_inv_oc,6553.5,0.00015259,0.00015259,6554

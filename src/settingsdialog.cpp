@@ -34,6 +34,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(m_ui->retriesSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->timeoutSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->modbusServerAddressSpinner, QOverload<int>::of(&QSpinBox::valueChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->pushButton_rescanSerialPorts, &QPushButton::clicked, this, &SettingsDialog::fillPortsInfo);
 
     fillPortsParameters();
     fillPortsInfo();
@@ -180,7 +181,6 @@ void SettingsDialog::onProtocolChanged(int idx)
         break;
     }
 }
-
 
 void SettingsDialog::fillPortsInfo()
 {

@@ -78,6 +78,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->label_fault->setAutoFillBackground(true);
     m_ui->label_impulsiAttivi->setAutoFillBackground(true);
     m_ui->label_ImpulsiSpenti->setAutoFillBackground(true);
+    m_ui->pushButton_start->setEnabled(0);
+    m_ui->pushButton_stop->setEnabled(0);
 
     // ---------------------------------------------------------- //
     // IMPORTAZIONE DATABASE E COSTRUZIONE TABELLE
@@ -89,8 +91,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // ---------------------------------------
     // GUI TIMERS
     // ---------------------------------------
-    timer_serialReadParamsData = new QTimer(this);
-    timer_serialReadParamsData->setInterval(5000);
+    //timer_serialReadParamsData = new QTimer(this);
+    //timer_serialReadParamsData->setInterval(5000);
     timer_serialReadProcessData = new QTimer(this);
     timer_serialReadProcessData->setInterval(m_settings->settings().readInterval_ms);
 
@@ -104,7 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // CONNESSIONI
     // ---------------------------------------
     initActionsConnections();
-    timer_serialReadParamsData->start();
+    //timer_serialReadParamsData->start();
 }
 
 MainWindow::~MainWindow()
@@ -131,6 +133,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionWrite_Param, &QAction::triggered, this, &MainWindow::writeParam);
     connect(m_ui->pushButton_ackFault, &QPushButton::pressed, this, &MainWindow::pressed_ackFault);
     connect(m_ui->pushButton_start, &QPushButton::pressed, this, &MainWindow::pressed_start);
+    connect(m_ui->pushButton_stop, &QPushButton::pressed, this, &MainWindow::pressed_stop);
     connect(timer_serialReadProcessData, SIGNAL(timeout()), this, SLOT(readProcessParam()));
     connect(model_params, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged_params(QModelIndex, QModelIndex, QVector<int>)));
 
@@ -321,7 +324,10 @@ error_db MainWindow::setupModelAndTables(bool default_db)
                             address_datetime_year = address_datetime_month + 1;
                         }
                         if (list_row_process.contains("diagn_out.fmw_version"))
+                        {
                             address_fmwVers = list_row_process.at(0).toInt();
+                            address_dbVers = address_fmwVers + 1;
+                        }
                         ++row;
                     }
                 }
@@ -334,9 +340,13 @@ error_db MainWindow::setupModelAndTables(bool default_db)
 
         if ((error == 0) && (process_csv_version == params_csv_version))
         {
-            db_version = params_csv_version;
-            db_version.replace("#", "");
-            m_status_label_dbVersion->setText(db_version);
+            gui_dbVersion.bit.DB_VER_H = params_csv_version.replace("#", "").split(".").at(0).toInt();
+            gui_dbVersion.bit.DB_VER_L1 = params_csv_version.replace("#", "").split(".").at(1).toInt();
+            gui_dbVersion.bit.DB_VER_L2 = params_csv_version.replace("#", "").split(".").at(2).toInt();
+            m_status_label_dbVersion->setText(QStringLiteral("DB: ") +
+                QString::number(gui_dbVersion.bit.DB_VER_H) + QStringLiteral(".") +
+                QString::number(gui_dbVersion.bit.DB_VER_L1) + QStringLiteral(".") +
+                QString::number(gui_dbVersion.bit.DB_VER_L2));
 
             // ---------------------------------------------------------- //
             // COSTRUZIONE TABELLA PARAMETRI
@@ -468,13 +478,13 @@ void MainWindow::writeParam()
     if ((!m_serial) && (modbusDevice))
     {
         sendRequest_Modbus(address_start, address_length, CMD_WRITE);
-        QTimer::singleShot(1000, this, [this] {readParam(); });
+        //QTimer::singleShot(1000, this, [this] {readParam(); });
     }
         
     else if ((m_serial) && (!modbusDevice))
     {
         sendRequest_CustomSerial10B(address_start, address_length, CMD_WRITE);
-        QTimer::singleShot(1000, this, [this] {readParam(); });
+        //QTimer::singleShot(1000, this, [this] {readParam(); });
     }
 }
 
@@ -494,12 +504,12 @@ void MainWindow::tableDataChanged_params(const QModelIndex& topLeft, const QMode
     if ((!m_serial) && (modbusDevice))
     {
         sendRequest_Modbus(id_address, 1, CMD_WRITE);
-        QTimer::singleShot(1000, this, [this, id_address] {sendRequest_Modbus(id_address, 1, CMD_READ); });  //SLOT(sendRequest_Modbus(id_address, 1, CMD_READ)));
+        //QTimer::singleShot(1000, this, [this, id_address] {sendRequest_Modbus(id_address, 1, CMD_READ); });  //SLOT(sendRequest_Modbus(id_address, 1, CMD_READ)));
     }
     else if ((m_serial) && (!modbusDevice))
     {
         sendRequest_CustomSerial10B(id_address, 1, CMD_WRITE);
-        QTimer::singleShot(1000, this, [this, id_address] {sendRequest_CustomSerial10B(id_address, 1, CMD_READ); });  //SLOT(sendRequest_CustomSerial10B(id_address, 1, CMD_READ)));
+        //QTimer::singleShot(1000, this, [this, id_address] {sendRequest_CustomSerial10B(id_address, 1, CMD_READ); });  //SLOT(sendRequest_CustomSerial10B(id_address, 1, CMD_READ)));
     }
 }
 
@@ -528,13 +538,13 @@ void MainWindow::onSettingsChanged()
         break;
     case Modbus_RTU:
         modbusDevice = new QModbusRtuSerialMaster(this);
-        connect(modbusDevice, &QModbusClient::errorOccurred, [this](QModbusDevice::Error) {
-            showStatusMessage(modbusDevice->errorString() + QStringLiteral(" - Could not create Modbus master.")); });
+        connect(modbusDevice, &QModbusClient::errorOccurred,
+            [this](QModbusDevice::Error) { handleError_Modbus(modbusDevice->error()); });
         break;
     case Modbus_TCP:
         modbusDevice = new QModbusTcpClient(this);
-        connect(modbusDevice, &QModbusClient::errorOccurred, [this](QModbusDevice::Error) {
-            showStatusMessage(modbusDevice->errorString() + QStringLiteral(" - Could not create Modbus client.")); });
+        connect(modbusDevice, &QModbusClient::errorOccurred,
+            [this](QModbusDevice::Error) { handleError_Modbus(modbusDevice->error()); });
         break;
     default:
         break;
@@ -552,12 +562,19 @@ void MainWindow::pressed_ackFault()
     CMD_WD1 cmd_wd_1_temp; cmd_wd_1_temp.all = 0; cmd_wd_1_temp.bit.FAULT_ACK = 1;
     quint16 data_val = model_params->data(model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual"))).toInt();   // CMD_WD_1
     quint16 data_val_new = data_val | (cmd_wd_1_temp.all);
+
     model_params->setData(
         model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual")),
         data_val_new);
-    QThread::msleep(500);
-    data_val = data_val_new;
-    data_val_new = data_val & ~(cmd_wd_1_temp.all);
+    QTimer::singleShot(500, this, [this] {reset_ackFault(); });
+}
+
+void MainWindow::reset_ackFault()
+{
+    CMD_WD1 cmd_wd_1_temp; cmd_wd_1_temp.all = 0; cmd_wd_1_temp.bit.FAULT_ACK = 1;
+    quint16 data_val = model_params->data(model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual"))).toInt();   // CMD_WD_1
+    quint16 data_val_new = data_val & ~(cmd_wd_1_temp.all);
+
     model_params->setData(
         model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual")),
         data_val_new);
@@ -567,7 +584,19 @@ void MainWindow::pressed_start()
 {
     CMD_WD1 cmd_wd_1_temp; cmd_wd_1_temp.all = 0; cmd_wd_1_temp.bit.SWITCH_ON = 1;
     quint16 data_val = model_params->data(model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual"))).toInt();   // CMD_WD_1
-    quint16 data_val_new = (m_ui->pushButton_start->isChecked() == 0) ? (data_val | (cmd_wd_1_temp.all)) : (data_val & ~(cmd_wd_1_temp.all));
+    //quint16 data_val_new = (m_ui->pushButton_start->isChecked() == 0) ? (data_val | (cmd_wd_1_temp.all)) : (data_val & ~(cmd_wd_1_temp.all));
+    quint16 data_val_new = (data_val | cmd_wd_1_temp.all);
+    model_params->setData(
+        model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual")),
+        data_val_new);
+}
+
+void MainWindow::pressed_stop()
+{
+    CMD_WD1 cmd_wd_1_temp; cmd_wd_1_temp.all = 0; cmd_wd_1_temp.bit.SWITCH_ON = 1;
+    quint16 data_val = model_params->data(model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual"))).toInt();   // CMD_WD_1
+    //quint16 data_val_new = (m_ui->pushButton_start->isChecked() == 0) ? (data_val | (cmd_wd_1_temp.all)) : (data_val & ~(cmd_wd_1_temp.all));
+    quint16 data_val_new = (data_val & ~(cmd_wd_1_temp.all));
     model_params->setData(
         model_params->index((address_cmd_wd_1 - startAddress_params), list_columns_params.indexOf("val_actual")),
         data_val_new);
@@ -575,10 +604,10 @@ void MainWindow::pressed_start()
 
 void MainWindow::readAll()
 {
-    if ((m_ui->actionReadAll->isChecked()) && (modbusDevice || m_serial))
+    if (m_ui->actionReadAll->isChecked())
     {
         timer_serialReadProcessData->start();
-        read_params = 1;
+        read_sequence = 0;
     }
     else
     {
@@ -682,7 +711,7 @@ void MainWindow::openSerialPort()
 
 void MainWindow::closeSerialPort()
 {
-    timer_serialReadProcessData->stop();
+    //timer_serialReadProcessData->stop();
 
     if (m_serial)
     {
@@ -699,22 +728,67 @@ void MainWindow::closeSerialPort()
 
 void MainWindow::readProcessParam()
 {
-    // Read Params on first call
-    if (read_params)
+    bool stop_timer_serialReadProcessData = 0;
+
+    // Check if no connection exist
+    if ((modbusDevice == nullptr) && (m_serial == nullptr))
+        stop_timer_serialReadProcessData = 1;
+
+    // Case MODBUS -> Check if Modbus connection is active
+    if (modbusDevice != nullptr)
     {
-        if ((!m_serial) && (modbusDevice))
-            sendRequest_Modbus(startAddress_params, model_params->rowCount(), CMD_READ);
-        else if ((m_serial) && (!modbusDevice))
-            sendRequest_CustomSerial10B(startAddress_params, model_params->rowCount(), CMD_WRITE);
-        read_params = 0;
+        if (modbusDevice->state() == QModbusClient::State::UnconnectedState)
+        {
+            stop_timer_serialReadProcessData = 1;
+            qDebug() << "STATO MODBUS: UnconnectedState\n";
+        }
+        else if (modbusDevice->state() == QModbusClient::State::ConnectedState)
+            qDebug() << "STATO MODBUS: ConnectedState\n";
+        else if (modbusDevice->state() == QModbusClient::State::ConnectingState)
+            qDebug() << "STATO MODBUS: ConnectingState\n";
+        else if (modbusDevice->state() == QModbusClient::State::ClosingState)
+            qDebug() << "STATO MODBUS: ClosingState\n";
     }
-    // Read Process on all other calls
-    else
+
+    // Case SERIAL -> Check if Serial connection is active
+    if (m_serial != nullptr)
     {
-        if ((!m_serial) && (modbusDevice))
-            sendRequest_Modbus(startAddress_process, model_process->rowCount(), CMD_READ);
-        else if ((m_serial) && (!modbusDevice))
-            sendRequest_CustomSerial10B(startAddress_process, model_process->rowCount(), CMD_WRITE);
+        if (!m_serial->isOpen())
+            stop_timer_serialReadProcessData = 1;
+    }
+
+    if (stop_timer_serialReadProcessData)   // STOP TIMER
+    {
+        timer_serialReadProcessData->stop();
+        m_ui->actionReadAll->setChecked(0);
+    }
+    else                                    // SEND MESSAGES
+    {
+        switch (read_sequence)
+        {
+        case 0:     // Read Params on first call
+            if ((!m_serial) && (modbusDevice))
+                sendRequest_Modbus(startAddress_params, model_params->rowCount(), CMD_READ);
+            else if ((m_serial) && (!modbusDevice))
+                sendRequest_CustomSerial10B(startAddress_params, model_params->rowCount(), CMD_WRITE);
+            read_sequence = 3;  // Jump waits
+            break;
+        case 1:     // Wait for answers...
+            read_sequence = 2;
+            break;
+        case 2:     // Wait for answers...
+            read_sequence = 3;
+            break;
+        case 3:     // Read Process on all other calls
+            if ((!m_serial) && (modbusDevice))
+                sendRequest_Modbus(startAddress_process, model_process->rowCount(), CMD_READ);
+            else if ((m_serial) && (!modbusDevice))
+                sendRequest_CustomSerial10B(startAddress_process, model_process->rowCount(), CMD_WRITE);
+            read_sequence = 3;    // Loop here
+            break;
+        default:
+            break;
+        }
     }
 }
 
@@ -846,18 +920,27 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
         if (sts_wd_1.bit.OP_ENABLED) m_ui->label_opEnabled->setStyleSheet("background-color: green");
         else m_ui->label_opEnabled->setStyleSheet("background-color: white");
         // FAULT
-        if (sts_wd_1.bit.FAULT) m_ui->label_fault->setStyleSheet("background-color: red");
-        else m_ui->label_fault->setStyleSheet("background-color: white");
+        if (sts_wd_1.bit.FAULT)
+        {
+            m_ui->label_fault->setStyleSheet("background-color: red");
+            pressed_stop();
+        }
+        else
+            m_ui->label_fault->setStyleSheet("background-color: white");
         // PULSE_ENABLED
         if (sts_wd_1.bit.PULSE_ENABLED)
         {
-            m_ui->pushButton_start->setChecked(1);
+            //m_ui->pushButton_start->setChecked(1);
+            m_ui->pushButton_start->setEnabled(0);
+            m_ui->pushButton_stop->setEnabled(1);
             m_ui->label_impulsiAttivi->setStyleSheet("background-color: red");
             m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: white");
         }
         else
         {
-            m_ui->pushButton_start->setChecked(0);
+            //m_ui->pushButton_start->setChecked(0);
+            m_ui->pushButton_start->setEnabled(1);
+            m_ui->pushButton_stop->setEnabled(0);
             m_ui->label_impulsiAttivi->setStyleSheet("background-color: white");
             m_ui->label_ImpulsiSpenti->setStyleSheet("background-color: green");
         }
@@ -927,13 +1010,30 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
     }
 
     // VERSION
-    if ((start_address <= address_fmwVers) && (start_address + address_length >= address_fmwVers))
+    if ((start_address <= address_fmwVers) && (start_address + address_length >= address_dbVers))
     {
-        fmw_version.all = model_process->data(model_process->index(address_fmwVers - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt();
+        device_fmwVersion.all = model_process->data(model_process->index(address_fmwVers - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt();
         m_ui->label_fmwvers->setText(QStringLiteral("Fmw Version: ") +
-            QString::number(fmw_version.bit.FMW_VER_H1) + QString::number(fmw_version.bit.FMW_VER_H2) + QStringLiteral(".") +
-            QString::number(fmw_version.bit.FMW_VER_L1) + QString::number(fmw_version.bit.FMW_VER_L2) + QStringLiteral(" - Type: ") +
-            QString::number(fmw_version.bit.FMW_VER_TYPE));
+            QString::number(device_fmwVersion.bit.FMW_VER_H) + QStringLiteral(".") +
+            QString::number(device_fmwVersion.bit.FMW_VER_L) + QStringLiteral(" - Type: ") +
+            QString::number(device_fmwVersion.bit.FMW_VER_TYPE));
+
+        device_dbVersion.all = model_process->data(model_process->index(address_dbVers - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt();
+        m_ui->label_dbvers->setText(QStringLiteral("DB: ") +
+            QString::number(device_dbVersion.bit.DB_VER_H) + QStringLiteral(".") +
+            QString::number(device_dbVersion.bit.DB_VER_L1) + QStringLiteral(".") +
+            QString::number(device_dbVersion.bit.DB_VER_L2));
+
+        if (device_dbVersion.all != gui_dbVersion.all)
+        {
+            m_ui->label_dbvers->setStyleSheet("background-color: red");
+            m_status_label_dbVersion->setStyleSheet("background-color: red");
+        }
+        else
+        {
+            m_ui->label_dbvers->setStyleSheet("background-color: white");
+            m_status_label_dbVersion->setStyleSheet("background-color: white");
+        }
     }
 }
 
@@ -1147,12 +1247,14 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
                         showStatusMessage(tr("Write response error: %1 (Mobus exception: 0x%2)")
                             .arg(reply->errorString()).arg(reply->rawResult().exceptionCode(), -1, 16));
                         comm_error_tx_num++;
+                        //closeSerialPort();
                     }
                     else if (reply->error() != QModbusDevice::NoError)
                     {
                         showStatusMessage(tr("Write response error: %1 (code: 0x%2)").
                             arg(reply->errorString()).arg(reply->error(), -1, 16));
                         comm_error_tx_num++;
+                        //closeSerialPort();
                     }
                     reply->deleteLater();
                     });
@@ -1167,6 +1269,7 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
         {
             showStatusMessage(tr("Write error: ") + modbusDevice->errorString());
             comm_error_tx_num++;
+            //closeSerialPort();
         }
     }
     // Read Params/Process
@@ -1182,6 +1285,7 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
         {
             showStatusMessage(tr("Read error: ") + modbusDevice->errorString());
             comm_error_tx_num++;
+            //closeSerialPort();
         }
     }
 }
@@ -1210,6 +1314,7 @@ void MainWindow::receiveMessage_Modbus()
             arg(reply->errorString()).
             arg(reply->rawResult().exceptionCode(), -1, 16));
         comm_error_rx_num++;
+        //closeSerialPort();
     }
     else
     {
@@ -1217,9 +1322,19 @@ void MainWindow::receiveMessage_Modbus()
             arg(reply->errorString()).
             arg(reply->error(), -1, 16));
         comm_error_rx_num++;
+        //closeSerialPort();
     }
 
     reply->deleteLater();
+}
+
+void MainWindow::handleError_Modbus(QModbusDevice::Error error)
+{
+    if (modbusDevice)
+    {
+        showStatusMessage(modbusDevice->errorString() + QStringLiteral(" - Could not create Modbus master."));
+        closeSerialPort();
+    }
 }
 
 void MainWindow::computeValU16FromDouble(QAbstractItemModel* model_generic, quint16 row)

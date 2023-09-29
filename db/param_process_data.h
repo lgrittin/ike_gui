@@ -4,13 +4,13 @@
 //------------------------------------------------------------------------
 //  Filename    :   param_process_data.h                                  
 //  Author      :   lucag                                                 
-//  Date        :   2023 9 1                                        
+//  Date        :   2023 9 25                                        
 //------------------------------------------------------------------------
 //  History     :                                                         
 //  23 Aug 2023     - Creation                                            
 //                                                                        
 //------------------------------------------------------------------------
-//!  Description:    DB_IKE_00.00.01                                    
+//!  Description:    02.03.01                                    
 //!                                                                       
 //                                                                        
 //########################################################################
@@ -27,12 +27,15 @@
                                                                           
 /* ## COMMON Defines ################################################## */
                                                                           
-#define PARAMS_LENGTH 24
-#define PROCESS_LENGTH 22
+#define PARAMS_LENGTH 25
+#define PROCESS_LENGTH 24
 #define PARAMS_FIRST_ADDRESS 0
 #define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH
 #define PROCESS_FIRST_ADDRESS PARAMS_LAST_ADDRESS + 1
 #define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH
+#define DB_VERSION_H 02
+#define DB_VERSION_L1 03
+#define DB_VERSION_L2 01
                                                                           
 typedef enum {                                                            
     word = 0,                                                             
@@ -51,9 +54,9 @@ typedef enum {
 typedef enum {                                                            
     CTRL_OUTPUT = 0,
     ADC_OUTPUT = 1,
-    SCR_OUTPUT = 2,
-    IGBT_OUTPUT = 3,
-    DGN_OUTPUT = 4
+    IGBT_OUTPUT = 2,
+    DGN_OUTPUT = 3,
+    SCR_OUTPUT = 4
 } PROCESS_FAMILY;                                                         
                                                                           
 struct DATA {                                                             
@@ -80,8 +83,8 @@ extern void updateProcessDataOut();
                                                                           
 /* ## EXTERNAL Vars ################################################### */
                                                                           
-extern struct DATA process_data[PARAMS_LENGTH];                           
-extern struct DATA param_data[PROCESS_LENGTH];                            
+extern struct DATA process_data[PROCESS_LENGTH];                          
+extern struct DATA param_data[PARAMS_LENGTH];                             
                                                                           
                                                                           
 #endif /* INC_PARAM_PROCESS_DATA_H_ */                                    

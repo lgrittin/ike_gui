@@ -8,6 +8,7 @@
 
 #include <QMainWindow>
 #include <QSerialPort>
+#include <qmodbusdevice.h>
 #include <QTimer>
 #include <QDebug>
 #include <QThread>
@@ -65,6 +66,7 @@ private slots:
     void handleError_CustomSerial10B(QSerialPort::SerialPortError error);
     void tableDataChanged_params(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
     void sendRequest_Modbus(quint16 start_address, quint16 address_length, int cmd);
+    void handleError_Modbus(QModbusDevice::Error error);
     void onSettingsChanged();
     void resetData();
     void onModbusStateChanged(int state);
@@ -72,6 +74,8 @@ private slots:
     void blinkEndTxLabel();
     void pressed_ackFault();
     void pressed_start();
+    void pressed_stop();
+    void reset_ackFault();
     void onLoadDatabase();
 
 private:
@@ -104,7 +108,7 @@ private:
     FreezeTableWidget* tableView_process = nullptr;
     SpinBoxDelegate* delegate_doubleSpinBox_params;
     SettingsDialog *m_settings = nullptr;
-    QTimer* timer_serialReadParamsData;
+    //QTimer* timer_serialReadParamsData;
     QTimer* timer_serialReadProcessData;
     QStringList list_columns_params;
     QStringList list_row_params;
@@ -125,12 +129,14 @@ private:
     quint16 address_datetime_month = 0;
     quint16 address_datetime_year = 0;
     quint16 address_fmwVers = 0;
+    quint16 address_dbVers = 0;
     quint16 address_cmd_wd_1 = 0;
-    bool read_params = 0;
+    quint16 read_sequence = 0;
     unsigned int comm_error_rx_num = 0;
     unsigned int comm_error_tx_num = 0;
-    FMW_VERSION fmw_version;
-    QString db_version;
+    FMW_VERSION device_fmwVersion;
+    DB_VERSION gui_dbVersion;
+    DB_VERSION device_dbVersion;
 };
 
 #endif // MAINWINDOW_H

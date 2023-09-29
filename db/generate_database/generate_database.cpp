@@ -4,9 +4,23 @@
 #include <fstream>
 #include <chrono>
 #include <ctime> 
+#include <string>
+#include <vector>
+#include <sstream>
 
 using namespace std;
 using namespace OpenXLSX;
+
+struct DB_VERSION_BIT {
+    uint16_t DB_VER_H : 4;
+    uint16_t DB_VER_L1 : 6;
+    uint16_t DB_VER_L2 : 6;
+};
+
+typedef union DB_VERSION {
+    uint16_t all;
+    struct DB_VERSION_BIT bit;
+} DB_VERSION;
 
 int main()
 {
@@ -23,6 +37,16 @@ int main()
 
     in_file_params_process.open("./ike_params_process_data.xlsx");
 
+    auto wks_version = in_file_params_process.workbook().worksheet("version");
+    std::string version_str = wks_version.cell("A1").value();
+    std::stringstream version_sstr(version_str);
+    std::string db_version_H;
+    std::getline(version_sstr, db_version_H, '.');
+    std::string db_version_L1;
+    std::getline(version_sstr, db_version_L1, '.');
+    std::string db_version_L2;
+    std::getline(version_sstr, db_version_L2, '.');
+
     // ************************** //
     // Generate params_data.csv
     //*************************** //
@@ -34,11 +58,8 @@ int main()
     cout << "Opening params_data.csv...\n";
     out_file_params_data_csv.open("params_data.csv");
 
-    auto wks_version = in_file_params_process.workbook().worksheet("version");
-    std::string version = wks_version.cell("A1").value();
-
     cout << "Writing on params_data.csv...\n";
-    out_file_params_data_csv << "#" << version << "\n";
+    out_file_params_data_csv << "#" << version_str << "\n";
     auto wks_params_data = in_file_params_process.workbook().worksheet("params_data");
     std::vector<std::vector<std::string>> params_data;
     for (auto& row : wks_params_data.rows())
@@ -87,7 +108,7 @@ int main()
     out_file_process_data_csv.open("process_data.csv");
     
     cout << "Writing on process_data.csv...\n";
-    out_file_process_data_csv << "#" << version << "\n";
+    out_file_process_data_csv << "#" << version_str << "\n";
     auto wks_process_data = in_file_params_process.workbook().worksheet("process_data");
     std::vector<std::vector<std::string>> process_data;
     for (auto& row : wks_process_data.rows())
@@ -196,7 +217,7 @@ int main()
         "//  23 Aug 2023     - Creation                                            \n" <<
         "//                                                                        \n" <<
         "//------------------------------------------------------------------------\n" <<
-        "//!  Description:    " << version << "                                    \n" <<
+        "//!  Description:    " << version_str << "                                    \n" <<
         "//!                                                                       \n" <<
         "//                                                                        \n" <<
         "//########################################################################\n" <<
@@ -213,12 +234,15 @@ int main()
         "                                                                          \n" <<
         "/* ## COMMON Defines ################################################## */\n" <<
         "                                                                          \n" <<
-        "#define PARAMS_LENGTH " << std::to_string(num_params) << "\n"
-        "#define PROCESS_LENGTH " << std::to_string(num_process) << "\n"
-        "#define PARAMS_FIRST_ADDRESS " << params_data.at(1).at(col_params_id_address) << "\n"
+        "#define PARAMS_LENGTH " << std::to_string(num_params) << "\n" <<
+        "#define PROCESS_LENGTH " << std::to_string(num_process) << "\n" <<
+        "#define PARAMS_FIRST_ADDRESS " << params_data.at(1).at(col_params_id_address) << "\n" <<
         "#define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH\n" <<
         "#define PROCESS_FIRST_ADDRESS PARAMS_LAST_ADDRESS + 1\n" <<
         "#define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH\n" <<
+        "#define DB_VERSION_H " << db_version_H << "\n"
+        "#define DB_VERSION_L1 " << db_version_L1 << "\n"
+        "#define DB_VERSION_L2 " << db_version_L2 << "\n"
         "                                                                          \n" <<
         "typedef enum {                                                            \n" <<
         "    word = 0,                                                             \n" <<
@@ -274,8 +298,8 @@ int main()
         "                                                                          \n" <<
         "/* ## EXTERNAL Vars ################################################### */\n" <<
         "                                                                          \n" <<
-        "extern struct DATA process_data[PARAMS_LENGTH];                           \n" <<
-        "extern struct DATA param_data[PROCESS_LENGTH];                            \n" <<
+        "extern struct DATA process_data[PROCESS_LENGTH];                          \n" <<
+        "extern struct DATA param_data[PARAMS_LENGTH];                             \n" <<
         "                                                                          \n" <<
         "                                                                          \n" <<
         "#endif /* INC_PARAM_PROCESS_DATA_H_ */                                    \n" <<
@@ -310,7 +334,7 @@ int main()
         "//  23 Aug 2023     - Creation                                            \n" <<
         "//                                                                        \n" <<
         "//------------------------------------------------------------------------\n" <<
-        "//!  Description:    " << version << "                                    \n" <<
+        "//!  Description:    " << version_str << "                                    \n" <<
         "//!                                                                       \n" <<
         "//                                                                        \n" <<
         "//########################################################################\n" <<

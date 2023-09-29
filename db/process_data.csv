@@ -1,24 +1,26 @@
-#DB_IKE_00.00.01
+#02.03.01
 id_address,dsp_family,type,decimal,val_actual,val_min,val_max,unit,description,dsp_name,k_double_to_u16,k_u16_to_double,precision,val_modbus
-24,CTRL_OUTPUT,word,0,0,0,65535,-,word stato 1,sts_out.sts_wd_1,1,1,1,0
-25,CTRL_OUTPUT,word,0,0,0,65535,-,word allarme 1,sts_out.alm_wd_1,1,1,1,0
-26,ADC_OUTPUT,real,2,0,0,600,V,tensione uscita (rms),adc.adc_ctrl_fdb.v_inv_f,109.225,0.00915541,0.00915541,0
-27,ADC_OUTPUT,real,3,0,0,50,A,corrente uscita (rms),adc.adc_ctrl_fdb.i_inv_f,1310.7,0.000762951,0.000762951,0
-28,ADC_OUTPUT,real,2,0,0,600,V,tensione uscita (rettificata),adc.adc_ctrl_fdb_rect.v_inv_rect_f,109.225,0.00915541,0.00915541,0
-29,ADC_OUTPUT,real,3,0,0,50,A,corrente uscita (rettificata),adc.adc_ctrl_fdb_rect.i_inv_rect_f,1310.7,0.000762951,0.000762951,0
-30,ADC_OUTPUT,real,2,0,-20,180,cels,temperatura ntc1,adc.adc_sys.ntc1_f,327.675,0.0030518,0.0030518,6554
-31,ADC_OUTPUT,real,2,0,-20,180,cels,temperatura ntc2,adc.adc_sys.ntc2_f,327.675,0.0030518,0.0030518,6554
-32,ADC_OUTPUT,real,3,0,0,1,pu,valore potenziometro,adc.adc_sys.pot_f,65535,1.5259e-05,1.5259e-05,0
-33,SCR_OUTPUT,real,2,0,0,359.99,deg,apertura scr,scr.cmd_alfa,182.047,0.0054931,0.0054931,0
-34,IGBT_OUTPUT,real,3,0,0,50,kHz,frequenza attuale igbt,igbt.igbt_actual_freq,1310.7,0.000762951,0.000762951,0
-35,DGN_OUTPUT,uint,0,0,0,65535,ms,contatore isr timer 0,diagn_out.main_fsm_loop_time_ms,1,1,1,0
-36,DGN_OUTPUT,uint,0,0,0,65535,-,numero conteggi invalidi misura frequenza,diagn_out.scr_synch_invalid_cnt,1,1,1,0
-37,DGN_OUTPUT,uint,0,0,0,65535,s,inverter datetime - seconds,diagn_out.datetime.Second,1,1,1,0
-38,DGN_OUTPUT,uint,0,0,0,65535,m,inverter datetime - minutes,diagn_out.datetime.Minute,1,1,1,0
-39,DGN_OUTPUT,uint,0,0,0,65535,h,inverter datetime - hours,diagn_out.datetime.Hour,1,1,1,0
-40,DGN_OUTPUT,uint,0,0,0,65535,D,inverter datetime - day,diagn_out.datetime.Day,1,1,1,0
-41,DGN_OUTPUT,uint,0,0,0,65535,D,inverter datetime - day of week,diagn_out.datetime.DayOfWeek,1,1,1,0
-42,DGN_OUTPUT,uint,0,0,0,65535,M,inverter datetime - month,diagn_out.datetime.Month,1,1,1,0
-43,DGN_OUTPUT,uint,0,0,0,65535,Y,inverter datetime - year,diagn_out.datetime.Year,1,1,1,0
-44,DGN_OUTPUT,uint,0,0,0,65535,-,versione firmware - H1.H2.L1.L2.TYPE,diagn_out.fmw_version,1,1,1,0
-45,SCR_OUTPUT,real,2,0,0,65,Hz,frequenza attuale ingresso,scr.scr_synch_freq,1008.23,0.000991836,0.000991836,0
+25,CTRL_OUTPUT,word,0,0,0,65535,-,word stato 1,sts_out.sts_wd_1,1,1,1,0
+26,CTRL_OUTPUT,word,0,0,0,65535,-,word allarme 1,sts_out.alm_wd_1,1,1,1,0
+27,ADC_OUTPUT,real,2,0,0,600,V,tensione uscita (rms),adc.adc_ctrl_fdb.v_inv_f,109.225,0.00915541,0.00915541,0
+28,ADC_OUTPUT,real,3,0,0,50,A,corrente uscita (rms),adc.adc_ctrl_fdb.i_inv_f,1310.7,0.000762951,0.000762951,0
+29,ADC_OUTPUT,real,2,0,0,600,V,tensione uscita (rettificata),adc.adc_ctrl_fdb_rect.v_inv_rect_f,109.225,0.00915541,0.00915541,0
+30,ADC_OUTPUT,real,3,0,0,50,A,corrente uscita (rettificata),adc.adc_ctrl_fdb_rect.i_inv_rect_f,1310.7,0.000762951,0.000762951,0
+31,ADC_OUTPUT,real,2,0,-20,180,cels,temperatura ntc1,adc.adc_sys.ntc1_f,327.675,0.0030518,0.0030518,6554
+32,ADC_OUTPUT,real,2,0,-20,180,cels,temperatura ntc2,adc.adc_sys.ntc2_f,327.675,0.0030518,0.0030518,6554
+33,ADC_OUTPUT,real,2,0,0,100,perc,valore potenziometro,adc.adc_sys.pot_f,655.35,0.0015259,0.0015259,0
+34,IGBT_OUTPUT,real,1,0,0,50000,Hz,frequenza attuale igbt,igbt_out.igbt_actual_freq,1.3107,0.762951,0.762951,0
+35,IGBT_OUTPUT,uint,0,0,0,6553,10ms,tempo freeze sweep igbt,igbt_out.freeze_sweep_cnt_ms,10.0008,0.0999924,0.0999924,0
+36,DGN_OUTPUT,uint,0,0,0,6553,10ms,contatore isr timer 0,diagn_out.main_fsm_loop_time_ms,10.0008,0.0999924,0.0999924,0
+37,DGN_OUTPUT,uint,0,0,0,65535,-,numero conteggi invalidi misura frequenza,diagn_out.scr_synch_invalid_cnt,1,1,1,0
+38,DGN_OUTPUT,uint,0,0,0,65535,s,inverter datetime - seconds,diagn_out.datetime.Second,1,1,1,0
+39,DGN_OUTPUT,uint,0,0,0,65535,m,inverter datetime - minutes,diagn_out.datetime.Minute,1,1,1,0
+40,DGN_OUTPUT,uint,0,0,0,65535,h,inverter datetime - hours,diagn_out.datetime.Hour,1,1,1,0
+41,DGN_OUTPUT,uint,0,0,0,65535,D,inverter datetime - day,diagn_out.datetime.Day,1,1,1,0
+42,DGN_OUTPUT,uint,0,0,0,65535,D,inverter datetime - day of week,diagn_out.datetime.DayOfWeek,1,1,1,0
+43,DGN_OUTPUT,uint,0,0,0,65535,M,inverter datetime - month,diagn_out.datetime.Month,1,1,1,0
+44,DGN_OUTPUT,uint,0,0,0,65535,Y,inverter datetime - year,diagn_out.datetime.Year,1,1,1,0
+45,DGN_OUTPUT,uint,0,0,0,65535,-,versione firmware - H.L.TYPE,diagn_out.fmw_version,1,1,1,0
+46,DGN_OUTPUT,uint,0,0,0,65535,-,versione database - DB_IKE_H.L1.L2,diagn_out.db_version,1,1,1,0
+47,SCR_OUTPUT,real,2,0,0,1,deg,apertura scr,scr_out.scr_cmd_alfa,65535,1.5259e-05,1.5259e-05,0
+48,SCR_OUTPUT,real,2,0,0,65,Hz,frequenza attuale ingresso,scr_out.scr_synch_freq,1008.23,0.000991836,0.000991836,0

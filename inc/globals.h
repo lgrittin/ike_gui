@@ -114,10 +114,8 @@ typedef union ALM_WD1 {
 
 /* Fmw Version */
 struct FMW_VERSION_BIT {
-    uint16_t FMW_VER_H1 : 3;
-    uint16_t FMW_VER_H2 : 3;
-    uint16_t FMW_VER_L1 : 3;
-    uint16_t FMW_VER_L2 : 3;
+    uint16_t FMW_VER_H : 6;
+    uint16_t FMW_VER_L : 6;
     uint16_t FMW_VER_TYPE : 4;
 };
 
@@ -125,6 +123,18 @@ typedef union FMW_VERSION {
     uint16_t all;
     struct FMW_VERSION_BIT bit;
 } FMW_VERSION;
+
+/* DB Version */
+struct DB_VERSION_BIT {
+    uint16_t DB_VER_H : 4;
+    uint16_t DB_VER_L1 : 6;
+    uint16_t DB_VER_L2 : 6;
+};
+
+typedef union DB_VERSION {
+    uint16_t all;
+    struct DB_VERSION_BIT bit;
+} DB_VERSION;
 
 /* Drive State */
 typedef enum {
