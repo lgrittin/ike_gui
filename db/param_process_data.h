@@ -4,13 +4,13 @@
 //------------------------------------------------------------------------
 //  Filename    :   param_process_data.h                                  
 //  Author      :   lucag                                                 
-//  Date        :   2023 9 25                                        
+//  Date        :   2023 12 30                                        
 //------------------------------------------------------------------------
 //  History     :                                                         
 //  23 Aug 2023     - Creation                                            
 //                                                                        
 //------------------------------------------------------------------------
-//!  Description:    02.03.01                                    
+//!  Description:    01.02.03                                    
 //!                                                                       
 //                                                                        
 //########################################################################
@@ -27,15 +27,15 @@
                                                                           
 /* ## COMMON Defines ################################################## */
                                                                           
-#define PARAMS_LENGTH 25
+#define PARAMS_LENGTH 20
 #define PROCESS_LENGTH 24
 #define PARAMS_FIRST_ADDRESS 0
-#define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH
+#define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH - 1
 #define PROCESS_FIRST_ADDRESS PARAMS_LAST_ADDRESS + 1
-#define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH
-#define DB_VERSION_H 02
-#define DB_VERSION_L1 03
-#define DB_VERSION_L2 01
+#define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH - 1
+#define DB_VERSION_H 01
+#define DB_VERSION_L1 02
+#define DB_VERSION_L2 03
                                                                           
 typedef enum {                                                            
     word = 0,                                                             
@@ -78,13 +78,15 @@ struct DATA {
                                                                           
 /* ## EXTERNAL Prototypes ############################################# */
                                                                           
+extern void updateSingleParamDataIn(unsigned int idx);                    
+extern void updateSingleProcessDataOut(unsigned int idx);                 
 extern void updateParamsDataIn();                                         
 extern void updateProcessDataOut();                                       
                                                                           
 /* ## EXTERNAL Vars ################################################### */
                                                                           
 extern struct DATA process_data[PROCESS_LENGTH];                          
-extern struct DATA param_data[PARAMS_LENGTH];                             
+extern struct DATA params_data[PARAMS_LENGTH];                            
                                                                           
                                                                           
 #endif /* INC_PARAM_PROCESS_DATA_H_ */                                    

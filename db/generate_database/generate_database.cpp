@@ -51,14 +51,14 @@ int main()
     // Generate params_data.csv
     //*************************** //
 
-    cout << "******************\n";
-    cout << "param_data.csv\n";
-    cout << "******************\n\n";
+    std::cout << "******************\n";
+    std::cout << "param_data.csv\n";
+    std::cout << "******************\n\n";
 
-    cout << "Opening params_data.csv...\n";
+    std::cout << "Opening params_data.csv...\n";
     out_file_params_data_csv.open("params_data.csv");
 
-    cout << "Writing on params_data.csv...\n";
+    std::cout << "Writing on params_data.csv...\n";
     out_file_params_data_csv << "#" << version_str << "\n";
     auto wks_params_data = in_file_params_process.workbook().worksheet("params_data");
     std::vector<std::vector<std::string>> params_data;
@@ -94,20 +94,20 @@ int main()
         out_file_params_data_csv << endl;
         params_data.push_back(row_str);
     }
-    cout << "Finished writing file params_data.csv!\n\n";
+    std::cout << "Finished writing file params_data.csv!\n\n";
 
     //*************************** //
     // Generate process_data.csv
     //*************************** //
 
-    cout << "******************\n";
-    cout << "process_data.csv\n";
-    cout << "******************\n\n";
+    std::cout << "******************\n";
+    std::cout << "process_data.csv\n";
+    std::cout << "******************\n\n";
 
-    cout << "Opening process_data.csv...\n";
+    std::cout << "Opening process_data.csv...\n";
     out_file_process_data_csv.open("process_data.csv");
     
-    cout << "Writing on process_data.csv...\n";
+    std::cout << "Writing on process_data.csv...\n";
     out_file_process_data_csv << "#" << version_str << "\n";
     auto wks_process_data = in_file_params_process.workbook().worksheet("process_data");
     std::vector<std::vector<std::string>> process_data;
@@ -143,17 +143,17 @@ int main()
         out_file_process_data_csv << endl;
         process_data.push_back(row_str);
     }
-    cout << "Finished writing file process_data.csv!\n\n";
+    std::cout << "Finished writing file process_data.csv!\n\n";
 
     //*************************** //
     // Generate param_process_data.h
     //*************************** //
 
-    cout << "******************\n";
-    cout << "param_process_data.h\n";
-    cout << "******************\n\n";
+    std::cout << "******************\n";
+    std::cout << "param_process_data.h\n";
+    std::cout << "******************\n\n";
     
-    cout << "Opening param_process_data.h...\n";
+    std::cout << "Opening param_process_data.h...\n";
     out_file_param_process_data_h.open("param_process_data.h");
 
     // Params
@@ -203,7 +203,7 @@ int main()
     std::tm* now = std::localtime(&t);
     std::string date = std::to_string(now->tm_year + 1900) + " " + std::to_string(now->tm_mon + 1) + " " + std::to_string(now->tm_mday);
 
-    cout << "Writing on param_process_data.h...\n";
+    std::cout << "Writing on param_process_data.h...\n";
     out_file_param_process_data_h <<
         "//########################################################################\n" <<
         "//  Project     :   launch_f280039c_template                              \n" <<
@@ -237,9 +237,9 @@ int main()
         "#define PARAMS_LENGTH " << std::to_string(num_params) << "\n" <<
         "#define PROCESS_LENGTH " << std::to_string(num_process) << "\n" <<
         "#define PARAMS_FIRST_ADDRESS " << params_data.at(1).at(col_params_id_address) << "\n" <<
-        "#define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH\n" <<
+        "#define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH - 1\n" <<
         "#define PROCESS_FIRST_ADDRESS PARAMS_LAST_ADDRESS + 1\n" <<
-        "#define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH\n" <<
+        "#define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH - 1\n" <<
         "#define DB_VERSION_H " << db_version_H << "\n"
         "#define DB_VERSION_L1 " << db_version_L1 << "\n"
         "#define DB_VERSION_L2 " << db_version_L2 << "\n"
@@ -293,13 +293,15 @@ int main()
         "                                                                          \n" <<
         "/* ## EXTERNAL Prototypes ############################################# */\n" <<
         "                                                                          \n" <<
+        "extern void updateSingleParamDataIn(unsigned int idx);                    \n" <<
+        "extern void updateSingleProcessDataOut(unsigned int idx);                 \n" <<
         "extern void updateParamsDataIn();                                         \n" <<
         "extern void updateProcessDataOut();                                       \n" <<
         "                                                                          \n" <<
         "/* ## EXTERNAL Vars ################################################### */\n" <<
         "                                                                          \n" <<
         "extern struct DATA process_data[PROCESS_LENGTH];                          \n" <<
-        "extern struct DATA param_data[PARAMS_LENGTH];                             \n" <<
+        "extern struct DATA params_data[PARAMS_LENGTH];                            \n" <<
         "                                                                          \n" <<
         "                                                                          \n" <<
         "#endif /* INC_PARAM_PROCESS_DATA_H_ */                                    \n" <<
@@ -307,20 +309,20 @@ int main()
         "/* #################################################################### */\n" <<
         "/* #################################################################### */\n";
     
-    cout << "Finished writing file param_process_data.h!\n\n";
+    std::cout << "Finished writing file param_process_data.h!\n\n";
 
     //*************************** //
     // Generate param_process_data.c
     //*************************** //
 
-    cout << "******************\n";
-    cout << "param_process_data.c\n";
-    cout << "******************\n\n";
+    std::cout << "******************\n";
+    std::cout << "param_process_data.c\n";
+    std::cout << "******************\n\n";
     
-    cout << "Opening param_process_data.c...\n";
+    std::cout << "Opening param_process_data.c...\n";
     out_file_param_process_data_c.open("param_process_data.c");
     
-    cout << "Writing on param_process_data.c...\n";
+    std::cout << "Writing on param_process_data.c...\n";
     out_file_param_process_data_c <<
         "//########################################################################\n" <<
         "//  Project     :   launch_f280039c_template                              \n" <<
@@ -399,6 +401,71 @@ int main()
         "/* #################################################################### */\n" <<
         "/* ############################# CODE ################################# */\n" <<
         "                                                                          \n" <<
+        "void updateSingleParamDataIn(unsigned int idx)                            \n" <<
+        "{                                                                         \n" <<
+        "    if ((idx >= PARAMS_FIRST_ADDRESS) && (idx <= PARAMS_LAST_ADDRESS))    \n" <<
+        "    {                                                                     \n" <<
+        "        switch (params_data[idx].type)                                    \n" <<
+        "        {                                                                 \n" <<
+        "        case word:                                                        \n" <<
+        "        case uint:                                                        \n" <<
+        "            *(unsigned int*)params_data[idx].val =                        \n" <<
+        "                ((*params_data[idx].val_modbus *                          \n" <<
+        "                params_data[idx].k_u16_to_double) +                       \n" <<
+        "                __f32toui16r(params_data[idx].lim_min));                  \n" <<
+        "            break;                                                        \n" <<
+        "        case real:                                                        \n" <<
+        "            *(float*)params_data[idx].val =                               \n" <<
+        "                ((*params_data[idx].val_modbus *                          \n" <<
+        "                params_data[idx].k_u16_to_double) +                       \n" <<
+        "                params_data[idx].lim_min);                                \n" <<
+        "            break;                                                        \n" <<
+        "        }                                                                 \n" <<
+        "    }                                                                     \n" <<
+        "}                                                                         \n" <<
+        "                                                                          \n" <<
+        "void updateSingleProcessDataOut(unsigned int idx)                         \n" <<
+        "{                                                                         \n" <<
+        "    if ((idx >= PROCESS_FIRST_ADDRESS) && (idx <= PROCESS_LAST_ADDRESS))  \n" <<
+        "    {                                                                     \n" <<
+        "        switch (process_data[idx].type)                                   \n" <<
+        "        {                                                                 \n" <<
+        "        case word:                                                        \n" <<
+        "        case uint:                                                        \n" <<
+        "            *process_data[idx].val_modbus =                               \n" <<
+        "                (*(unsigned int*)process_data[idx].val -                  \n" <<
+        "                __f32toui16r(process_data[idx].lim_min))*                 \n" <<
+        "                process_data[idx].k_double_to_u16;                        \n" <<
+        "            break;                                                        \n" <<
+        "        case real:                                                        \n" <<
+        "            *process_data[idx].val_modbus =                               \n" <<
+        "                (*(float*)process_data[idx].val -                         \n" <<
+        "                process_data[idx].lim_min)*                               \n" <<
+        "                process_data[idx].k_double_to_u16;                        \n" <<
+        "            break;                                                        \n" <<
+        "        }                                                                 \n" <<
+        "    }                                                                     \n" <<
+        "    else if ((idx >= PARAMS_FIRST_ADDRESS) && (idx <= PARAMS_LAST_ADDRESS)) \n" <<
+        "    {                                                                     \n" <<
+        "        switch (params_data[idx].type)                                    \n" <<
+        "        {                                                                 \n" <<
+        "        case word:                                                        \n" <<
+        "        case uint:                                                        \n" <<
+        "            *params_data[idx].val_modbus =                                \n" <<
+        "                (*(unsigned int*)params_data[idx].val -                   \n" <<
+        "                __f32toui16r(params_data[idx].lim_min))*                  \n" <<
+        "                params_data[idx].k_double_to_u16;                         \n" <<
+        "            break;                                                        \n" <<
+        "        case real:                                                        \n" <<
+        "            *params_data[idx].val_modbus =                                \n" <<
+        "                (*(float*)params_data[idx].val -                          \n" <<
+        "                params_data[idx].lim_min)*                                \n" <<
+        "                params_data[idx].k_double_to_u16;                         \n" <<
+        "            break;                                                        \n" <<
+        "        }                                                                 \n" <<
+        "    }                                                                     \n" <<
+        "}                                                                         \n" <<
+        "                                                                          \n" <<
         "void updateParamsDataIn()                                                 \n" <<
         "{                                                                         \n" <<
         "    Uint16 i;                                                             \n" <<
@@ -410,14 +477,14 @@ int main()
         "        case uint:                                                        \n" <<
         "            *(unsigned int*)params_data[i].val =                          \n" <<
         "                ((*params_data[i].val_modbus *                            \n" <<
-        "                params_data[i].k_u16_to_double) +                         \n" <<
-        "                __f32toui16r(params_data[i].lim_min));                    \n" <<
+        "                    params_data[i].k_u16_to_double) +                     \n" <<
+        "                    __f32toui16r(params_data[i].lim_min));                \n" <<
         "            break;                                                        \n" <<
         "        case real:                                                        \n" <<
         "            *(float*)params_data[i].val =                                 \n" <<
         "                ((*params_data[i].val_modbus *                            \n" <<
-        "                params_data[i].k_u16_to_double) +                         \n" <<
-        "                params_data[i].lim_min);                                  \n" <<
+        "                    params_data[i].k_u16_to_double) +                     \n" <<
+        "                    params_data[i].lim_min);                              \n" <<
         "            break;                                                        \n" <<
         "        }                                                                 \n" <<
         "    }                                                                     \n" <<
@@ -435,13 +502,13 @@ int main()
         "        case uint:                                                        \n" <<
         "            *process_data[i].val_modbus =                                 \n" <<
         "                (*(unsigned int*)process_data[i].val -                    \n" <<
-        "                __f32toui16r(process_data[i].lim_min))*                   \n" <<
+        "                    __f32toui16r(process_data[i].lim_min)) *              \n" <<
         "                process_data[i].k_double_to_u16;                          \n" <<
         "            break;                                                        \n" <<
         "        case real:                                                        \n" <<
         "            *process_data[i].val_modbus =                                 \n" <<
         "                (*(float*)process_data[i].val -                           \n" <<
-        "                process_data[i].lim_min)*                                 \n" <<
+        "                    process_data[i].lim_min) *                            \n" <<
         "                process_data[i].k_double_to_u16;                          \n" <<
         "            break;                                                        \n" <<
         "        }                                                                 \n" <<
@@ -450,16 +517,15 @@ int main()
         "                                                                          \n" <<
         "/* #################################################################### */\n" <<
         "/* #################################################################### */\n";
-
-    cout << "Finished writing file param_process_data.c!\n\n";
-
-    cout << "Closing all files...\n\n";
+    
+    std::cout << "Finished writing file param_process_data.c!\n\n";
+    std::cout << "Closing all files...\n\n";
     out_file_param_process_data_h.close();
     out_file_param_process_data_c.close();
     in_file_params_process.close();
     out_file_params_data_csv.close();
     out_file_process_data_csv.close();
-    cout << "All files closed!\n\n";
+    std::cout << "All files closed!\n\n";
 
     return 0;
 }

@@ -1,126 +1,169 @@
-#include <OpenXLSX.hpp>
-#include <iostream>
-#include <cmath>
+/*
 
-using namespace std;
-using namespace OpenXLSX;
+   ____                               ____      ___ ____       ____  ____      ___
+  6MMMMb                              `MM(      )M' `MM'      6MMMMb\`MM(      )M'
+ 8P    Y8                              `MM.     d'   MM      6M'    ` `MM.     d'
+6M      Mb __ ____     ____  ___  __    `MM.   d'    MM      MM        `MM.   d'
+MM      MM `M6MMMMb   6MMMMb `MM 6MMb    `MM. d'     MM      YM.        `MM. d'
+MM      MM  MM'  `Mb 6M'  `Mb MMM9 `Mb    `MMd       MM       YMMMMb     `MMd
+MM      MM  MM    MM MM    MM MM'   MM     dMM.      MM           `Mb     dMM.
+MM      MM  MM    MM MMMMMMMM MM    MM    d'`MM.     MM            MM    d'`MM.
+YM      M9  MM    MM MM       MM    MM   d'  `MM.    MM            MM   d'  `MM.
+ 8b    d8   MM.  ,M9 YM    d9 MM    MM  d'    `MM.   MM    / L    ,M9  d'    `MM.
+  YMMMM9    MMYMMM9   YMMMM9 _MM_  _MM_M(_    _)MM_ _MMMMMMM MYMMMM9 _M(_    _)MM_
+            MM
+            MM
+           _MM_
 
-int main()
+  Copyright (c) 2018, Kenneth Troldal Balslev
+
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+  - Neither the name of the author nor the
+    names of any contributors may be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ */
+
+#ifndef OPENXLSX_XLZIPARCHIVE_HPP
+#define OPENXLSX_XLZIPARCHIVE_HPP
+
+#pragma warning(push)
+#pragma warning(disable : 4251)
+#pragma warning(disable : 4275)
+
+// ===== OpenXLSX Includes ===== //
+#include "OpenXLSX-Exports.hpp"
+
+namespace Zippy
 {
-    cout << "********************************************************************************\n";
-    cout << "DEMO PROGRAM #01: Basic Usage\n";
-    cout << "********************************************************************************\n";
+    class ZipArchive;
+}    // namespace Zippy
 
-    // This example program illustrates basic usage of OpenXLSX, for example creation of a new workbook, and read/write
-    // of cell values.
+namespace OpenXLSX
+{
+    /**
+     * @brief
+     */
+    class OPENXLSX_EXPORT XLZipArchive
+    {
+    public:
+        /**
+         * @brief
+         */
+        XLZipArchive();
 
-    // First, create a new document and access the sheet named 'Sheet1'.
-    // New documents contain a single worksheet named 'Sheet1'
-    XLDocument doc;
-    doc.create("./Demo01.xlsx");
-    auto wks = doc.workbook().worksheet("Sheet1");
+        /**
+         * @brief
+         * @param other
+         */
+        XLZipArchive(const XLZipArchive& other) = default;
 
-    // The individual cells can be accessed by using the .cell() method on the worksheet object.
-    // The .cell() method can take the cell address as a string, or alternatively take a XLCellReference
-    // object. By using an XLCellReference object, the cells can be accessed by row/column coordinates.
-    // The .cell() method returns an XLCell object.
+        /**
+         * @brief
+         * @param other
+         */
+        XLZipArchive(XLZipArchive&& other) = default;
 
-    // The .value() method of an XLCell object can be used for both getting and setting the cell value.
-    // Setting the value of a cell can be done by using the assignment operator on the .value() method
-    // as shown below. Alternatively, a .set() can be used. The cell values can be floating point numbers,
-    // integers, strings, and booleans. It can also accept XLDateTime objects, but this requires special
-    // handling (see later).
-    wks.cell("A1").value() = 3.14159265358979323846;
-    wks.cell("B1").value() = 42;
-    wks.cell("C1").value() = "  Hello OpenXLSX!  ";
-    wks.cell("D1").value() = true;
-    wks.cell("E1").value() = std::sqrt(-2); // Result is NAN, resulting in an error value in the Excel spreadsheet.
+        /**
+         * @brief
+         */
+        ~XLZipArchive();
 
-    // As mentioned, the .value() method can also be used for getting tha value of a cell.
-    // The .value() method returns a proxy object that cannot be copied or assigned, but
-    // it can be implicitly converted to an XLCellValue object, as shown below.
-    // Unfortunately, it is not possible to use the 'auto' keyword, so the XLCellValue
-    // type has to be explicitly stated.
-    XLCellValue A1 = wks.cell("A1").value();
-    XLCellValue B1 = wks.cell("B1").value();
-    XLCellValue C1 = wks.cell("C1").value();
-    XLCellValue D1 = wks.cell("D1").value();
-    XLCellValue E1 = wks.cell("E1").value();
+        /**
+         * @brief
+         * @param other
+         * @return
+         */
+        XLZipArchive& operator=(const XLZipArchive& other) = default;
 
-    // The cell value can be implicitly converted to a basic c++ type. However, if the type does not
-    // match the type contained in the XLCellValue object (if, for example, floating point value is
-    // assigned to a std::string), then an XLValueTypeError exception will be thrown.
-    // To check which type is contained, use the .type() method, which will return a XLValueType enum
-    // representing the type. As a convenience, the .typeAsString() method returns the type as a string,
-    // which can be useful when printing to console.
-    double vA1 = wks.cell("A1").value();
-    int vB1 = wks.cell("B1").value();
-    std::string vC1 = wks.cell("C1").value();
-    bool vD1 = wks.cell("D1").value();
-    double vE1 = wks.cell("E1").value();
+        /**
+         * @brief
+         * @param other
+         * @return
+         */
+        XLZipArchive& operator=(XLZipArchive&& other) = default;
 
-    cout << "Cell A1: (" << A1.typeAsString() << ") " << vA1 << endl;
-    cout << "Cell B1: (" << B1.typeAsString() << ") " << vB1 << endl;
-    cout << "Cell C1: (" << C1.typeAsString() << ") " << vC1 << endl;
-    cout << "Cell D1: (" << D1.typeAsString() << ") " << vD1 << endl;
-    cout << "Cell E1: (" << E1.typeAsString() << ") " << vE1 << endl << endl;
+        /**
+         * @brief
+         * @return
+         */
+        explicit operator bool() const;
 
-    // Instead of using implicit (or explicit) conversion, the underlying value can also be retrieved
-    // using the .get() method. This is a templated member function, which takes the desired type
-    // as a template argument.
-    cout << "Cell A1: (" << A1.typeAsString() << ") " << A1.get<double>() << endl;
-    cout << "Cell B1: (" << B1.typeAsString() << ") " << B1.get<int64_t>() << endl;
-    cout << "Cell C1: (" << C1.typeAsString() << ") " << C1.get<std::string>() << endl;
-    cout << "Cell D1: (" << D1.typeAsString() << ") " << D1.get<bool>() << endl;
-    cout << "Cell E1: (" << E1.typeAsString() << ") " << E1.get<double>() << endl << endl;
+        bool isValid() const;
 
-    // XLCellValue objects can also be copied and assigned to other cells. This following line
-    // will copy and assign the value of cell C1 to cell E1. Note tha only the value is copied;
-    // other cell properties of the target cell remain unchanged.
-    wks.cell("F1").value() = wks.cell(XLCellReference("C1")).value();
-    XLCellValue F1 = wks.cell("F1").value();
-    cout << "Cell F1: (" << F1.typeAsString() << ") " << F1.get<std::string_view>() << endl << endl;
+        /**
+         * @brief
+         * @return
+         */
+        bool isOpen() const;
 
-    // Date/time values is a special case. In Excel, date/time values are essentially just a
-    // 64-bit floating point value, that is rendered as a date/time string using special
-    // formatting. When retrieving the cell value, it is just a floating point value,
-    // and there is no way to identify it as a date/time value.
-    // If, however, you know it to be a date time value, or if you want to assign a date/time
-    // value to a cell, you can use the XLDateTime class, which falilitates conversion between
-    // Excel date/time serial numbers, and the std::tm struct, that is used to store
-    // date/time data. See https://en.cppreference.com/w/cpp/chrono/c/tm for more information.
+        /**
+         * @brief
+         * @param fileName
+         */
+        void open(const std::string& fileName);
 
-    // An XLDateTime object can be created from a std::tm object:
-    std::tm tm;
-    tm.tm_year = 121;
-    tm.tm_mon = 8;
-    tm.tm_mday = 1;
-    tm.tm_hour = 12;
-    tm.tm_min = 0;
-    tm.tm_sec = 0;
-    XLDateTime dt(tm);
-    //    XLDateTime dt (43791.583333333299);
+        /**
+         * @brief
+         */
+        void close();
 
-        // The std::tm object can be assigned to a cell value in the same way as shown previously.
-    wks.cell("G1").value() = dt;
+        /**
+         * @brief
+         * @param path
+         */
+        void save(const std::string& path = "");
 
-    // And as seen previously, an XLCellValue object can be retrieved. However, the object
-    // will just contain a floating point value; there is no way to identify it as a date/time value.
-    XLCellValue G1 = wks.cell("G1").value();
-    cout << "Cell G1: (" << G1.typeAsString() << ") " << G1.get<double>() << endl;
+        /**
+         * @brief
+         * @param name
+         * @param data
+         */
+        void addEntry(const std::string& name, const std::string& data);
 
-    // If it is known to be a date/time value, the cell value can be converted to an XLDateTime object.
-    auto result = G1.get<XLDateTime>();
+        /**
+         * @brief
+         * @param entryName
+         */
+        void deleteEntry(const std::string& entryName);
 
-    // The Excel date/time serial number can be retrieved using the .serial() method.
-    cout << "Cell G1: (" << G1.typeAsString() << ") " << result.serial() << endl;
+        /**
+         * @brief
+         * @param name
+         * @return
+         */
+        std::string getEntry(const std::string& name);
 
-    // Using the .tm() method, the corresponding std::tm object can be retrieved.
-    auto tmo = result.tm();
-    cout << "Cell G1: (" << G1.typeAsString() << ") " << std::asctime(&tmo);
+        /**
+         * @brief
+         * @param entryName
+         * @return
+         */
+        bool hasEntry(const std::string& entryName);
 
-    doc.save();
-    doc.close();
+    private:
+        std::shared_ptr<Zippy::ZipArchive> m_archive; /**< */
+    };
+}    // namespace OpenXLSX
 
-    return 0;
-}
+#pragma warning(pop)
+#endif    // OPENXLSX_XLZIPARCHIVE_HPP

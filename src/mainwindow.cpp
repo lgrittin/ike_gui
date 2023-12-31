@@ -22,11 +22,11 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::MainWindow),
-    m_status_label_1(new QLabel),
-    m_status_label_2(new QLabel),
-    m_status_label_3(new QLabel),
-    m_status_label_4(new QLabel),
-    m_status_label_5(new QLabel),
+    m_status_label_rx_blink(new QLabel),
+    m_status_label_tx_blink(new QLabel),
+    m_status_label_tx_chksm_num(new QLabel),
+    m_status_label_rx_chksm_num(new QLabel),
+    m_status_label_debug_msg(new QLabel),
     m_status_label_dbVersion(new QLabel),
     m_settings(new SettingsDialog),
     model_params(new QStandardItemModel),
@@ -45,31 +45,31 @@ MainWindow::MainWindow(QWidget *parent) :
     QLabel* label_rx = new QLabel("Rx: ", this);
     QLabel* label_tx_chksm = new QLabel("TxCommErr: ", this);
     QLabel* label_rx_chksm = new QLabel("RxCommErr: ", this);
-    m_status_label_1->setText(" ");
-    m_status_label_1->setFrameShape(QFrame::StyledPanel);
-    m_status_label_1->setAutoFillBackground(true);
-    m_status_label_1->setStyleSheet("QLabel { background-color: rgb(255,255,255) }");
-    m_status_label_2->setText(" ");
-    m_status_label_2->setFrameShape(QFrame::StyledPanel);
-    m_status_label_2->setAutoFillBackground(true);
-    m_status_label_2->setStyleSheet("QLabel { background-color: rgb(255,255,255) }");
+    m_status_label_rx_blink->setText(" ");
+    m_status_label_rx_blink->setFrameShape(QFrame::StyledPanel);
+    m_status_label_rx_blink->setAutoFillBackground(true);
+    m_status_label_rx_blink->setStyleSheet("QLabel { background-color: rgb(255,255,255) }");
+    m_status_label_tx_blink->setText(" ");
+    m_status_label_tx_blink->setFrameShape(QFrame::StyledPanel);
+    m_status_label_tx_blink->setAutoFillBackground(true);
+    m_status_label_tx_blink->setStyleSheet("QLabel { background-color: rgb(255,255,255) }");
     label_tx->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     label_rx->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     label_tx_chksm->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     label_rx_chksm->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    m_status_label_3->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    m_status_label_4->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    m_status_label_5->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_status_label_tx_chksm_num->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_status_label_rx_chksm_num->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    m_status_label_debug_msg->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_status_label_dbVersion->setFrameStyle(QFrame::Panel | QFrame::Sunken);
     m_ui->bottomStatusBar->addPermanentWidget(label_tx, 1);
-    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_1, 2);
+    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_tx_blink, 2);
     m_ui->bottomStatusBar->addPermanentWidget(label_tx_chksm, 5);
-    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_4, 5);
+    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_tx_chksm_num, 5);
     m_ui->bottomStatusBar->addPermanentWidget(label_rx, 1);
-    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_2, 2);
+    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_rx_blink, 2);
     m_ui->bottomStatusBar->addPermanentWidget(label_rx_chksm, 5);
-    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_3, 5);
-    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_5, 40);
+    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_rx_chksm_num, 5);
+    m_ui->bottomStatusBar->addPermanentWidget(m_status_label_debug_msg, 40);
     m_ui->bottomStatusBar->addPermanentWidget(m_status_label_dbVersion, 5);
     m_ui->label_init->setAutoFillBackground(true);
     m_ui->label_freqEst->setAutoFillBackground(true);
@@ -770,7 +770,7 @@ void MainWindow::readProcessParam()
             if ((!m_serial) && (modbusDevice))
                 sendRequest_Modbus(startAddress_params, model_params->rowCount(), CMD_READ);
             else if ((m_serial) && (!modbusDevice))
-                sendRequest_CustomSerial10B(startAddress_params, model_params->rowCount(), CMD_WRITE);
+                sendRequest_CustomSerial10B(startAddress_params, model_params->rowCount(), CMD_READ);
             read_sequence = 3;  // Jump waits
             break;
         case 1:     // Wait for answers...
@@ -783,7 +783,7 @@ void MainWindow::readProcessParam()
             if ((!m_serial) && (modbusDevice))
                 sendRequest_Modbus(startAddress_process, model_process->rowCount(), CMD_READ);
             else if ((m_serial) && (!modbusDevice))
-                sendRequest_CustomSerial10B(startAddress_process, model_process->rowCount(), CMD_WRITE);
+                sendRequest_CustomSerial10B(startAddress_process, model_process->rowCount(), CMD_READ);
             read_sequence = 3;    // Loop here
             break;
         default:
@@ -830,30 +830,30 @@ void MainWindow::createCentralWidget()
 void MainWindow::blinkRxLabel()
 {
     QTimer::singleShot(200, this, [this] {blinkEndRxLabel(); });    //SLOT(blinkEndRxLabel()));
-    m_status_label_1->setStyleSheet("background-color: green");
-    m_status_label_3->setText(QString::number(comm_error_rx_num));
+    m_status_label_rx_blink->setStyleSheet("background-color: green");
+    m_status_label_tx_chksm_num->setText(QString::number(comm_error_rx_num));
 }
 
 void MainWindow::blinkEndRxLabel()
 {
-    m_status_label_1->setStyleSheet("background-color: white");
+    m_status_label_rx_blink->setStyleSheet("background-color: white");
 }
 
 void MainWindow::blinkTxLabel()
 {
     QTimer::singleShot(200, this, [this] {blinkEndTxLabel(); });    //SLOT(blinkEndTxLabel()));
-    m_status_label_2->setStyleSheet("background-color: green");
-    m_status_label_4->setText(QString::number(comm_error_tx_num));
+    m_status_label_tx_blink->setStyleSheet("background-color: green");
+    m_status_label_rx_chksm_num->setText(QString::number(comm_error_tx_num));
 }
 
 void MainWindow::blinkEndTxLabel()
 {
-    m_status_label_2->setStyleSheet("background-color: white");
+    m_status_label_tx_blink->setStyleSheet("background-color: white");
 }
 
 void MainWindow::showStatusMessage(const QString& message)
 {
-    m_status_label_5->setText(message);
+    m_status_label_debug_msg->setText(message);
 }
 
 void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVector<quint16> val_u16_list)
@@ -1099,6 +1099,7 @@ void MainWindow::sendRequest_CustomSerial10B(quint16 start_address, quint16 addr
 
             // send data through serial
             m_serial->write(array);
+            showStatusMessage(" ");
         }
         else
         {
@@ -1263,6 +1264,7 @@ void MainWindow::sendRequest_Modbus(quint16 start_address, quint16 address_lengt
             {
                 // broadcast replies return immediately
                 reply->deleteLater();
+                showStatusMessage(" ");
             }
         }
         else
@@ -1305,7 +1307,7 @@ void MainWindow::receiveMessage_Modbus()
         quint16 start_address = unit.startAddress();
         quint16 address_length = unit.valueCount();
         QVector<quint16> val_u16_list = unit.values();
-
+        showStatusMessage(" ");
         refreshData(start_address, address_length, val_u16_list);
     }
     else if (reply->error() == QModbusDevice::ProtocolError)

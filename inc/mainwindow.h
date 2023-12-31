@@ -96,11 +96,11 @@ private:
     error_db setupModelAndTables(bool default_db);
 
     Ui::MainWindow *m_ui = nullptr;
-    QLabel* m_status_label_1 = nullptr;
-    QLabel* m_status_label_2 = nullptr;
-    QLabel* m_status_label_3 = nullptr;
-    QLabel* m_status_label_4 = nullptr;
-    QLabel* m_status_label_5 = nullptr;
+    QLabel* m_status_label_rx_blink = nullptr;
+    QLabel* m_status_label_tx_blink = nullptr;
+    QLabel* m_status_label_tx_chksm_num = nullptr;
+    QLabel* m_status_label_rx_chksm_num = nullptr;
+    QLabel* m_status_label_debug_msg = nullptr;
     QLabel* m_status_label_dbVersion = nullptr;
     QStandardItemModel* model_params = nullptr;
     QStandardItemModel* model_process = nullptr;

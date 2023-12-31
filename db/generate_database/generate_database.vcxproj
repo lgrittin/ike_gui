@@ -110,7 +110,7 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_DEBUG;_CONSOLE;WIN32;_WINDOWS;OPENXLSX_STATIC_DEFINE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\lgrittin\Downloads\OpenXLSX-master\OpenXLSX-master\OpenXLSX;C:\Users\lgrittin\Downloads\OpenXLSX-master\OpenXLSX-master\OpenXLSX\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>OpenXLSX\headers;OpenXLSX;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>

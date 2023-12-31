@@ -25,6 +25,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(m_ui->serialPortInfoListBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->parityBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->baudRateBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
+    connect(m_ui->baudRateBox, &QComboBox::currentTextChanged, this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->dataBitsBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->stopBitsBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
     connect(m_ui->flowControlBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SettingsDialog::applyButton_setUnchecked);
@@ -107,7 +108,8 @@ void SettingsDialog::fillPortsParameters()
     m_ui->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
     m_ui->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
     m_ui->baudRateBox->addItem(tr("Custom"));
-    m_ui->baudRateBox->setCurrentIndex(3);
+    m_ui->baudRateBox->setCurrentIndex(4);
+    m_ui->baudRateBox->setCurrentText("250000");
 
     m_ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
     m_ui->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);
@@ -120,6 +122,7 @@ void SettingsDialog::fillPortsParameters()
     m_ui->parityBox->addItem(tr("Odd"), QSerialPort::OddParity);
     m_ui->parityBox->addItem(tr("Mark"), QSerialPort::MarkParity);
     m_ui->parityBox->addItem(tr("Space"), QSerialPort::SpaceParity);
+    m_ui->parityBox->setCurrentIndex(1);
 
     m_ui->stopBitsBox->addItem(QStringLiteral("1"), QSerialPort::OneStop);
 #ifdef Q_OS_WIN
@@ -132,7 +135,7 @@ void SettingsDialog::fillPortsParameters()
     m_ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
 
     m_ui->ipPortLineEdit->setText(tr("127.0.0.1:502"));
-    m_ui->readIntervalSpinner->setValue(1000);
+    m_ui->readIntervalSpinner->setValue(2000);
     m_ui->retriesSpinner->setValue(3);
     m_ui->timeoutSpinner->setValue(1000);
     m_ui->modbusServerAddressSpinner->setValue(1);
