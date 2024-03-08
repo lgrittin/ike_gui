@@ -478,13 +478,13 @@ void MainWindow::writeParam()
     if ((!m_serial) && (modbusDevice))
     {
         sendRequest_Modbus(address_start, address_length, CMD_WRITE);
-        //QTimer::singleShot(1000, this, [this] {readParam(); });
+        //QTimer::singleShot(4500, this, [this] {readParam(); });
     }
         
     else if ((m_serial) && (!modbusDevice))
     {
         sendRequest_CustomSerial10B(address_start, address_length, CMD_WRITE);
-        //QTimer::singleShot(1000, this, [this] {readParam(); });
+        //QTimer::singleShot(4500, this, [this] {readParam(); });
     }
 }
 
@@ -504,12 +504,12 @@ void MainWindow::tableDataChanged_params(const QModelIndex& topLeft, const QMode
     if ((!m_serial) && (modbusDevice))
     {
         sendRequest_Modbus(id_address, 1, CMD_WRITE);
-        //QTimer::singleShot(1000, this, [this, id_address] {sendRequest_Modbus(id_address, 1, CMD_READ); });  //SLOT(sendRequest_Modbus(id_address, 1, CMD_READ)));
+        //QTimer::singleShot(4500, this, [this, id_address] {sendRequest_Modbus(id_address, 1, CMD_READ); });  //SLOT(sendRequest_Modbus(id_address, 1, CMD_READ)));
     }
     else if ((m_serial) && (!modbusDevice))
     {
         sendRequest_CustomSerial10B(id_address, 1, CMD_WRITE);
-        //QTimer::singleShot(1000, this, [this, id_address] {sendRequest_CustomSerial10B(id_address, 1, CMD_READ); });  //SLOT(sendRequest_CustomSerial10B(id_address, 1, CMD_READ)));
+        //QTimer::singleShot(4500, this, [this, id_address] {sendRequest_CustomSerial10B(id_address, 1, CMD_READ); });  //SLOT(sendRequest_CustomSerial10B(id_address, 1, CMD_READ)));
     }
 }
 
@@ -771,7 +771,7 @@ void MainWindow::readProcessParam()
                 sendRequest_Modbus(startAddress_params, model_params->rowCount(), CMD_READ);
             else if ((m_serial) && (!modbusDevice))
                 sendRequest_CustomSerial10B(startAddress_params, model_params->rowCount(), CMD_READ);
-            read_sequence = 3;  // Jump waits
+            read_sequence = 1;
             break;
         case 1:     // Wait for answers...
             read_sequence = 2;

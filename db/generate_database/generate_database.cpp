@@ -247,7 +247,8 @@ int main()
         "typedef enum {                                                            \n" <<
         "    word = 0,                                                             \n" <<
         "    uint = 1,                                                             \n" <<
-        "    real = 2                                                              \n" <<
+        "    real = 2,                                                             \n" <<
+        "    integer = 3                                                           \n" <<
         "} TYPE;                                                                   \n" <<
         "                                                                          \n" <<
         "typedef enum {                                                            \n";
@@ -296,7 +297,7 @@ int main()
         "extern void updateSingleParamDataIn(unsigned int idx);                    \n" <<
         "extern void updateSingleProcessDataOut(unsigned int idx);                 \n" <<
         "extern void updateParamsDataIn();                                         \n" <<
-        "extern void updateProcessDataOut();                                       \n" <<
+        "extern void updateParamsProcessDataOut();                                 \n" <<
         "                                                                          \n" <<
         "/* ## EXTERNAL Vars ################################################### */\n" <<
         "                                                                          \n" <<
@@ -401,12 +402,19 @@ int main()
         "/* #################################################################### */\n" <<
         "/* ############################# CODE ################################# */\n" <<
         "                                                                          \n" <<
-        "void updateSingleParamDataIn(unsigned int idx)                            \n" <<
+        "void updateSingleParamDataIn(unsigned int modbus_address)                 \n" <<
         "{                                                                         \n" <<
-        "    if ((idx >= PARAMS_FIRST_ADDRESS) && (idx <= PARAMS_LAST_ADDRESS))    \n" <<
+        "    if ((modbus_address >= PARAMS_FIRST_ADDRESS) && (modbus_address <= PARAMS_LAST_ADDRESS))  \n" <<
         "    {                                                                     \n" <<
+        "        Uint16 idx = modbus_address - PARAMS_FIRST_ADDRESS;               \n" <<
         "        switch (params_data[idx].type)                                    \n" <<
         "        {                                                                 \n" <<
+        "        case integer:                                                     \n" <<
+        "            *(int*)params_data[idx].val =                                 \n" <<
+        "                ((*params_data[idx].val_modbus *                          \n" <<
+        "                params_data[idx].k_u16_to_double) +                       \n" <<
+        "                __f32toui16r(params_data[idx].lim_min));                  \n" <<
+        "            break;                                                        \n" <<
         "        case word:                                                        \n" <<
         "        case uint:                                                        \n" <<
         "            *(unsigned int*)params_data[idx].val =                        \n" <<
@@ -424,10 +432,11 @@ int main()
         "    }                                                                     \n" <<
         "}                                                                         \n" <<
         "                                                                          \n" <<
-        "void updateSingleProcessDataOut(unsigned int idx)                         \n" <<
+        "void updateSingleProcessDataOut(unsigned int modbus_address)              \n" <<
         "{                                                                         \n" <<
-        "    if ((idx >= PROCESS_FIRST_ADDRESS) && (idx <= PROCESS_LAST_ADDRESS))  \n" <<
+        "    if ((modbus_address >= PROCESS_FIRST_ADDRESS) && (modbus_address <= PROCESS_LAST_ADDRESS))  \n" <<
         "    {                                                                     \n" <<
+        "        Uint16 idx = modbus_address - PROCESS_FIRST_ADDRESS;              \n" <<
         "        switch (process_data[idx].type)                                   \n" <<
         "        {                                                                 \n" <<
         "        case word:                                                        \n" <<
@@ -445,25 +454,6 @@ int main()
         "            break;                                                        \n" <<
         "        }                                                                 \n" <<
         "    }                                                                     \n" <<
-        "    else if ((idx >= PARAMS_FIRST_ADDRESS) && (idx <= PARAMS_LAST_ADDRESS)) \n" <<
-        "    {                                                                     \n" <<
-        "        switch (params_data[idx].type)                                    \n" <<
-        "        {                                                                 \n" <<
-        "        case word:                                                        \n" <<
-        "        case uint:                                                        \n" <<
-        "            *params_data[idx].val_modbus =                                \n" <<
-        "                (*(unsigned int*)params_data[idx].val -                   \n" <<
-        "                __f32toui16r(params_data[idx].lim_min))*                  \n" <<
-        "                params_data[idx].k_double_to_u16;                         \n" <<
-        "            break;                                                        \n" <<
-        "        case real:                                                        \n" <<
-        "            *params_data[idx].val_modbus =                                \n" <<
-        "                (*(float*)params_data[idx].val -                          \n" <<
-        "                params_data[idx].lim_min)*                                \n" <<
-        "                params_data[idx].k_double_to_u16;                         \n" <<
-        "            break;                                                        \n" <<
-        "        }                                                                 \n" <<
-        "    }                                                                     \n" <<
         "}                                                                         \n" <<
         "                                                                          \n" <<
         "void updateParamsDataIn()                                                 \n" <<
@@ -473,6 +463,12 @@ int main()
         "    {                                                                     \n" <<
         "        switch (params_data[i].type)                                      \n" <<
         "        {                                                                 \n" <<
+        "        case integer:                                                     \n" <<
+        "            *(int*)params_data[i].val =                                   \n" <<
+        "                ((*params_data[i].val_modbus *                            \n" <<
+        "                params_data[i].k_u16_to_double) +                         \n" <<
+        "                __f32toui16r(params_data[i].lim_min));                    \n" <<
+        "            break;                                                        \n" <<
         "        case word:                                                        \n" <<
         "        case uint:                                                        \n" <<
         "            *(unsigned int*)params_data[i].val =                          \n" <<
@@ -490,7 +486,7 @@ int main()
         "    }                                                                     \n" <<
         "}                                                                         \n" <<
         "                                                                          \n" <<
-        "void updateProcessDataOut()                                               \n" <<
+        "void updateParamsProcessDataOut()                                         \n" <<
         "{                                                                         \n" <<
         "    Uint16 i;                                                             \n" <<
         "                                                                          \n" <<
@@ -510,6 +506,26 @@ int main()
         "                (*(float*)process_data[i].val -                           \n" <<
         "                    process_data[i].lim_min) *                            \n" <<
         "                process_data[i].k_double_to_u16;                          \n" <<
+        "            break;                                                        \n" <<
+        "        }                                                                 \n" <<
+        "    }                                                                     \n" <<
+        "                                                                          \n" <<
+        "    for (i = 0; i < PARAMS_LENGTH; i++)                                   \n" <<
+        "    {                                                                     \n" <<
+        "        switch (params_data[i].type)                                      \n" <<
+        "        {                                                                 \n" <<
+        "        case word:                                                        \n" <<
+        "        case uint:                                                        \n" <<
+        "            *params_data[i].val_modbus =                                  \n" <<
+        "                (*(unsigned int*)params_data[i].val -                     \n" <<
+        "                    __f32toui16r(params_data[i].lim_min)) *               \n" <<
+        "                params_data[i].k_double_to_u16;                           \n" <<
+        "            break;                                                        \n" <<
+        "        case real:                                                        \n" <<
+        "            *params_data[i].val_modbus =                                  \n" <<
+        "                (*(float*)params_data[i].val -                            \n" <<
+        "                    params_data[i].lim_min) *                             \n" <<
+        "                params_data[i].k_double_to_u16;                           \n" <<
         "            break;                                                        \n" <<
         "        }                                                                 \n" <<
         "    }                                                                     \n" <<

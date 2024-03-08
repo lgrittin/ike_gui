@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------
 //  Filename    :   param_process_data.h                                  
 //  Author      :   lucag                                                 
-//  Date        :   2023 12 30                                        
+//  Date        :   2024 1 3                                        
 //------------------------------------------------------------------------
 //  History     :                                                         
 //  23 Aug 2023     - Creation                                            
@@ -27,7 +27,7 @@
                                                                           
 /* ## COMMON Defines ################################################## */
                                                                           
-#define PARAMS_LENGTH 20
+#define PARAMS_LENGTH 18
 #define PROCESS_LENGTH 24
 #define PARAMS_FIRST_ADDRESS 0
 #define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH - 1
@@ -40,7 +40,8 @@
 typedef enum {                                                            
     word = 0,                                                             
     uint = 1,                                                             
-    real = 2                                                              
+    real = 2,                                                             
+    integer = 3                                                           
 } TYPE;                                                                   
                                                                           
 typedef enum {                                                            
@@ -81,7 +82,7 @@ struct DATA {
 extern void updateSingleParamDataIn(unsigned int idx);                    
 extern void updateSingleProcessDataOut(unsigned int idx);                 
 extern void updateParamsDataIn();                                         
-extern void updateProcessDataOut();                                       
+extern void updateParamsProcessDataOut();                                 
                                                                           
 /* ## EXTERNAL Vars ################################################### */
                                                                           

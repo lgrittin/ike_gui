@@ -135,7 +135,7 @@ void SettingsDialog::fillPortsParameters()
     m_ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);
 
     m_ui->ipPortLineEdit->setText(tr("127.0.0.1:502"));
-    m_ui->readIntervalSpinner->setValue(2000);
+    m_ui->readIntervalSpinner->setValue(1000);
     m_ui->retriesSpinner->setValue(3);
     m_ui->timeoutSpinner->setValue(1000);
     m_ui->modbusServerAddressSpinner->setValue(1);

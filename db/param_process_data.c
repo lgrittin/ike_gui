@@ -4,7 +4,7 @@
 //------------------------------------------------------------------------
 //  Filename    :   param_process_data.c                                  
 //  Author      :   lucag                                                 
-//  Date        :   2023 12 30                                        
+//  Date        :   2024 1 3                                        
 //------------------------------------------------------------------------
 //  History     :                                                         
 //  23 Aug 2023     - Creation                                            
@@ -42,33 +42,11 @@ struct DATA params_data[] =
     0,
     65535,
 
-    //durata fase init,
-    1,
-    CTRL_INPUT,
-    uint,
-    &mb.holdingRegisters.dummy1,
-    1,
-    1,
-    &cmd_in.init_time_ms,
-    0,
-    65535,
-
-    //durata fase misura frequenza,
-    2,
-    CTRL_INPUT,
-    uint,
-    &mb.holdingRegisters.dummy2,
-    4.371915,
-    0.228733,
-    &cmd_in.freq_estim_time_ms,
-    10,
-    15000,
-
     //abilita settaggio manuale apertura scr,
-    3,
+    1,
     SCR_SETTINGS,
     uint,
-    &mb.holdingRegisters.dummy3,
+    &mb.holdingRegisters.dummy1,
     1,
     1,
     &scr_sett.en_manual_alfa,
@@ -76,10 +54,10 @@ struct DATA params_data[] =
     65535,
 
     //valore settaggio manuale apertura scr,
-    4,
+    2,
     SCR_SETTINGS,
     real,
-    &mb.holdingRegisters.dummy4,
+    &mb.holdingRegisters.dummy2,
     65535,
     0.000015,
     &scr_sett.scr_cmd_alfa_set,
@@ -87,10 +65,10 @@ struct DATA params_data[] =
     1,
 
     //valore massimo apertura scr,
-    5,
+    3,
     SCR_SETTINGS,
     uint,
-    &mb.holdingRegisters.dummy5,
+    &mb.holdingRegisters.dummy3,
     93621.428571,
     0.000011,
     &scr_sett.scr_cmd_alfa_max,
@@ -98,10 +76,10 @@ struct DATA params_data[] =
     1,
 
     //valore apertura scr durante il check a 50Hz,
-    6,
+    4,
     SCR_SETTINGS,
     real,
-    &mb.holdingRegisters.dummy6,
+    &mb.holdingRegisters.dummy4,
     65535,
     0.000015,
     &scr_sett.scr_cmd_alfa_check_50hz,
@@ -109,10 +87,10 @@ struct DATA params_data[] =
     1,
 
     //valore apertura scr durante il check a 60Hz,
-    7,
+    5,
     SCR_SETTINGS,
     real,
-    &mb.holdingRegisters.dummy7,
+    &mb.holdingRegisters.dummy5,
     65535,
     0.000015,
     &scr_sett.scr_cmd_alfa_check_60hz,
@@ -120,10 +98,10 @@ struct DATA params_data[] =
     1,
 
     //durata apertura scr ridotta per check,
-    8,
+    6,
     SCR_SETTINGS,
     uint,
-    &mb.holdingRegisters.dummy8,
+    &mb.holdingRegisters.dummy6,
     1,
     1,
     &scr_sett.scr_freeze_ramp_cnt_end,
@@ -131,10 +109,10 @@ struct DATA params_data[] =
     65535,
 
     //tempo per la rampa scr,
-    9,
+    7,
     SCR_SETTINGS,
     uint,
-    &mb.holdingRegisters.dummy9,
+    &mb.holdingRegisters.dummy7,
     1,
     1,
     &scr_sett.scr_ramp_time_cnt_end,
@@ -142,10 +120,10 @@ struct DATA params_data[] =
     65535,
 
     //abilita sweep igbt,
-    10,
+    8,
     IGBT_SETTINGS,
     uint,
-    &mb.holdingRegisters.dummy10,
+    &mb.holdingRegisters.dummy8,
     1,
     1,
     &igbt_sett.en_sweep,
@@ -153,10 +131,10 @@ struct DATA params_data[] =
     65535,
 
     //frequenza principale igbt,
-    11,
+    9,
     IGBT_SETTINGS,
     real,
-    &mb.holdingRegisters.dummy11,
+    &mb.holdingRegisters.dummy9,
     4.369000,
     0.228885,
     &igbt_sett.igbt_main_freq,
@@ -164,10 +142,10 @@ struct DATA params_data[] =
     30000,
 
     //range modulante sinusoidale sweep igbt,
-    12,
+    10,
     IGBT_SETTINGS,
     real,
-    &mb.holdingRegisters.dummy12,
+    &mb.holdingRegisters.dummy10,
     3.276750,
     0.305180,
     &igbt_sett.sweep_amplitude,
@@ -175,10 +153,10 @@ struct DATA params_data[] =
     20000,
 
     //frequenza modulante sinusoidale sweep igbt,
-    13,
+    11,
     IGBT_SETTINGS,
     real,
-    &mb.holdingRegisters.dummy13,
+    &mb.holdingRegisters.dummy11,
     655.350000,
     0.001526,
     &igbt_sett.sweep_freq,
@@ -186,10 +164,10 @@ struct DATA params_data[] =
     100,
 
     //durata senza sweep igbt per check,
-    14,
+    12,
     IGBT_SETTINGS,
     uint,
-    &mb.holdingRegisters.dummy14,
+    &mb.holdingRegisters.dummy12,
     1,
     1,
     &igbt_sett.freeze_sweep_cnt_end,
@@ -197,54 +175,54 @@ struct DATA params_data[] =
     65535,
 
     //adattamento adc v_inv_rect_gain,
+    13,
+    ADC_SETTINGS,
+    real,
+    &mb.holdingRegisters.dummy13,
+    65535,
+    0.000015,
+    &adc.adc_ctrl_fdb_rect.v_inv_rect_gain,
+    0,
+    1,
+
+    //adattamento adc v_inv_rect_offset,
+    14,
+    ADC_SETTINGS,
+    real,
+    &mb.holdingRegisters.dummy14,
+    327.675000,
+    0.003052,
+    &adc.adc_ctrl_fdb_rect.v_inv_rect_offset,
+    -100,
+    100,
+
+    //adattamento adc i_inv_rect_gain,
     15,
     ADC_SETTINGS,
     real,
     &mb.holdingRegisters.dummy15,
-    65.535000,
-    0.015259,
-    &adc.adc_ctrl_fdb_rect.v_inv_rect_gain,
+    65535,
+    0.000015,
+    &adc.adc_ctrl_fdb_rect.i_inv_rect_gain,
     0,
-    1000,
+    1,
 
-    //adattamento adc v_inv_rect_offset,
+    //adattamento adc i_inv_rect_offset,
     16,
     ADC_SETTINGS,
     real,
     &mb.holdingRegisters.dummy16,
-    65.535000,
-    0.015259,
-    &adc.adc_ctrl_fdb_rect.v_inv_rect_offset,
-    -500,
-    500,
-
-    //adattamento adc i_inv_rect_gain,
-    17,
-    ADC_SETTINGS,
-    real,
-    &mb.holdingRegisters.dummy17,
-    65.535000,
-    0.015259,
-    &adc.adc_ctrl_fdb_rect.i_inv_rect_gain,
-    0,
-    1000,
-
-    //adattamento adc i_inv_rect_offset,
-    18,
-    ADC_SETTINGS,
-    real,
-    &mb.holdingRegisters.dummy18,
-    65.535000,
-    0.015259,
+    327.675000,
+    0.003052,
     &adc.adc_ctrl_fdb_rect.i_inv_rect_offset,
-    -500,
-    500,
+    -100,
+    100,
 
     //valore di scatto sovracorrente AC,
-    19,
+    17,
     PROTECTION,
     real,
-    &mb.holdingRegisters.dummy19,
+    &mb.holdingRegisters.dummy17,
     6553.500000,
     0.000153,
     &protection.i_inv_oc,
@@ -255,10 +233,10 @@ struct DATA params_data[] =
 struct DATA process_data[] =                                              
 {                                                                         
     //word stato 1,
-    20,
+    18,
     CTRL_OUTPUT,
     word,
-    &mb.holdingRegisters.dummy20,
+    &mb.holdingRegisters.dummy18,
     1,
     1,
     &sts_out.sts_wd_1,
@@ -266,10 +244,10 @@ struct DATA process_data[] =
     65535,
 
     //word allarme 1,
-    21,
+    19,
     CTRL_OUTPUT,
     word,
-    &mb.holdingRegisters.dummy21,
+    &mb.holdingRegisters.dummy19,
     1,
     1,
     &sts_out.alm_wd_1,
@@ -277,10 +255,10 @@ struct DATA process_data[] =
     65535,
 
     //tensione uscita (rms),
-    22,
+    20,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy22,
+    &mb.holdingRegisters.dummy20,
     109.225000,
     0.009155,
     &adc.adc_ctrl_fdb.v_inv_f,
@@ -288,10 +266,10 @@ struct DATA process_data[] =
     600,
 
     //corrente uscita (rms),
-    23,
+    21,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy23,
+    &mb.holdingRegisters.dummy21,
     1310.700000,
     0.000763,
     &adc.adc_ctrl_fdb.i_inv_f,
@@ -299,10 +277,10 @@ struct DATA process_data[] =
     50,
 
     //tensione uscita (rettificata),
-    24,
+    22,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy24,
+    &mb.holdingRegisters.dummy22,
     109.225000,
     0.009155,
     &adc.adc_ctrl_fdb_rect.v_inv_rect_f,
@@ -310,10 +288,10 @@ struct DATA process_data[] =
     600,
 
     //corrente uscita (rettificata),
-    25,
+    23,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy25,
+    &mb.holdingRegisters.dummy23,
     1310.700000,
     0.000763,
     &adc.adc_ctrl_fdb_rect.i_inv_rect_f,
@@ -321,10 +299,10 @@ struct DATA process_data[] =
     50,
 
     //temperatura ntc1,
-    26,
+    24,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy26,
+    &mb.holdingRegisters.dummy24,
     327.675000,
     0.003052,
     &adc.adc_sys.ntc1_f,
@@ -332,10 +310,10 @@ struct DATA process_data[] =
     180,
 
     //temperatura ntc2,
-    27,
+    25,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy27,
+    &mb.holdingRegisters.dummy25,
     327.675000,
     0.003052,
     &adc.adc_sys.ntc2_f,
@@ -343,10 +321,10 @@ struct DATA process_data[] =
     180,
 
     //valore potenziometro,
-    28,
+    26,
     ADC_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy28,
+    &mb.holdingRegisters.dummy26,
     655.350000,
     0.001526,
     &adc.adc_sys.pot_f,
@@ -354,10 +332,10 @@ struct DATA process_data[] =
     100,
 
     //frequenza attuale igbt,
-    29,
+    27,
     IGBT_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy29,
+    &mb.holdingRegisters.dummy27,
     1.310700,
     0.762951,
     &igbt_out.igbt_actual_freq,
@@ -365,10 +343,10 @@ struct DATA process_data[] =
     50000,
 
     //tempo freeze sweep igbt,
-    30,
+    28,
     IGBT_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy30,
+    &mb.holdingRegisters.dummy28,
     1,
     1,
     &igbt_out.freeze_sweep_cnt_ms,
@@ -376,10 +354,10 @@ struct DATA process_data[] =
     65535,
 
     //contatore isr timer 0,
-    31,
+    29,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy31,
+    &mb.holdingRegisters.dummy29,
     1,
     1,
     &diagn_out.main_fsm_loop_time_ms,
@@ -387,10 +365,10 @@ struct DATA process_data[] =
     65535,
 
     //numero conteggi invalidi misura frequenza,
-    32,
+    30,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy32,
+    &mb.holdingRegisters.dummy30,
     1,
     1,
     &diagn_out.scr_synch_invalid_cnt,
@@ -398,10 +376,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - seconds,
-    33,
+    31,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy33,
+    &mb.holdingRegisters.dummy31,
     1,
     1,
     &diagn_out.datetime.Second,
@@ -409,10 +387,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - minutes,
-    34,
+    32,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy34,
+    &mb.holdingRegisters.dummy32,
     1,
     1,
     &diagn_out.datetime.Minute,
@@ -420,10 +398,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - hours,
-    35,
+    33,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy35,
+    &mb.holdingRegisters.dummy33,
     1,
     1,
     &diagn_out.datetime.Hour,
@@ -431,10 +409,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - day,
-    36,
+    34,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy36,
+    &mb.holdingRegisters.dummy34,
     1,
     1,
     &diagn_out.datetime.Day,
@@ -442,10 +420,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - day of week,
-    37,
+    35,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy37,
+    &mb.holdingRegisters.dummy35,
     1,
     1,
     &diagn_out.datetime.DayOfWeek,
@@ -453,10 +431,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - month,
-    38,
+    36,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy38,
+    &mb.holdingRegisters.dummy36,
     1,
     1,
     &diagn_out.datetime.Month,
@@ -464,10 +442,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - year,
-    39,
+    37,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy39,
+    &mb.holdingRegisters.dummy37,
     1,
     1,
     &diagn_out.datetime.Year,
@@ -475,10 +453,10 @@ struct DATA process_data[] =
     65535,
 
     //versione firmware - H.L.TYPE,
-    40,
+    38,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy40,
+    &mb.holdingRegisters.dummy38,
     1,
     1,
     &diagn_out.fmw_version,
@@ -486,10 +464,10 @@ struct DATA process_data[] =
     65535,
 
     //versione database - DB_IKE_H.L1.L2,
-    41,
+    39,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy41,
+    &mb.holdingRegisters.dummy39,
     1,
     1,
     &diagn_out.db_version,
@@ -497,10 +475,10 @@ struct DATA process_data[] =
     65535,
 
     //apertura scr,
-    42,
+    40,
     SCR_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy42,
+    &mb.holdingRegisters.dummy40,
     65535,
     0.000015,
     &scr_out.scr_cmd_alfa,
@@ -508,10 +486,10 @@ struct DATA process_data[] =
     1,
 
     //frequenza attuale ingresso,
-    43,
+    41,
     SCR_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy43,
+    &mb.holdingRegisters.dummy41,
     1008.230769,
     0.000992,
     &scr_out.scr_synch_freq,
@@ -522,12 +500,19 @@ struct DATA process_data[] =
 /* #################################################################### */
 /* ############################# CODE ################################# */
                                                                           
-void updateSingleParamDataIn(unsigned int idx)                            
+void updateSingleParamDataIn(unsigned int modbus_address)                 
 {                                                                         
-    if ((idx >= PARAMS_FIRST_ADDRESS) && (idx <= PARAMS_LAST_ADDRESS))    
+    if ((modbus_address >= PARAMS_FIRST_ADDRESS) && (modbus_address <= PARAMS_LAST_ADDRESS))  
     {                                                                     
+        Uint16 idx = modbus_address - PARAMS_FIRST_ADDRESS;               
         switch (params_data[idx].type)                                    
         {                                                                 
+        case integer:                                                     
+            *(int*)params_data[idx].val =                                 
+                ((*params_data[idx].val_modbus *                          
+                params_data[idx].k_u16_to_double) +                       
+                __f32toui16r(params_data[idx].lim_min));                  
+            break;                                                        
         case word:                                                        
         case uint:                                                        
             *(unsigned int*)params_data[idx].val =                        
@@ -545,10 +530,11 @@ void updateSingleParamDataIn(unsigned int idx)
     }                                                                     
 }                                                                         
                                                                           
-void updateSingleProcessDataOut(unsigned int idx)                         
+void updateSingleProcessDataOut(unsigned int modbus_address)              
 {                                                                         
-    if ((idx >= PROCESS_FIRST_ADDRESS) && (idx <= PROCESS_LAST_ADDRESS))  
+    if ((modbus_address >= PROCESS_FIRST_ADDRESS) && (modbus_address <= PROCESS_LAST_ADDRESS))  
     {                                                                     
+        Uint16 idx = modbus_address - PROCESS_FIRST_ADDRESS;              
         switch (process_data[idx].type)                                   
         {                                                                 
         case word:                                                        
@@ -566,25 +552,6 @@ void updateSingleProcessDataOut(unsigned int idx)
             break;                                                        
         }                                                                 
     }                                                                     
-    else if ((idx >= PARAMS_FIRST_ADDRESS) && (idx <= PARAMS_LAST_ADDRESS)) 
-    {                                                                     
-        switch (params_data[idx].type)                                    
-        {                                                                 
-        case word:                                                        
-        case uint:                                                        
-            *params_data[idx].val_modbus =                                
-                (*(unsigned int*)params_data[idx].val -                   
-                __f32toui16r(params_data[idx].lim_min))*                  
-                params_data[idx].k_double_to_u16;                         
-            break;                                                        
-        case real:                                                        
-            *params_data[idx].val_modbus =                                
-                (*(float*)params_data[idx].val -                          
-                params_data[idx].lim_min)*                                
-                params_data[idx].k_double_to_u16;                         
-            break;                                                        
-        }                                                                 
-    }                                                                     
 }                                                                         
                                                                           
 void updateParamsDataIn()                                                 
@@ -594,6 +561,12 @@ void updateParamsDataIn()
     {                                                                     
         switch (params_data[i].type)                                      
         {                                                                 
+        case integer:                                                     
+            *(int*)params_data[i].val =                                   
+                ((*params_data[i].val_modbus *                            
+                params_data[i].k_u16_to_double) +                         
+                __f32toui16r(params_data[i].lim_min));                    
+            break;                                                        
         case word:                                                        
         case uint:                                                        
             *(unsigned int*)params_data[i].val =                          
@@ -611,7 +584,7 @@ void updateParamsDataIn()
     }                                                                     
 }                                                                         
                                                                           
-void updateProcessDataOut()                                               
+void updateParamsProcessDataOut()                                         
 {                                                                         
     Uint16 i;                                                             
                                                                           
@@ -631,6 +604,26 @@ void updateProcessDataOut()
                 (*(float*)process_data[i].val -                           
                     process_data[i].lim_min) *                            
                 process_data[i].k_double_to_u16;                          
+            break;                                                        
+        }                                                                 
+    }                                                                     
+                                                                          
+    for (i = 0; i < PARAMS_LENGTH; i++)                                   
+    {                                                                     
+        switch (params_data[i].type)                                      
+        {                                                                 
+        case word:                                                        
+        case uint:                                                        
+            *params_data[i].val_modbus =                                  
+                (*(unsigned int*)params_data[i].val -                     
+                    __f32toui16r(params_data[i].lim_min)) *               
+                params_data[i].k_double_to_u16;                           
+            break;                                                        
+        case real:                                                        
+            *params_data[i].val_modbus =                                  
+                (*(float*)params_data[i].val -                            
+                    params_data[i].lim_min) *                             
+                params_data[i].k_double_to_u16;                           
             break;                                                        
         }                                                                 
     }                                                                     

@@ -1,22 +1,20 @@
 #01.02.03
 id_address,dsp_family,type,decimal,single_steps,val_actual,val_default,val_min,val_max,unit,description,dsp_name,k_double_to_u16,k_u16_to_double,precision,val_modbus
 0,CTRL_INPUT,word,0,1,0,0,0,65535,-,word comando 1,cmd_in.cmd_wd_1,1,1,1,0
-1,CTRL_INPUT,uint,0,10,1000,1000,0,65535,ms,durata fase init,cmd_in.init_time_ms,1,1,1,1000
-2,CTRL_INPUT,uint,0,10,1000,1000,10,15000,ms,durata fase misura frequenza,cmd_in.freq_estim_time_ms,4.37191,0.228733,0.228733,4328
-3,SCR_SETTINGS,uint,0,1,0,0,0,65535,-,abilita settaggio manuale apertura scr,scr_sett.en_manual_alfa,1,1,1,0
-4,SCR_SETTINGS,real,2,0.1,0.1,0.1,0,1,pu,valore settaggio manuale apertura scr,scr_sett.scr_cmd_alfa_set,65535,1.5259e-05,1.5259e-05,6554
-5,SCR_SETTINGS,uint,3,0.01,0.95,0.95,0.3,1,pu,valore massimo apertura scr,scr_sett.scr_cmd_alfa_max,93621.4,1.06813e-05,1.06813e-05,60854
-6,SCR_SETTINGS,real,2,0.1,0.05,0.05,0,1,pu,valore apertura scr durante il check a 50Hz,scr_sett.scr_cmd_alfa_check_50hz,65535,1.5259e-05,1.5259e-05,3277
-7,SCR_SETTINGS,real,2,0.1,0.05,0.05,0,1,pu,valore apertura scr durante il check a 60Hz,scr_sett.scr_cmd_alfa_check_60hz,65535,1.5259e-05,1.5259e-05,3277
-8,SCR_SETTINGS,uint,0,10,2000,2000,0,65535,ms,durata apertura scr ridotta per check,scr_sett.scr_freeze_ramp_cnt_end,1,1,1,2000
-9,SCR_SETTINGS,uint,0,10,6000,6000,0,65535,ms,tempo per la rampa scr,scr_sett.scr_ramp_time_cnt_end,1,1,1,6000
-10,IGBT_SETTINGS,uint,0,1,0,0,0,65535,-,abilita sweep igbt,igbt_sett.en_sweep,1,1,1,0
-11,IGBT_SETTINGS,real,1,0.1,22000,22000,15000,30000,Hz,frequenza principale igbt,igbt_sett.igbt_main_freq,4.369,0.228885,0.228885,30583
-12,IGBT_SETTINGS,real,1,0.1,2000,2000,0,20000,Hz,range modulante sinusoidale sweep igbt,igbt_sett.sweep_amplitude,3.27675,0.30518,0.30518,6554
-13,IGBT_SETTINGS,real,1,0.1,2.5,2.5,0,100,Hz,frequenza modulante sinusoidale sweep igbt,igbt_sett.sweep_freq,655.35,0.0015259,0.0015259,1638
-14,IGBT_SETTINGS,uint,0,10,6000,6000,0,65535,10,durata senza sweep igbt per check,igbt_sett.freeze_sweep_cnt_end,1,1,1,6000
-15,ADC_SETTINGS,real,3,0.01,1,1,0,1000,V/u16,adattamento adc v_inv_rect_gain,adc.adc_ctrl_fdb_rect.v_inv_rect_gain,65.535,0.015259,0.015259,66
-16,ADC_SETTINGS,real,3,0.01,0,0,-500,500,V/u16,adattamento adc v_inv_rect_offset,adc.adc_ctrl_fdb_rect.v_inv_rect_offset,65.535,0.015259,0.015259,32768
-17,ADC_SETTINGS,real,3,0.01,1,1,0,1000,A/u16,adattamento adc i_inv_rect_gain,adc.adc_ctrl_fdb_rect.i_inv_rect_gain,65.535,0.015259,0.015259,66
-18,ADC_SETTINGS,real,3,0.01,0,0,-500,500,A/u16,adattamento adc i_inv_rect_offset,adc.adc_ctrl_fdb_rect.i_inv_rect_offset,65.535,0.015259,0.015259,32768
-19,PROTECTION,real,3,0.01,1,1,0,10,A,valore di scatto sovracorrente AC,protection.i_inv_oc,6553.5,0.00015259,0.00015259,6554
+1,SCR_SETTINGS,uint,0,1,0,0,0,65535,-,abilita settaggio manuale apertura scr,scr_sett.en_manual_alfa,1,1,1,0
+2,SCR_SETTINGS,real,2,0.1,0.1,0.1,0,1,pu,valore settaggio manuale apertura scr,scr_sett.scr_cmd_alfa_set,65535,1.5259e-05,1.5259e-05,6554
+3,SCR_SETTINGS,uint,3,0.01,0.95,0.95,0.3,1,pu,valore massimo apertura scr,scr_sett.scr_cmd_alfa_max,93621.4,1.06813e-05,1.06813e-05,60854
+4,SCR_SETTINGS,real,2,0.1,0.05,0.05,0,1,pu,valore apertura scr durante il check a 50Hz,scr_sett.scr_cmd_alfa_check_50hz,65535,1.5259e-05,1.5259e-05,3277
+5,SCR_SETTINGS,real,2,0.1,0.05,0.05,0,1,pu,valore apertura scr durante il check a 60Hz,scr_sett.scr_cmd_alfa_check_60hz,65535,1.5259e-05,1.5259e-05,3277
+6,SCR_SETTINGS,uint,0,10,2000,2000,0,65535,ms,durata apertura scr ridotta per check,scr_sett.scr_freeze_ramp_cnt_end,1,1,1,2000
+7,SCR_SETTINGS,uint,0,10,6000,6000,0,65535,ms,tempo per la rampa scr,scr_sett.scr_ramp_time_cnt_end,1,1,1,6000
+8,IGBT_SETTINGS,uint,0,1,0,0,0,65535,-,abilita sweep igbt,igbt_sett.en_sweep,1,1,1,0
+9,IGBT_SETTINGS,real,1,0.1,22000,22000,15000,30000,Hz,frequenza principale igbt,igbt_sett.igbt_main_freq,4.369,0.228885,0.228885,30583
+10,IGBT_SETTINGS,real,1,0.1,2000,2000,0,20000,Hz,range modulante sinusoidale sweep igbt,igbt_sett.sweep_amplitude,3.27675,0.30518,0.30518,6554
+11,IGBT_SETTINGS,real,1,0.1,2.5,2.5,0,100,Hz,frequenza modulante sinusoidale sweep igbt,igbt_sett.sweep_freq,655.35,0.0015259,0.0015259,1638
+12,IGBT_SETTINGS,uint,0,10,6000,6000,0,65535,ms,durata senza sweep igbt per check,igbt_sett.freeze_sweep_cnt_end,1,1,1,6000
+13,ADC_SETTINGS,real,5,0.001,0.08547,0.08547,0,1,V/u12,adattamento adc v_inv_rect_gain,adc.adc_ctrl_fdb_rect.v_inv_rect_gain,65535,1.5259e-05,1.5259e-05,5601
+14,ADC_SETTINGS,real,5,0.1,0,0,-100,100,V,adattamento adc v_inv_rect_offset,adc.adc_ctrl_fdb_rect.v_inv_rect_offset,327.675,0.0030518,0.0030518,32768
+15,ADC_SETTINGS,real,5,0.001,0.00488,0.00488,0,1,A/u12,adattamento adc i_inv_rect_gain,adc.adc_ctrl_fdb_rect.i_inv_rect_gain,65535,1.5259e-05,1.5259e-05,320
+16,ADC_SETTINGS,real,5,0.1,0,0,-100,100,A,adattamento adc i_inv_rect_offset,adc.adc_ctrl_fdb_rect.i_inv_rect_offset,327.675,0.0030518,0.0030518,32768
+17,PROTECTION,real,3,0.01,1,1,0,10,A,valore di scatto sovracorrente AC,protection.i_inv_oc,6553.5,0.00015259,0.00015259,6554

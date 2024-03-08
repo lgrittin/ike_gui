@@ -66,22 +66,22 @@ typedef union CMD_WD1 {
 
 /* Status Word 1 */
 struct STS_BIT {
-    uint16_t INITIALIZED : 1;       // bit0
-    uint16_t FREQ_ESTIMATED : 1;    // bit1
-    uint16_t READY_TO_OPERATE : 1;  // bit2
-    uint16_t OP_ENABLED : 1;        // bit3
-    uint16_t FAULT : 1;             // bit4
-    uint16_t PULSE_ENABLED : 1;     // bit5
-    uint16_t WARNING : 1;           // bit6
-    uint16_t SDCARD_ENABLED : 1;    // bit7
-    uint16_t RTC_ENABLED : 1;       // bit8
-    uint16_t b9 : 1;                // bit9
-    uint16_t b10 : 1;               // bit10
-    uint16_t b11 : 1;               // bit11
-    uint16_t b12 : 1;               // bit12
-    uint16_t b13 : 1;               // bit13
-    uint16_t b14 : 1;               // bit14
-    uint16_t b15 : 1;               // bit15
+    uint16_t INITIALIZED : 1;           // bit0
+    uint16_t FREQ_ESTIMATED : 1;        // bit1
+    uint16_t READY_TO_OPERATE : 1;      // bit2
+    uint16_t OP_ENABLED : 1;            // bit3
+    uint16_t FAULT : 1;                 // bit4
+    uint16_t PULSE_ENABLED : 1;         // bit5
+    uint16_t WARNING : 1;               // bit6
+    uint16_t SDCARD_ENABLED : 1;        // bit7
+    uint16_t RTC_ENABLED : 1;           // bit8
+    uint16_t IGBT_SWEEP_ENABLED : 1;    // bit9
+    uint16_t SCR_MANUAL_ALFA_SET : 1;   // bit10
+    uint16_t MUX_STATE : 1;             // bit11
+    uint16_t b12 : 1;                   // bit12
+    uint16_t b13 : 1;                   // bit13
+    uint16_t b14 : 1;                   // bit14
+    uint16_t b15 : 1;                   // bit15
 };
 typedef union STS_WD1 {
     uint16_t all;
