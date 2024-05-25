@@ -4,13 +4,13 @@
 //------------------------------------------------------------------------
 //  Filename    :   param_process_data.h                                  
 //  Author      :   lucag                                                 
-//  Date        :   2024 1 3                                        
+//  Date        :   2024 5 25                                        
 //------------------------------------------------------------------------
 //  History     :                                                         
 //  23 Aug 2023     - Creation                                            
 //                                                                        
 //------------------------------------------------------------------------
-//!  Description:    01.02.03                                    
+//!  Description:    01.02.05                                    
 //!                                                                       
 //                                                                        
 //########################################################################
@@ -27,15 +27,15 @@
                                                                           
 /* ## COMMON Defines ################################################## */
                                                                           
-#define PARAMS_LENGTH 18
-#define PROCESS_LENGTH 24
+#define PARAMS_LENGTH 19
+#define PROCESS_LENGTH 25
 #define PARAMS_FIRST_ADDRESS 0
 #define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH - 1
 #define PROCESS_FIRST_ADDRESS PARAMS_LAST_ADDRESS + 1
 #define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH - 1
 #define DB_VERSION_H 01
 #define DB_VERSION_L1 02
-#define DB_VERSION_L2 03
+#define DB_VERSION_L2 05
                                                                           
 typedef enum {                                                            
     word = 0,                                                             

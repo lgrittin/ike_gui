@@ -1,4 +1,4 @@
-#01.02.03
+#01.02.05
 id_address,dsp_family,type,decimal,single_steps,val_actual,val_default,val_min,val_max,unit,description,dsp_name,k_double_to_u16,k_u16_to_double,precision,val_modbus
 0,CTRL_INPUT,word,0,1,0,0,0,65535,-,word comando 1,cmd_in.cmd_wd_1,1,1,1,0
 1,SCR_SETTINGS,uint,0,1,0,0,0,65535,-,abilita settaggio manuale apertura scr,scr_sett.en_manual_alfa,1,1,1,0
@@ -18,3 +18,4 @@ id_address,dsp_family,type,decimal,single_steps,val_actual,val_default,val_min,v
 15,ADC_SETTINGS,real,5,0.001,0.00488,0.00488,0,1,A/u12,adattamento adc i_inv_rect_gain,adc.adc_ctrl_fdb_rect.i_inv_rect_gain,65535,1.5259e-05,1.5259e-05,320
 16,ADC_SETTINGS,real,5,0.1,0,0,-100,100,A,adattamento adc i_inv_rect_offset,adc.adc_ctrl_fdb_rect.i_inv_rect_offset,327.675,0.0030518,0.0030518,32768
 17,PROTECTION,real,3,0.01,1,1,0,10,A,valore di scatto sovracorrente AC,protection.i_inv_oc,6553.5,0.00015259,0.00015259,6554
+18,PROTECTION,uint,0,1,0,0,0,65535,-,en protezione sovraccorrente AC,protection.en_prot_overcurr,1,1,1,0
