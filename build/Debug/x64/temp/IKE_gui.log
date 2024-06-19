@@ -1,4 +1,14 @@
 ﻿  Reading Qt configuration (C:/Qt/5.15.2/msvc2019_64/bin/qmake)
   Generate moc_predefs.h
 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(241,5): warning MSB8064: Custom build for item "debug\moc_predefs.h.cbt" succeeded, but specified dependency "c:\users\lucag\local_repos\ike_gui\debug\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
+  mainwindow.cpp
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(183,40): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(401,21): warning C4129: 'S': unrecognized character escape sequence
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(433,32): warning C4018: '<': signed/unsigned mismatch
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(477,13): warning C4189: 'address_length': local variable is initialized but not referenced
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(491,122): warning C4100: 'roles': unreferenced formal parameter
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(491,89): warning C4100: 'bottomRight': unreferenced formal parameter
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(1062,77): warning C4100: 'address_length': unreferenced formal parameter
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(1175,14): warning C4189: 'flushed': local variable is initialized but not referenced
+C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(1381,58): warning C4100: 'error': unreferenced formal parameter
   IKE_gui.vcxproj -> C:\Users\lucag\local_repos\ike_gui\build\Debug\x64\IKE_gui.exe

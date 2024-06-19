@@ -87,7 +87,7 @@ private:
     void writeParam();
     void blinkRxLabel();
     void blinkTxLabel();
-    void refreshData(quint16 start_address, quint16 address_length, QVector<quint16> val_u16_list);
+    void refreshData(quint16 start_address, quint16 address_length, QVector<quint16> val_u16_list, QVector<quint32> val_u32_list, bool val_from_modbus);
     void receiveMessage_Modbus();
     void computeValU16FromDouble(QAbstractItemModel* model_generic, quint16 row);
     void computeValDoubleFromU16(QAbstractItemModel* model_generic, quint16 row);

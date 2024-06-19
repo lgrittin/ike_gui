@@ -102,6 +102,7 @@ void SettingsDialog::fillPortsParameters()
     m_ui->protocolListBox->addItem(tr("Modbus_RTU"));
     m_ui->protocolListBox->addItem(tr("Modbus_TCP"));
     m_ui->protocolListBox->addItem(tr("CustomSerial10B"));
+    m_ui->protocolListBox->setCurrentIndex(2);
 
     m_ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
     m_ui->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
@@ -109,7 +110,7 @@ void SettingsDialog::fillPortsParameters()
     m_ui->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
     m_ui->baudRateBox->addItem(tr("Custom"));
     m_ui->baudRateBox->setCurrentIndex(4);
-    m_ui->baudRateBox->setCurrentText("250000");
+    m_ui->baudRateBox->setCurrentText("450000");
 
     m_ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
     m_ui->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);

@@ -477,13 +477,13 @@ void MainWindow::writeParam()
     quint16 address_length = selected_row_idx_list.count();
     if ((!m_serial) && (modbusDevice))
     {
-        sendRequest_Modbus(address_start, address_length, CMD_WRITE);
+        sendRequest_Modbus(address_start, 1, CMD_WRITE);
         //QTimer::singleShot(4500, this, [this] {readParam(); });
     }
         
     else if ((m_serial) && (!modbusDevice))
     {
-        sendRequest_CustomSerial10B(address_start, address_length, CMD_WRITE);
+        sendRequest_CustomSerial10B(address_start, 1, CMD_WRITE);
         //QTimer::singleShot(4500, this, [this] {readParam(); });
     }
 }
@@ -769,8 +769,8 @@ void MainWindow::readProcessParam()
         case 0:     // Read Params on first call
             if ((!m_serial) && (modbusDevice))
                 sendRequest_Modbus(startAddress_params, model_params->rowCount(), CMD_READ);
-            else if ((m_serial) && (!modbusDevice))
-                sendRequest_CustomSerial10B(startAddress_params, model_params->rowCount(), CMD_READ);
+            //else if ((m_serial) && (!modbusDevice))
+            //    sendRequest_CustomSerial10B(startAddress_params, 1, CMD_READ);
             read_sequence = 1;
             break;
         case 1:     // Wait for answers...
@@ -782,8 +782,8 @@ void MainWindow::readProcessParam()
         case 3:     // Read Process on all other calls
             if ((!m_serial) && (modbusDevice))
                 sendRequest_Modbus(startAddress_process, model_process->rowCount(), CMD_READ);
-            else if ((m_serial) && (!modbusDevice))
-                sendRequest_CustomSerial10B(startAddress_process, model_process->rowCount(), CMD_READ);
+            //else if ((m_serial) && (!modbusDevice))
+            //    sendRequest_CustomSerial10B(startAddress_process, 1, CMD_READ);
             read_sequence = 3;    // Loop here
             break;
         default:
@@ -856,7 +856,7 @@ void MainWindow::showStatusMessage(const QString& message)
     m_status_label_debug_msg->setText(message);
 }
 
-void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVector<quint16> val_u16_list)
+void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVector<quint16> val_u16_list, QVector<quint32> val_u32_list, bool val_from_modbus)
 {
     QStandardItemModel* model_generic;
     quint16 base_address = 0;
@@ -886,15 +886,33 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
         // Disable tableView_params dataChanged connection
         if (disable_updateTableParams)
             disconnect(model_params, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged_params(QModelIndex, QModelIndex, QVector<int>)));
-        // Update model (params/process) - u16_val
-        model_generic->setData(
-            model_generic->index(baseIndex + i, list_column_generic->indexOf("val_modbus")),
-            val_u16_list.at(i));
+        // Update model (params/process)
+        if (val_from_modbus)
+        {
+            // u16_val from Modbus
+            model_generic->setData(model_generic->index(baseIndex + i, list_column_generic->indexOf("val_modbus")), val_u16_list.at(i));
+            computeValDoubleFromU16(model_generic, baseIndex + i);
+        }
+        else
+        {
+            // u32_val directly
+            QString dtype = model_generic->data(model_generic->index(baseIndex + i, list_column_generic->indexOf("type"))).toString();
+
+            if (dtype == "real")
+            {
+                float data_float = *(reinterpret_cast<const float*>(&val_u32_list.at(i)));
+                model_generic->setData(model_generic->index(baseIndex + i, list_column_generic->indexOf("val_actual")), data_float);
+            }
+            else if ((dtype == "uint") || (dtype == "word"))
+            {
+                uint16_t data_u16 = *(reinterpret_cast<const ushort*>(&val_u32_list.at(i)));
+                model_generic->setData(model_generic->index(baseIndex + i, list_column_generic->indexOf("val_actual")), data_u16);
+            }
+        }
+
         // Re-enable tableView_params dataChanged connection
         if (disable_updateTableParams)
             connect(model_params, SIGNAL(dataChanged(QModelIndex, QModelIndex, QVector<int>)), this, SLOT(tableDataChanged_params(QModelIndex, QModelIndex, QVector<int>)));
-        // Update model (params/process) - double_val
-        computeValDoubleFromU16(model_generic, baseIndex + i);
 
         qDebug() << "RECEIVED: "
             << "id_addr: " << QString::number(model_generic->data(model_generic->index(baseIndex + i, list_columns_params.indexOf("id_address"))).toInt())
@@ -993,8 +1011,8 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
     }
 
     // DATETIME
-    if ((start_address <= address_datetime_sec) && (start_address + address_length >= address_datetime_year))
-    {
+    //if ((start_address <= address_datetime_sec) && (start_address + address_length >= address_datetime_year))
+    //{
         QStringList dayOfWeekList = { "Lunedi", "Martedi", "Mercoledi", "Giovedi", "Venerdi", "Sabato", "Domenica" };
         m_ui->label_date->setText(
             dayOfWeekList.at(model_process->data(model_process->index(address_datetime_dayOfWeek - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt()) +
@@ -1007,11 +1025,11 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
             .arg(model_process->data(model_process->index(address_datetime_hour - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt(), 2, 'd', 0, '0')
             .arg(model_process->data(model_process->index(address_datetime_min - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt(), 2, 'd', 0, '0')
             .arg(model_process->data(model_process->index(address_datetime_sec - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt(), 2, 'd', 0, '0'));
-    }
+    //}
 
     // VERSION
-    if ((start_address <= address_fmwVers) && (start_address + address_length >= address_dbVers))
-    {
+    //if ((start_address <= address_fmwVers) && (start_address + address_length >= address_dbVers))
+    //{
         device_fmwVersion.all = model_process->data(model_process->index(address_fmwVers - startAddress_process, list_columns_process.indexOf("val_actual"))).toInt();
         m_ui->label_fmwvers->setText(QStringLiteral("Fmw Version: ") +
             QString::number(device_fmwVersion.bit.FMW_VER_H) + QStringLiteral(".") +
@@ -1034,7 +1052,7 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
             m_ui->label_dbvers->setStyleSheet("background-color: white");
             m_status_label_dbVersion->setStyleSheet("background-color: white");
         }
-    }
+    //}
 }
 
 #pragma endregion
@@ -1043,9 +1061,22 @@ void MainWindow::refreshData(quint16 start_address, quint16 address_length, QVec
 
 void MainWindow::sendRequest_CustomSerial10B(quint16 start_address, quint16 address_length, int cmd)
 {
-    QByteArray data_tx_serial = QByteArray::number(
-        model_params->data(model_params->index((start_address - startAddress_params), list_columns_params.indexOf("val_modbus"))).toInt(),
-        16);
+    // u32_val directly
+    uint32_t data_val_u32;
+    QString dtype = model_params->data(model_params->index((start_address - startAddress_params), list_columns_params.indexOf("type"))).toString();
+    float data_float;
+    uint16_t data_u16;
+
+    if (dtype == "real")
+    {
+        data_float = model_params->data(model_params->index((start_address - startAddress_params), list_columns_params.indexOf("val_actual"))).toDouble();
+        memcpy(&data_val_u32, &data_float, 4);
+    }
+    else if ((dtype == "word") || ((dtype == "uint")))
+    {
+        data_u16 = model_params->data(model_params->index((start_address - startAddress_params), list_columns_params.indexOf("val_actual"))).toUInt();
+        memcpy(&data_val_u32, &data_u16, 2);
+    }
 
     if (m_serial)
     {
@@ -1063,12 +1094,24 @@ void MainWindow::sendRequest_CustomSerial10B(quint16 start_address, quint16 addr
             QByteArray array;
             uint8_t data_cod[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
             uint16_t en_artifact = 0;
+            
             data_cod[0] = ((start_address & 0xFF00) >> 8);
             data_cod[1] = (start_address & 0x00FF);
-            data_cod[2] = data_tx_serial.at(0);
-            data_cod[3] = data_tx_serial.at(1);
-            data_cod[4] = data_tx_serial.at(2);
-            data_cod[5] = data_tx_serial.at(3);
+            if (dtype == "real")
+            {
+                data_cod[2] = (uint16_t)((uint32_t)(data_val_u32 & 0xFF000000) >> 24U);
+                data_cod[3] = (uint16_t)((uint32_t)(data_val_u32 & 0x00FF0000) >> 16U);
+                data_cod[4] = (uint16_t)((uint32_t)(data_val_u32 & 0x0000FF00) >> 8U);
+                data_cod[5] = (uint16_t)((uint32_t)(data_val_u32 & 0x000000FF));
+            }
+            else if ((dtype == "word") || ((dtype == "uint")))
+            {
+                data_cod[2] = 0;
+                data_cod[3] = 0;
+                data_cod[4] = (uint16_t)((uint32_t)(data_val_u32 & 0x0000FF00) >> 8U);
+                data_cod[5] = (uint16_t)((uint32_t)(data_val_u32 & 0x000000FF));
+            }
+
             data_cod[6] = (comm_error_rx_num & 0xFE) + (cmd & 0x01);
 
             for (int i = 0; i < 7; i++)
@@ -1120,19 +1163,24 @@ void MainWindow::receiveMessage_CustomSerial10B()
 {
     uint8_t artifact = 0;
     quint16 start_address = 0;
-    QVector<quint16> val_u16_list;
+    QVector<quint32> val_u32_list;
     uint8_t data_dec[7] = { 0, 0, 0, 0, 0, 0, 0 };
     uint8_t computed_chksm = 0xA5;
     uint8_t data_chksm = 0x00;
     //USART_RX_MSG usart_rx;
+    uint16_t debug;
 
     if (m_serial)
     {
+        bool flushed = m_serial->flush();
+
         while (m_serial->canReadLine())
         {
             QByteArray data = m_serial->readLine();
 
             blinkRxLabel();
+
+            debug = data.size();
 
             if (data.size() == 10)
             {
@@ -1159,9 +1207,9 @@ void MainWindow::receiveMessage_CustomSerial10B()
                     data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
                     comm_error_tx_num = data_dec[6];
                     start_address = (data_dec[0] << 8) + data_dec[1];
-                    quint16 val_u16 = (data_dec[2] << 8) + data_dec[3];
-                    val_u16_list.append(val_u16);
-                    refreshData(start_address, 1, val_u16_list);    // address_length future implementation for CustomSerial10B
+                    quint32 val_u32 = (data_dec[5] << 24) + (data_dec[4] << 16) + (data_dec[3] << 8) + data_dec[2];
+                    val_u32_list.append(val_u32);
+                    refreshData(start_address, 1, {0}, val_u32_list, 0);    // address_length future implementation for CustomSerial10B
                 }
                 else
                 {
@@ -1308,7 +1356,7 @@ void MainWindow::receiveMessage_Modbus()
         quint16 address_length = unit.valueCount();
         QVector<quint16> val_u16_list = unit.values();
         showStatusMessage(" ");
-        refreshData(start_address, address_length, val_u16_list);
+        refreshData(start_address, address_length, val_u16_list, {0}, 1);
     }
     else if (reply->error() == QModbusDevice::ProtocolError)
     {

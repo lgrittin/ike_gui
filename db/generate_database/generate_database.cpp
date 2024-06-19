@@ -237,9 +237,9 @@ int main()
         "#define PARAMS_LENGTH " << std::to_string(num_params) << "\n" <<
         "#define PROCESS_LENGTH " << std::to_string(num_process) << "\n" <<
         "#define PARAMS_FIRST_ADDRESS " << params_data.at(1).at(col_params_id_address) << "\n" <<
-        "#define PARAMS_LAST_ADDRESS PARAMS_FIRST_ADDRESS + PARAMS_LENGTH - 1\n" <<
-        "#define PROCESS_FIRST_ADDRESS PARAMS_LAST_ADDRESS + 1\n" <<
-        "#define PROCESS_LAST_ADDRESS PROCESS_FIRST_ADDRESS + PROCESS_LENGTH - 1\n" <<
+        "#define PARAMS_LAST_ADDRESS (PARAMS_FIRST_ADDRESS + PARAMS_LENGTH - 1)\n" <<
+        "#define PROCESS_FIRST_ADDRESS (PARAMS_LAST_ADDRESS + 1)\n" <<
+        "#define PROCESS_LAST_ADDRESS (PROCESS_FIRST_ADDRESS + PROCESS_LENGTH - 1)\n" <<
         "#define DB_VERSION_H " << db_version_H << "\n"
         "#define DB_VERSION_L1 " << db_version_L1 << "\n"
         "#define DB_VERSION_L2 " << db_version_L2 << "\n"

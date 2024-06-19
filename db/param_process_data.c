@@ -4,13 +4,13 @@
 //------------------------------------------------------------------------
 //  Filename    :   param_process_data.c                                  
 //  Author      :   lucag                                                 
-//  Date        :   2024 5 25                                        
+//  Date        :   2024 6 16                                        
 //------------------------------------------------------------------------
 //  History     :                                                         
 //  23 Aug 2023     - Creation                                            
 //                                                                        
 //------------------------------------------------------------------------
-//!  Description:    01.02.05                                    
+//!  Description:    01.02.06                                    
 //!                                                                       
 //                                                                        
 //########################################################################
@@ -67,7 +67,7 @@ struct DATA params_data[] =
     //valore massimo apertura scr,
     3,
     SCR_SETTINGS,
-    uint,
+    real,
     &mb.holdingRegisters.dummy3,
     93621.428571,
     0.000011,
@@ -386,22 +386,11 @@ struct DATA process_data[] =
     0,
     65535,
 
-    //numero conteggi invalidi misura frequenza,
+    //inverter datetime - seconds,
     32,
     DGN_OUTPUT,
     uint,
     &mb.holdingRegisters.dummy32,
-    1,
-    1,
-    &diagn_out.scr_synch_invalid_cnt,
-    0,
-    65535,
-
-    //inverter datetime - seconds,
-    33,
-    DGN_OUTPUT,
-    uint,
-    &mb.holdingRegisters.dummy33,
     1,
     1,
     &diagn_out.datetime.Second,
@@ -409,10 +398,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - minutes,
-    34,
+    33,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy34,
+    &mb.holdingRegisters.dummy33,
     1,
     1,
     &diagn_out.datetime.Minute,
@@ -420,10 +409,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - hours,
-    35,
+    34,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy35,
+    &mb.holdingRegisters.dummy34,
     1,
     1,
     &diagn_out.datetime.Hour,
@@ -431,10 +420,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - day,
-    36,
+    35,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy36,
+    &mb.holdingRegisters.dummy35,
     1,
     1,
     &diagn_out.datetime.Day,
@@ -442,10 +431,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - day of week,
-    37,
+    36,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy37,
+    &mb.holdingRegisters.dummy36,
     1,
     1,
     &diagn_out.datetime.DayOfWeek,
@@ -453,10 +442,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - month,
-    38,
+    37,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy38,
+    &mb.holdingRegisters.dummy37,
     1,
     1,
     &diagn_out.datetime.Month,
@@ -464,10 +453,10 @@ struct DATA process_data[] =
     65535,
 
     //inverter datetime - year,
-    39,
+    38,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy39,
+    &mb.holdingRegisters.dummy38,
     1,
     1,
     &diagn_out.datetime.Year,
@@ -475,10 +464,10 @@ struct DATA process_data[] =
     65535,
 
     //versione firmware - H.L.TYPE,
-    40,
+    39,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy40,
+    &mb.holdingRegisters.dummy39,
     1,
     1,
     &diagn_out.fmw_version,
@@ -486,10 +475,10 @@ struct DATA process_data[] =
     65535,
 
     //versione database - DB_IKE_H.L1.L2,
-    41,
+    40,
     DGN_OUTPUT,
     uint,
-    &mb.holdingRegisters.dummy41,
+    &mb.holdingRegisters.dummy40,
     1,
     1,
     &diagn_out.db_version,
@@ -497,10 +486,10 @@ struct DATA process_data[] =
     65535,
 
     //apertura scr,
-    42,
+    41,
     SCR_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy42,
+    &mb.holdingRegisters.dummy41,
     65535,
     0.000015,
     &scr_out.scr_cmd_alfa,
@@ -508,15 +497,26 @@ struct DATA process_data[] =
     1,
 
     //frequenza attuale ingresso,
-    43,
+    42,
     SCR_OUTPUT,
     real,
-    &mb.holdingRegisters.dummy43,
+    &mb.holdingRegisters.dummy42,
     1008.230769,
     0.000992,
     &scr_out.scr_synch_freq,
     0,
-    65
+    65,
+
+    //numero conteggi invalidi misura frequenza,
+    43,
+    SCR_OUTPUT,
+    uint,
+    &mb.holdingRegisters.dummy43,
+    1,
+    1,
+    &scr_out.scr_synch_invalid_cnt,
+    0,
+    65535
 };                                                                        
                                                                           
 /* #################################################################### */
