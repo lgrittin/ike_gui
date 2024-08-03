@@ -1205,7 +1205,7 @@ void MainWindow::receiveMessage_CustomSerial10B()
                     data_dec[4] = ((((artifact & 0x08) >> 3) * 0x0A) + (data.at(4) * (1 - ((artifact & 0x08) >> 3))));
                     data_dec[5] = ((((artifact & 0x04) >> 2) * 0x0A) + (data.at(5) * (1 - ((artifact & 0x04) >> 2))));
                     data_dec[6] = ((((artifact & 0x02) >> 1) * 0x0A) + (data.at(6) * (1 - ((artifact & 0x02) >> 1))));
-                    comm_error_tx_num = data_dec[6];
+                    //comm_error_tx_num = data_dec[6];
                     start_address = (data_dec[0] << 8) + data_dec[1];
                     quint32 val_u32 = (data_dec[5] << 24) + (data_dec[4] << 16) + (data_dec[3] << 8) + data_dec[2];
                     val_u32_list.append(val_u32);

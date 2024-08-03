@@ -11,4 +11,5 @@ C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(491,89): warning C4100: 'b
 C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(1062,77): warning C4100: 'address_length': unreferenced formal parameter
 C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(1175,14): warning C4189: 'flushed': local variable is initialized but not referenced
 C:\Users\lucag\local_repos\ike_gui\src\mainwindow.cpp(1381,58): warning C4100: 'error': unreferenced formal parameter
+  qrc_IKE_gui.cpp
   IKE_gui.vcxproj -> C:\Users\lucag\local_repos\ike_gui\build\Debug\x64\IKE_gui.exe
